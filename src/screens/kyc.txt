@@ -1,0 +1,443 @@
+import React, {
+    useEffect,
+    useState,
+    useCallback,
+    useContext,
+    useRef,
+} from "react";
+import {
+    View,
+    StyleSheet,
+    Text,
+    BackHandler,
+    Alert,
+    Modal,
+    TouchableOpacity,
+    Animated,
+    Platform,
+} from "react-native";
+import { WebView } from "react-native-webview";
+import { DetailsHeader } from "../components/DetailsHeader";
+import BackgroundWrapper from "../components/BackgroundWrapper";
+import {
+    widthPercentageToDP as wp,
+    heightPercentageToDP as hp,
+} from "react-native-responsive-screen";
+import Loader from "../components/Loader";
+import apiClient from "../utils/apiClient";
+import { AuthContext } from "../context/AuthContext";
+import Icon from "react-native-vector-icons/MaterialIcons";
+
+const AadharKycWebview = ({ route, navigation }) => {
+    const { url, requestId } = route.params ?? {};
+    const { userID } = useContext(AuthContext);
+
+    const [loading, setLoading] = useState(false);
+    const [errorModal, setErrorModal] = useState({ visible: false, message: "" });
+
+    // animated value for bottom sheet
+    const slideAnim = useRef(new Animated.Value(0)).current;
+
+    // animate in
+    const openModalAnimated = useCallback(() => {
+        Animated.timing(slideAnim, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }, [slideAnim]);
+
+    // animate out and then hide
+    const closeModalAnimated = useCallback((cb) => {
+        Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 220,
+            useNativeDriver: true,
+        }).start(() => {
+            // hide modal after animation
+            setErrorModal({ visible: false, message: "" });
+            if (typeof cb === "function") cb();
+        });
+    }, [slideAnim]);
+
+    // handle hardware back press
+    useEffect(() => {
+        const backAction = () => {
+            // if modal visible, close it first
+            if (errorModal.visible) {
+                closeModalAnimated();
+                return true;
+            }
+
+            // otherwise ask to exit KYC flow
+            Alert.alert("Exit KYC?", "Are you sure you want to exit the Aadhaar KYC process?", [
+                { text: "Cancel", style: "cancel" },
+                { text: "Exit", style: "destructive", onPress: () => navigation.goBack() },
+            ]);
+            return true; // prevent default behaviour
+        };
+
+        const backHandler = BackHandler.addEventListener("hardwareBackPress", backAction);
+        return () => backHandler.remove();
+    }, [navigation, errorModal.visible, closeModalAnimated]);
+
+    // check transaction status
+    const checkTransactionStatus = useCallback(async () => {
+        if (!requestId) return;
+        try {
+            //   setLoading(true);
+            const response = await apiClient.get(
+                `/api/dealer/digilockerresponseRoute/transaction-status/${requestId}`
+            );
+
+            const { success, appCode, data } = response.data ?? {};
+
+            if (success && appCode === 1000 && data?.transaction_status) {
+                const status = data.transaction_status;
+                // handle statuses
+                // status === "DIGILOCKER_CALLBACK_SUCCESS" ||
+                if ( status === "SUCCESS") {
+                    // completed
+                    // navigation.replace("SupportTicketScreen", { requestId });
+                } else if (status === "DIGILOCKER_FAILURE") {
+                    // failed -> show bottom sheet modal
+                    // setErrorModal({ visible: true, message: "KYC Failed. Please retry the process." });
+                } else if (status === "DIGILOCKER_REDIRECT") {
+                    // still in progress, keep showing webview
+                } else {
+                    // unknown status: show a gentle message
+                    // (do not spam modal)
+                    console.log("Digilocker transaction status:", status);
+                }
+            }
+        } catch (err) {
+            console.warn("Transaction status check failed:", err?.message ?? err);
+            // show a retry modal only if not already visible
+            // setErrorModal((prev) => (prev.visible ? prev : { visible: true, message: "Network error. Please retry." }));
+        } finally {
+            setLoading(false);
+        }
+    }, [requestId, navigation]);
+
+    // polling interval (only while URL is present)
+    useEffect(() => {
+        if (!requestId) return;
+        // run immediately once
+        checkTransactionStatus();
+
+        const interval = setInterval(() => {
+            checkTransactionStatus();
+        }, 10000); // 10s
+
+        return () => clearInterval(interval);
+    }, [requestId, checkTransactionStatus]);
+
+    // open/close animation when modal visible state changes
+    useEffect(() => {
+        if (errorModal.visible) {
+            openModalAnimated();
+        } else {
+            // ensure slideAnim reset if hidden (so next open animates)
+            slideAnim.setValue(0);
+        }
+    }, [errorModal.visible, openModalAnimated, slideAnim]);
+
+    // Retry flow: call init API and navigate to new sdk_url session
+    const retryKyc = async () => {
+        if (loading) return;
+        try {
+            setLoading(true);
+            // close bottom sheet visually first
+            closeModalAnimated(); // it sets visible false after animation
+
+            const resp = await apiClient.post("api/dealer/aadhaarRoutes/digilocker/init", {
+                dealerId: userID,
+            });
+
+            const newUrl = resp?.data?.data?.sdk_url;
+            const newRequestId = resp?.data?.data?.request_id;
+
+            if (newUrl && newRequestId) {
+                // navigate to a fresh webview session
+                // replace current screen with new request
+                navigation.replace("AadharKycWebview", {
+                    url: newUrl,
+                    requestId: newRequestId,
+                });
+            } else {
+                // if init didn't return url, show modal again with message
+                setTimeout(() => {
+                    setErrorModal({ visible: true, message: "Retry failed. Please try again later." });
+                }, 300); // allow modal to re-open after previous closed animation
+            }
+        } catch (err) {
+            console.warn("Retry error:", err?.message ?? err);
+            setTimeout(() => {
+                // setErrorModal({ visible: true, message: "Retry failed. Please check your connection." });
+            }, 300);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // helper to close modal and exit
+    const exitFromModal = () => {
+        // animate out then go back
+        closeModalAnimated(() => navigation.goBack());
+    };
+
+    if (!url) {
+        return (
+            <BackgroundWrapper style={styles.container}>
+                <DetailsHeader title="Aadhaar KYC" divider={true} onBack={() => navigation.goBack()} />
+                <View style={styles.errorBox}>
+                    <Text style={styles.errorText}>KYC URL is missing. Please try again.</Text>
+                </View>
+            </BackgroundWrapper>
+        );
+    }
+
+    // sheet translateY interpolation (from offscreen to 0)
+    const translateY = slideAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [hp("100%"), 0],
+    });
+
+    return (
+        <BackgroundWrapper style={styles.container}>
+            <DetailsHeader
+                title="Aadhaar KYC"
+                divider={true}
+                onBack={() => {
+                    // if modal open, close it; otherwise show exit confirm
+                    if (errorModal.visible) {
+                        closeModalAnimated();
+                        return;
+                    }
+                    Alert.alert("Exit KYC?", "Are you sure you want to exit the Aadhaar KYC process?", [
+                        { text: "Cancel", style: "cancel" },
+                        { text: "Exit", style: "destructive", onPress: () => navigation.goBack() },
+                    ]);
+                }}
+            />
+
+            <View style={styles.webviewWrapper}>
+                <WebView
+                    source={{ uri: url }}
+                    style={{ flex: 1 }}
+                    startInLoadingState={true}
+                    onMessage={(e) => {
+                        const msg = e.nativeEvent.data;
+                        if (msg === 'closeWebView') {
+                          Alert.alert('closeWebView')
+                          navigation.replace("SupportTicketScreen", { requestId });
+                          
+                        } else if (msg === 'RetryWebView') {
+                            // trigger retry (e.g., reload or start flow again)
+                            // webviewRef.current?.reload();
+                             Alert.alert('RetryWebView')
+                             retryKyc()
+                        }
+                    }}
+                    renderLoading={() => (
+                        <View style={styles.loaderContainer}>
+                            <Loader />
+                            <Text style={styles.loadingText}>Loading Aadhaar KYC...</Text>
+                        </View>
+                    )}
+                    onNavigationStateChange={(navState) => {
+                        // fallback URL-based success/failure detection
+                        const u = navState.url ?? "";
+                        if (u.includes("callback-success") || u.includes("success")) {
+                            navigation.replace("KycSuccessScreen", { requestId });
+                        } else if (u.includes("callback-failed") || u.includes("failed")) {
+                            setErrorModal({ visible: true, message: "KYC Failed. Please retry." });
+                        }
+                    }}
+                />
+            </View>
+
+            {/* small inline spinner while polling */}
+            {loading && (
+                <View style={styles.pollLoader}>
+                    <Loader size={26} />
+                </View>
+            )}
+
+            {/* Bottom sheet modal */}
+            <Modal
+                visible={errorModal.visible}
+                transparent
+                animationType="none"
+                statusBarTranslucent={true}
+            >
+                <View style={styles.modalOverlay}>
+                    <Animated.View
+                        style={[
+                            styles.bottomSheet,
+                            {
+                                transform: [{ translateY }],
+                            },
+                        ]}
+                    >
+                        {/* grabber */}
+                        <View style={styles.grabber} />
+
+                        {/* Icon */}
+                        <View style={styles.modalIconBox}>
+                            <Icon name="error-outline" size={hp("4%")} color="#f59e0b" />
+                        </View>
+
+                        <Text style={styles.modalTitle}>KYC Status</Text>
+                        <Text style={styles.modalMessage}>{errorModal.message}</Text>
+
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity
+                                style={[styles.button, styles.retryButton]}
+                                activeOpacity={0.8}
+                                onPress={retryKyc}
+                                disabled={loading}
+                            >
+                                {loading ? <Loader size={18} /> : <Text style={styles.buttonText}>Retry</Text>}
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[styles.button, styles.exitButton]}
+                                activeOpacity={0.8}
+                                onPress={exitFromModal}
+                                disabled={loading}
+                            >
+                                <Text style={styles.exitText}>Exit</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Animated.View>
+                </View>
+            </Modal>
+        </BackgroundWrapper>
+    );
+};
+
+export default AadharKycWebview;
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        paddingBottom: Platform.OS === "ios" ? wp("6%") : wp("14%"),
+        paddingTop: wp("4%"),
+    },
+    webviewWrapper: {
+        flex: 1,
+        borderRadius: 10,
+        overflow: "hidden",
+        backgroundColor: "#fff",
+        // subtle card shadow
+        elevation: 3,
+        shadowColor: "#000",
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+        shadowOffset: { width: 0, height: 3 },
+    },
+    loaderContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#fafafa",
+    },
+    loadingText: {
+        marginTop: hp("1.5%"),
+        fontSize: hp("1.9%"),
+        color: "#444",
+        fontWeight: "500",
+    },
+    errorBox: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        padding: wp("5%"),
+    },
+    errorText: {
+        fontSize: hp("2%"),
+        color: "red",
+        textAlign: "center",
+        fontWeight: "500",
+    },
+    pollLoader: {
+        position: "absolute",
+        bottom: hp("2%"),
+        alignSelf: "center",
+        backgroundColor: "transparent",
+    },
+
+    /* Modal / bottom-sheet styles */
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.45)",
+        justifyContent: "flex-end",
+    },
+    bottomSheet: {
+        backgroundColor: "#fff",
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
+        paddingHorizontal: wp("6%"),
+        paddingTop: hp("2%"),
+        paddingBottom: hp("4%"),
+        alignItems: "center",
+    },
+    grabber: {
+        width: 60,
+        height: 6,
+        borderRadius: 6,
+        backgroundColor: "#e6e6e6",
+        marginBottom: hp("1.4%"),
+    },
+    modalIconBox: {
+        width: hp("9%"),
+        height: hp("9%"),
+        borderRadius: hp("9%") / 2,
+        backgroundColor: "#fff6ea",
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: hp("1.2%"),
+    },
+    modalTitle: {
+        fontSize: hp("2.2%"),
+        fontWeight: "700",
+        marginBottom: hp("0.8%"),
+    },
+    modalMessage: {
+        fontSize: hp("1.9%"),
+        color: "#444",
+        textAlign: "center",
+        marginBottom: hp("2.4%"),
+    },
+    modalButtons: {
+        flexDirection: "row",
+        width: "100%",
+        justifyContent: "space-between",
+    },
+    button: {
+        flex: 1,
+        marginHorizontal: wp("1.5%"),
+        paddingVertical: hp("1.6%"),
+        borderRadius: 10,
+        alignItems: "center",
+    },
+    retryButton: {
+        backgroundColor: "#0284c7",
+    },
+    exitButton: {
+        backgroundColor: "#f3f4f6",
+        borderWidth: 1,
+        borderColor: "#eee",
+    },
+    buttonText: {
+        color: "#fff",
+        fontSize: hp("2%"),
+        fontWeight: "600",
+    },
+    exitText: {
+        color: "#ef4444",
+        fontSize: hp("2%"),
+        fontWeight: "700",
+    },
+});

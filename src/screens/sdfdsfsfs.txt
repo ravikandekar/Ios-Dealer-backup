@@ -1,0 +1,95 @@
+import React, { useEffect, useState, useContext } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import AppStack from './AppStack';
+import AuthStack from './AuthStack';
+import RegisterStack from './RegisterStack';
+import { View, StatusBar } from 'react-native';
+import { ToastProvider } from '../utils/toastService';
+import { AuthContext } from '../context/AuthContext';
+import apiClient from '../utils/apiClient';
+import StartupScreen from '../screens/StartupScreen';
+
+const RootNavigation = () => {
+  const [isAppReady, setIsAppReady] = useState(false);
+  const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const {
+    isAuthenticated,
+    register,
+    cityselected,
+    checkToken,
+    setUserID,
+    setUserName,
+    setregister,
+    setcityselected,
+    setProfileCompleted,
+    setisAadharVerified,
+    setBussinessdetails,
+    isDark,
+    theme,
+  } = useContext(AuthContext);
+
+  const initializeApp = async () => {
+    setIsLoading(true);
+    setError(false);
+
+    try {
+     const authStatus= await checkToken()
+      if (!authStatus) {
+        setIsAppReady(true);
+        
+      }
+
+      const res = await apiClient.get('/api/dealer/auth/dealer-app-config');
+      const data = res.data?.data?.config;
+
+      setUserID(data?.dealerId || '');
+      setUserName(data?.name || '');
+      setcityselected(data?.isCitySelected || false);
+      setProfileCompleted(data?.isProfileCompleted || false);
+      setisAadharVerified(data?.isAadharVerified || false);
+      setBussinessdetails(data?.isBusinessDetailCompleted || false);
+      setregister(data?.isRegistrationCompleted || false);
+
+      setIsAppReady(true);
+    } catch (err) {
+      console.error('Error loading app config:', err?.response?.data || err.message);
+      setError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    initializeApp();
+  }, []);
+
+  // 🛠️ Fixed: missing closing brace
+if (isAuthenticated && (isLoading || error || !isAppReady)) {
+  return (
+    <StartupScreen
+      isLoading={isLoading && !error}
+      hasError={error}
+      onRetry={initializeApp}
+    />
+  );
+}
+
+
+  return (
+    <View style={{ flex: 1 }}>
+      <NavigationContainer>
+        <StatusBar hidden />
+        {isAuthenticated && cityselected ? (
+          register ? <AppStack /> : <RegisterStack />
+        ) : (
+          <AuthStack />
+        )}
+      </NavigationContainer>
+      <ToastProvider />
+    </View>
+  );
+};
+
+export default RootNavigation;

@@ -1,0 +1,230 @@
+import React, { useContext, useEffect, useState } from 'react';
+import {
+  View,
+  TextInput,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen';
+
+import BackgroundWrapper from '../components/BackgroundWrapper';
+import { AuthContext } from '../context/AuthContext';
+import BrandAndCarNameCard from '../components/BrandAndCarNameCard';
+import { DetailsHeader } from '../components/DetailsHeader';
+import { useFormStore } from '../store/formStore';
+import AppText from '../components/AppText';
+import apiClient from '../utils/apiClient';
+import { showToast } from '../utils/toastService';
+import BrandInputModal from '../components/BrandInputModal';
+import PriceChnageModal from '../components/PriceChnageModal';
+
+const PAGE_LIMIT = 30;
+
+const CarDetailsScreen = ({ navigation, route }) => {
+  const biketypeId = route.params.typeId;
+  const { formData, updateForm } = useFormStore();
+  const { theme, selectedCategory } = useContext(AuthContext);
+  const headerName = selectedCategory;
+
+  const [searchText, setSearchText] = useState('');
+  const [brandInput, setBrandInput] = useState('');
+  const [brandID, setbrandID] = useState('');
+  const [ShowModal, setShowModal] = useState(false);
+  const [brandList, setBrandList] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const fetchBrands = async (search = '', pageNumber = 1, isRefresh = false) => {
+    try {
+      if (!isRefresh) setLoading(true);
+      const endpoint =
+        selectedCategory === 'Bike'
+          ? `/api/product/bike_brandRoutes/getdata-by-buyer-dealer/${biketypeId}?page=${pageNumber}&limit=${PAGE_LIMIT}&search=${search}`
+          : `/api/product/carbrandRoute/getdata-by-buyer-dealer?search=${search}&page=${pageNumber}&limit=${PAGE_LIMIT}`;
+      const response = await apiClient.get(endpoint);
+
+      if (response?.data?.appCode === 1000) {
+        const newBrands = response.data.data.brands || [];
+        const total = response.data.pagination?.totalPages || 1;
+        setTotalPages(total);
+        setBrandList(prev =>
+          isRefresh || pageNumber === 1 ? newBrands : [...prev, ...newBrands]
+        );
+      } else {
+        showToast('error', '', response?.data?.message || 'Invalid request');
+        setBrandList([]);
+      }
+    } catch (error) {
+      console.error('Error fetching brands:', error);
+      showToast('error', '', error?.response?.data?.message || 'Network error');
+    } finally {
+      if (!isRefresh) setLoading(false);
+      setIsRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBrands(searchText, 1);
+  }, []);
+
+  const handleSearch = (text) => {
+    setSearchText(text);
+    setPage(1);
+    fetchBrands(text, 1);
+  };
+
+  const handleBrandPress = (brand) => {
+    if (brand?.isOthers === true) {
+      setbrandID(brand?._id)
+      setShowModal(true);
+      return;
+    }
+    updateForm('carAndBikeBrandId', brand._id);
+    navigation.navigate('CarNameScreen', { brandId: brand._id });
+  };
+
+  const handleLoadMore = () => {
+    if (page < totalPages && !loading) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchBrands(searchText, nextPage);
+    }
+  };
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setPage(1);
+    fetchBrands(searchText, 1, true);
+  };
+  const otherbrand = (brandInput) => {
+    setShowModal(false);
+    if (brandInput.trim()) {
+      updateForm('otherbrand', brandInput);
+      updateForm('carAndBikeBrandId', brandID);
+      navigation.navigate('CarNameScreen', { brandId: brandID });
+    }
+  };
+
+  return (
+    <BackgroundWrapper>
+      <DetailsHeader
+        title={`${headerName} Details`}
+        onBackPress={() => navigation.goBack()}
+        stepText="1/7"
+        rightType="steps"
+      />
+
+      <View style={[styles.inputContainer, { backgroundColor: theme.colors.inputBg }]}>
+        <TextInput
+          style={[styles.searchBox, { color: theme.colors.text }]}
+          placeholder="Search"
+          value={searchText}
+          onChangeText={handleSearch}
+          placeholderTextColor={theme.colors.themeIcon}
+        />
+        <Icon
+          name="magnify"
+          size={27}
+          color={theme.colors.themeIcon}
+          style={styles.searchIcon}
+        />
+      </View>
+
+      <AppText style={[styles.subHeader, { color: theme.colors.text }]}>
+        Select your {headerName} brand.
+      </AppText>
+
+      {loading && page === 1 ? (
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      ) : (
+        <FlatList
+          data={brandList}
+          renderItem={({ item }) => (
+            <BrandAndCarNameCard
+              item={item.brand || item.car_brand_name}
+              isSelected={formData.carAndBikeBrandId === item._id}
+              onPress={() => handleBrandPress(item)}
+              theme={theme}
+            />
+          )}
+          keyExtractor={(item) => item._id}
+          numColumns={4}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.5}
+          refreshing={isRefreshing}
+          onRefresh={handleRefresh}
+          columnWrapperStyle={{
+            justifyContent: 'flex-start',
+            marginBottom: hp('1.5%'),
+          }}
+          contentContainerStyle={styles.gridContainer}
+          ListEmptyComponent={
+            <AppText
+              style={{
+                color: theme.colors.text,
+                textAlign: 'center',
+                marginTop: hp('4%'),
+              }}>
+              No Brands Found.
+            </AppText>
+          }
+          ListFooterComponent={
+            loading && page > 1 ? (
+              <ActivityIndicator
+                size="small"
+                color={theme.colors.primary}
+                style={{ marginBottom: 20 }}
+              />
+            ) : null
+          }
+        />
+      )}
+
+      <BrandInputModal
+        visible={ShowModal}
+        onClose={() => setShowModal(false)}
+        brandInput={brandInput}
+        setBrandInput={setBrandInput}
+        onNextPress={() => otherbrand(brandInput) }
+        onBackPress={() => navigation.goBack()}
+        theme={theme}
+      />
+
+
+    </BackgroundWrapper>
+  );
+};
+
+const styles = StyleSheet.create({
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: wp('3%'),
+    paddingHorizontal: wp('3%'),
+    marginVertical: hp('2%'),
+  },
+  searchBox: {
+    flex: 1,
+    fontSize: wp('4.8%'),
+    paddingVertical: hp('1.2%'),
+    fontWeight: '500',
+  },
+  subHeader: {
+    fontSize: wp('4.5%'),
+    fontWeight: '500',
+    marginBottom: hp('2%'),
+  },
+  gridContainer: {
+    paddingBottom: hp('4%'),
+  },
+  searchIcon: {},
+});
+
+export default CarDetailsScreen;
