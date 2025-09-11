@@ -9,12 +9,14 @@ import { initApp } from './src/utils/appInitializer';
 import PermissionSettingsModal from './src/components/PermissionSettingsModal';
 
 import { navigationRef, processPendingNavigation } from './src/utils/NavigationService';
-import { AppState ,LogBox} from 'react-native';
+import { AppState, LogBox } from 'react-native';
 
 import DeviceInfo from 'react-native-device-info';
 import { getApp } from 'firebase/app';
 import { useNotificationPermission } from './src/utils/useNotificationPermission';
 import { removeToken } from './src/utils/storage';
+import InternetStatus from './src/components/InternetStatus';
+
 const AppContent = () => {
   const [isAppReady, setIsAppReady] = useState(false);
   const { updateForm } = useFormStore();
@@ -27,7 +29,6 @@ const AppContent = () => {
   } = useContext(AuthContext);
 
   useEffect(() => {
-    // removeToken();
     const initialize = async () => {
       try {
         const isTokenValid = await checkToken();
@@ -53,14 +54,11 @@ const AppContent = () => {
 };
 
 const App = () => {
-
-
-
   return (
     <AuthProvider>
       <NavigationContainer
         ref={navigationRef}
-        onReady={async () => {
+        onReady={() => {
           processPendingNavigation();
 
           // Handle kill mode notification after navigation is ready
@@ -68,29 +66,10 @@ const App = () => {
             handleNotificationData(global.initialNotificationData);
             global.initialNotificationData = null;
           }
-
-          // Track the initial route
-          const currentRoute = navigationRef.getCurrentRoute();
-          if (currentRoute?.name) {
-            await analytics().logScreenView({
-              screen_name: currentRoute.name,
-              screen_class: currentRoute.name,
-            });
-          }
-        }}
-        onStateChange={async () => {
-          // Track screen changes automatically
-          const currentRoute = navigationRef.getCurrentRoute();
-          if (currentRoute?.name) {
-            await analytics().logScreenView({
-              screen_name: currentRoute.name,
-              screen_class: currentRoute.name,
-            });
-          }
         }}
       >
         <AppContent />
- 
+         <InternetStatus />
       </NavigationContainer>
     </AuthProvider>
   );

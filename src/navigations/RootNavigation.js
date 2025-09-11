@@ -164,7 +164,7 @@ const RootNavigation = () => {
         <AppStack />
       )}
 
-      <InternetStatus />
+      {/* <InternetStatus /> */}
       <ToastProvider />
     </View>
   );

@@ -18,16 +18,24 @@ const InternetStatus = () => {
   const [isConnected, setIsConnected] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
 
-  useEffect(() => {
-    checkConnection(); // Initial check
+useEffect(() => {
+  let isFirstCheck = true;
 
-    const unsubscribe = NetInfo.addEventListener(state => {
-      const connected = state.isConnected && state.isInternetReachable;
-      handleConnectionChange(connected);
-    });
+  const unsubscribe = NetInfo.addEventListener(state => {
+    const connected = state.isConnected && state.isInternetReachable;
 
-    return () => unsubscribe();
-  }, []);
+    if (isFirstCheck) {
+      // 👇 Ignore the very first event to prevent modal flash
+      isFirstCheck = false;
+      if (connected) return; 
+    }
+
+    handleConnectionChange(connected);
+  });
+
+  return () => unsubscribe();
+}, []);
+
 
   const checkConnection = async () => {
     const state = await NetInfo.fetch();
