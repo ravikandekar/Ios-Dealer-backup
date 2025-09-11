@@ -9,13 +9,11 @@ import { initApp } from './src/utils/appInitializer';
 import PermissionSettingsModal from './src/components/PermissionSettingsModal';
 
 import { navigationRef, processPendingNavigation } from './src/utils/NavigationService';
-import { AppState, LogBox } from 'react-native';
 
-import DeviceInfo from 'react-native-device-info';
-import { getApp } from 'firebase/app';
-import { useNotificationPermission } from './src/utils/useNotificationPermission';
-import { removeToken } from './src/utils/storage';
+import messaging from '@react-native-firebase/messaging';
+
 import InternetStatus from './src/components/InternetStatus';
+import { requestPermission, setupNotificationListeners } from './src/utils/NotificationService';
 
 const AppContent = () => {
   const [isAppReady, setIsAppReady] = useState(false);
@@ -54,6 +52,26 @@ const AppContent = () => {
 };
 
 const App = () => {
+
+
+
+  useEffect(() => {
+    console.log('🚀 [App] Setting up notifications...');
+    requestPermission();
+
+    const testTimer = setTimeout(() => {
+     // testLocalNotification();
+    }, 3000);
+
+    const unsubscribe = setupNotificationListeners();
+
+    return () => {
+      clearTimeout(testTimer);
+      unsubscribe();
+    };
+  }, []);
+
+
   return (
     <AuthProvider>
       <NavigationContainer
