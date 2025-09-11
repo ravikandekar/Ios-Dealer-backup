@@ -79,38 +79,6 @@ export const extractNotificationData = (msg: FirebaseMessagingTypes.RemoteMessag
   return { title, body, customData };
 };
 
-/**
- * 🎯 Handle tap actions
- */
-export const handleNotificationAction = (data: Record<string, any>) => {
-  console.log('🎯 [Action]', data);
-  if (data.notificationType === 'car_launch') {
-    Alert.alert('Car Launch', `New car: ${data.carName}`);
-    navigate('FAQScreen');
-  } else if (data.notificationType === 'test') {
-    Alert.alert('Test', 'Test notification tapped!');
-    navigate('FAQScreen');
-  } else {
-    Alert.alert('Notification', 'Notification tapped!');
-    navigate('FAQScreen');
-  }
-};
-
-/**
- * 🧪 Test local notification
- */
-export const testLocalNotification = async () => {
-  console.log('🧪 [Test] Triggering test notification');
-  await displayLocalNotification(
-    '🧪 Test Notification',
-    'This is a test notification to verify setup',
-    { test: 'true', notificationType: 'test', time: new Date().toISOString() }
-  );
-};
-
-/**
- * 🔐 Request FCM + Notifee permissions
- */
 export const requestPermission = async () => {
   console.log('🔑 [FCM] Requesting permissions...');
   try {
