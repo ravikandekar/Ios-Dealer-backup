@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "44559711504",
+    "project_id": "dev-gdlb",
+    "storage_bucket": "dev-gdlb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:44559711504:android:94d7b6a474d34541cc3995",
+        "android_client_info": {
+          "package_name": "com.gadilobharat.dealers"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7Q_g8yCAfYJuZPBPo2aPYcM5SPUZ314M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

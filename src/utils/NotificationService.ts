@@ -2,6 +2,8 @@
 import { Platform, Alert } from 'react-native';
 import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
+import { navigate } from './NavigationService';
+import { handleNotificationData } from './notifications';
 // import { navigate } from '../navigations/RootNavigation';
 
 /**
@@ -84,13 +86,13 @@ export const handleNotificationAction = (data: Record<string, any>) => {
   console.log('🎯 [Action]', data);
   if (data.notificationType === 'car_launch') {
     Alert.alert('Car Launch', `New car: ${data.carName}`);
-    // navigate('CitySelectionScreen');
+    navigate('FAQScreen');
   } else if (data.notificationType === 'test') {
     Alert.alert('Test', 'Test notification tapped!');
-    // navigate('CitySelectionScreen');
+    navigate('FAQScreen');
   } else {
     Alert.alert('Notification', 'Notification tapped!');
-    // navigate('CitySelectionScreen');
+    navigate('FAQScreen');
   }
 };
 
@@ -161,7 +163,7 @@ export const setupNotificationListeners = () => {
     console.log('🔙 [Background->Foreground]', msg);
     if (msg) {
       const { customData } = extractNotificationData(msg);
-      handleNotificationAction(customData);
+      handleNotificationData(customData);
     }
   });
 
@@ -171,14 +173,14 @@ export const setupNotificationListeners = () => {
       console.log('💀 [Killed->Foreground]', msg);
       if (msg) {
         const { customData } = extractNotificationData(msg);
-        handleNotificationAction(customData);
+        handleNotificationData(customData);
       }
     });
 
   const unsubscribeNotifee = notifee.onForegroundEvent(({ type, detail }) => {
     console.log('🎯 [Notifee Event]', type, detail);
     if (type === EventType.PRESS && detail.notification?.data) {
-      handleNotificationAction(detail.notification.data);
+      handleNotificationData(detail.notification.data);
     }
   });
 

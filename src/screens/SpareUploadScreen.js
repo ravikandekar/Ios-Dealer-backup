@@ -7,7 +7,8 @@ import {
     FlatList,
     Modal,
     Pressable,
-    InteractionManager
+    InteractionManager,
+    AppState
 } from 'react-native';
 import AppText from '../components/AppText';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
@@ -27,7 +28,8 @@ import RNFS from 'react-native-fs';
 import ImageResizer from 'react-native-image-resizer';
 import SubscriptionModal from '../components/SubscriptionModal';
 import Loader from '../components/Loader';
-
+import { check, request, PERMISSIONS, RESULTS, openSettings } from 'react-native-permissions';
+import PermissionSettingsModal from '../components/PermissionSettingsModal';
 const SpareUploadScreen = ({ navigation }) => {
     const { theme, userID, selectedCategory } = useContext(AuthContext);
     const [modalVisible, setModalVisible] = useState(false);
@@ -36,6 +38,7 @@ const SpareUploadScreen = ({ navigation }) => {
     const [images, setImages] = useState(formData.images || []);
     const [loading, setLoading] = useState(false);
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+    const [settingsModalVisible, setSettingsModalVisible] = useState(false);
     console.log('ffffff', formData.subscription_plan);
     const isEditing = formData?.isEditSpare;
 
@@ -46,8 +49,67 @@ const SpareUploadScreen = ({ navigation }) => {
     useEffect(() => {
         updateForm('images', images);
     }, [images]);
+    useEffect(() => {
+        const subscription = AppState.addEventListener("change", async state => {
+            if (state === "active") {
+                // 🔄 Re-check camera + storage permissions
+                const granted = await requestCameraAndStoragePermissions();
+                if (granted) {
+                    setSettingsModalVisible(false); // ✅ auto-close modal when fixed in settings
+                }
+            }
+        });
 
-    const pickImage = (source) => {
+        return () => subscription.remove();
+    }, []);
+    const requestCameraAndStoragePermissions = async () => {
+        try {
+            if (Platform.OS === "android") {
+                const permissionsToRequest = [
+                    PermissionsAndroid.PERMISSIONS.CAMERA,
+                    Platform.Version >= 33
+                        ? PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES
+                        : PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+                ];
+
+                const result = await PermissionsAndroid.requestMultiple(permissionsToRequest);
+
+                const allGranted = permissionsToRequest.every(
+                    (p) => result[p] === PermissionsAndroid.RESULTS.GRANTED
+                );
+
+                const anyNeverAskAgain = permissionsToRequest.some(
+                    (p) => result[p] === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN
+                );
+
+                if (anyNeverAskAgain) {
+                    setSettingsModalVisible(true); // 👉 show modal instead of Alert
+                    return false;
+                }
+
+                return allGranted;
+            } else {
+                // iOS
+                const result = await request(PERMISSIONS.IOS.CAMERA);
+
+                if (result === RESULTS.GRANTED) {
+                    return true;
+                } else if (result === RESULTS.BLOCKED) {
+                    setSettingsModalVisible(true); // 👉 show modal instead of Alert
+                    return false;
+                }
+                return false;
+            }
+        } catch (err) {
+            console.warn("Permission error:", err);
+            return false;
+        }
+    };
+    const pickImage = async (source) => {
+        if (Platform.OS === "android") {
+            const hasPermission = await requestCameraAndStoragePermissions();
+            if (!hasPermission) return;
+        }
         const options = { mediaType: 'photo', selectionLimit: 3 };
         const callback = (response) => {
             if (!response.didCancel && !response.errorCode && response.assets?.length) {
@@ -436,7 +498,12 @@ const SpareUploadScreen = ({ navigation }) => {
                 onClose={() => setShowSubscriptionModal(false)}
                 onSubscribe={() => { handleSubscribe() }}
             />
-             <Loader visible={loading}/>
+            <PermissionSettingsModal
+                visible={settingsModalVisible}
+                title="Permission Required"
+                message="Camera and storage permissions are required. Please enable them in settings."
+            />
+            <Loader visible={loading} />
         </BackgroundWrapper>
     );
 };
@@ -510,7 +577,7 @@ const styles = StyleSheet.create({
     buttonRow: {
         flexDirection: 'row',
         justifyContent: 'space-evenly',
-         marginBottom: hp('7%'),
+        marginBottom: hp('7%'),
         paddingHorizontal: wp('4%'),
         // backgroundColor:'red'
     },

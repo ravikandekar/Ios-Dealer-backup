@@ -106,10 +106,12 @@ const CarPhotoUploadScreen = ({ navigation }) => {
             console.warn("Permission error:", err);
             return false;
         }
-    };
+    }; 
     const pickImage = async (source) => {
-        const hasPermission = await requestCameraAndStoragePermissions();
-        if (!hasPermission) return;
+         if (Platform.OS === "android") {
+           const hasPermission = await requestCameraAndStoragePermissions();
+           if (!hasPermission) return;
+         }
         const options = { mediaType: 'photo', selectionLimit: isBike ? 5 : 10 };
         const callback = (response) => {
             if (!response.didCancel && !response.errorCode && response.assets?.length) {

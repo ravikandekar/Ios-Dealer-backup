@@ -81,7 +81,7 @@ const RegistrationBDScreen = ({ navigation }) => {
         navigation.navigate('RegisterDealer');
       } else if (appCode === 1006) {
         showToast('error', '', 'Your profile is already completed.');
-        setBussinessdetails(true);
+        // setBussinessdetails(true);
       } else {
         showToast('error', '', message || 'Submission failed');
       }

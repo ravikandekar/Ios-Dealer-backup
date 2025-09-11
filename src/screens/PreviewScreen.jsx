@@ -181,11 +181,11 @@ const PreviewScreen = ({ navigation, route }) => {
   };
 
   const handleSubscribe = () => {
-    InteractionManager.runAfterInteractions(() => {
-               setShowSubscriptionModal(false);
-           });
-   
+
     navigation.navigate('SubscriptionScreen');
+    InteractionManager.runAfterInteractions(() => {
+      setShowSubscriptionModal(false);
+    });
   };
 
   return (
@@ -260,7 +260,7 @@ const PreviewScreen = ({ navigation, route }) => {
 
               <TouchableOpacity
                 style={[styles.modalBtnFilled, { backgroundColor: theme.colors.primary }]}
-                onPress={handleSubscribe}
+                onPress={() => { handleSubscribe() }}
               >
                 <AppText style={{ color: theme.colors.background }}>Subscribe</AppText>
               </TouchableOpacity>

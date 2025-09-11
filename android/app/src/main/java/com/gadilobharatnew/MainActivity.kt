@@ -1,4 +1,4 @@
-package com.gadilobharat.dealer
+package com.gadilobharat.dealers
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

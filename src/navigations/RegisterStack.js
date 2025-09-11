@@ -159,7 +159,7 @@ const RegisterStack = () => {
               <Stack.Screen name="RegistrationBDScreen" component={RegistrationBDScreen} />
               <Stack.Screen name="RegisterDealer" component={RegisterDealer} />
               <Stack.Screen name="CMSWebViewScreen" component={CMSWebViewScreen} />
-            </>
+            </> 
           );
         }
 
