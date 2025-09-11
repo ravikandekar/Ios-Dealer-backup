@@ -286,7 +286,6 @@ const SubscriptionScreen = ({ navigation }) => {
   };
 
   const purchasePlan = async (plan) => {
-    console.log('dada', plan);
 
     if (loading || !isMountedRef.current || isProcessingPurchaseRef.current) {
       console.log('⚠️ Purchase already in progress or component unmounted');
@@ -304,8 +303,6 @@ const SubscriptionScreen = ({ navigation }) => {
 
     const product = iapProducts.find(p => p.productId === sku);
 
-    console.log('iapProducts', iapProducts);
-    console.log('hhh', product);
 
     if (!product) {
       showToast('error', '', 'Purchase failed. Please try again.');
@@ -361,10 +358,10 @@ const SubscriptionScreen = ({ navigation }) => {
 
         } else if (err.code === 'E_ITEM_UNAVAILABLE') {
           // Alert.alert('Error', 'This subscription is currently unavailable.');
-          showToast('error', '', 'This subscription is currently unavailable.');
+          // showToast('error', '', 'This subscription is currently unavailable.');
         } else {
           // Alert.alert('Error', err.message || 'Purchase failed. Please try again.');
-          showToast('error', '', err.message || 'Purchase failed. Please try again.');
+          // showToast('error', '', err.message || 'Purchase failed. Please try again.');
         }
       }
     }
