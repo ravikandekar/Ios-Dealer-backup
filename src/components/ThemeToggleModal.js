@@ -1,24 +1,25 @@
-import React, { useContext, useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   Modal,
   View,
-
   StyleSheet,
   TouchableWithoutFeedback,
   Switch,
   Animated,
-  Dimensions,
   TouchableOpacity,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { AuthContext } from '../context/AuthContext';
+import axios from 'axios';
 import AppText from './AppText';
-const { height } = Dimensions.get('window');
 
-const ThemeToggleModal = ({ visible, onClose, isDark, toggleTheme }) => {
-  const { theme } = useContext(AuthContext);
+const ThemeToggleModal = ({ visible, onClose, useApi = true, name, userid }) => {
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
+
+  const [marked, setMarked] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (visible) {
@@ -50,6 +51,48 @@ const ThemeToggleModal = ({ visible, onClose, isDark, toggleTheme }) => {
     }
   }, [visible]);
 
+  const handleMarkAttendance = async (value) => {
+    if (!useApi) {
+      setMarked(value); // ✅ Static mode
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // ✅ Build FormData
+      const formData = new FormData();
+      formData.append('userId', `${userid} => Dealer App`);  // ✅ formatted string
+      formData.append('mobileNumber', name);
+      formData.append('appSignature', 'sdfgjkldsfksdfhksjdfhklsdfhksjfhksdfhksdfkjsdfhjk');
+
+      // ✅ API call with axios
+      const response = await axios.post(
+        'https://sumagodemo.com/markattendance.php',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      const data = response.data;
+
+      if (data?.status === 'success') {
+        setMarked(true);
+        Alert.alert('Success', data.message || 'Attendance marked');
+      } else {
+        throw new Error(data?.message || 'Failed to mark attendance');
+      }
+    } catch (error) {
+      console.error('❌ Attendance API error:', error);
+      Alert.alert('Error', error.message || 'Something went wrong');
+      setMarked(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Modal transparent visible={visible} onRequestClose={onClose} animationType="fade">
       <TouchableWithoutFeedback onPress={onClose}>
@@ -59,7 +102,6 @@ const ThemeToggleModal = ({ visible, onClose, isDark, toggleTheme }) => {
               style={[
                 styles.container,
                 {
-                  backgroundColor: theme.colors.card,
                   transform: [{ scale: scaleAnim }],
                   opacity: opacityAnim,
                 },
@@ -67,29 +109,33 @@ const ThemeToggleModal = ({ visible, onClose, isDark, toggleTheme }) => {
             >
               {/* Title and Close */}
               <View style={styles.headerRow}>
-                <AppText style={[styles.title, { color: theme.colors.text }]}>
-                  Appearance
-                </AppText>
+                <AppText style={styles.title}>Mark Attendance</AppText>
                 <TouchableOpacity onPress={onClose} style={styles.closeIcon}>
-                  <Icon name="close" size={24} color={theme.colors.text} />
+                  <Icon name="close" size={24} color="#000" />
                 </TouchableOpacity>
               </View>
 
               {/* Switch */}
               <View style={styles.switchRow}>
-                <AppText style={[styles.label, { color: theme.colors.text }]}>
-                  {isDark ? 'Dark Mode' : 'Light Mode'}
+                <AppText
+                  style={[
+                    styles.label,
+                    { color: marked ? 'green' : '#000' }, // ✅ Green if marked
+                  ]}
+                >
+                  {marked ? 'Attendance Marked' : 'Mark Attendance'}
                 </AppText>
-                <Switch
-                  value={isDark}
-                  onValueChange={toggleTheme}
-                  trackColor={{
-                    false: theme.colors.border,
-                    true: theme.colors.primary,
-                  }}
-                  thumbColor={isDark ? theme.colors.text : theme.colors.card}
-                  ios_backgroundColor={theme.colors.border}
-                />
+
+                {loading ? (
+                  <ActivityIndicator size="small" color="green" />
+                ) : (
+                  <Switch
+                    value={marked}
+                    onValueChange={handleMarkAttendance}
+                    trackColor={{ false: '#ccc', true: 'green' }}
+                    thumbColor={marked ? '#fff' : '#f4f3f4'}
+                  />
+                )}
               </View>
             </Animated.View>
           </TouchableWithoutFeedback>
@@ -112,6 +158,7 @@ const styles = StyleSheet.create({
     width: '80%',
     borderRadius: 20,
     padding: 20,
+    backgroundColor: '#fff',
     elevation: 5,
     position: 'relative',
   },
@@ -127,6 +174,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: '700',
+    color: '#000',
   },
   switchRow: {
     flexDirection: 'row',

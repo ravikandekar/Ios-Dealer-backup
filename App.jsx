@@ -14,6 +14,7 @@ import messaging from '@react-native-firebase/messaging';
 
 import InternetStatus from './src/components/InternetStatus';
 import { requestPermission, setupNotificationListeners } from './src/utils/NotificationService';
+import { handleNotificationData } from './src/utils/notifications';
 
 const AppContent = () => {
   const [isAppReady, setIsAppReady] = useState(false);

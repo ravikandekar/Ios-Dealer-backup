@@ -136,9 +136,16 @@ const bannerItems = [
     imageIconStyle: iconStyle,
     isDestructive: true,
   },
+  {
+    title: 'Mark Attendance',
+    imageName: deleteIcon,
+    iconName: 'checkbox-marked-outline',
+    iconType: 'materialCI',
+    imageIconStyle: iconStyle,
+  },
 ];
 const AccountScreen = () => {
-  const { theme, isDark, toggleTheme, } = useContext(AuthContext);
+  const { theme, isDark, toggleTheme,userID ,userName} = useContext(AuthContext);
   const navigation = useNavigation();
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
@@ -251,9 +258,7 @@ const AccountScreen = () => {
                 });
               } else if (item.title === 'Feedback & Ratings') {
                 setFeedbackVisible(true);
-              } else if (item.title === 'Appearance') {
-                // setsShowThemeModal(true);
-              } else if (item.title === 'Terms & Conditions') {
+              }  else if (item.title === 'Terms & Conditions') {
                 fetchCMSContentAndNavigate('terms');
               } else if (item.title === 'Privacy Policy') {
                 fetchCMSContentAndNavigate('privacy');
@@ -267,7 +272,11 @@ const AccountScreen = () => {
               // } 
               else if (item.title === 'Tutorial') {
                 navigation.navigate('TutorialScreen');
-              } else {
+              }
+              else if (item.title === 'Mark Attendance') {
+                setsShowThemeModal(true);
+              }
+               else {
                 console.log(`${item.title} pressed`);
               }
             };
@@ -310,6 +319,8 @@ const AccountScreen = () => {
         onClose={() => setsShowThemeModal(false)}
         isDark={isDark}
         toggleTheme={toggleTheme}
+        name={userName}
+        userid={userID}
       />
     </BackgroundWrapper>
   );
