@@ -572,7 +572,7 @@ const SubscriptionScreen = ({ navigation }) => {
                 </TouchableOpacity>
 
               </View>
-              {Platform.OS === 'ios' ? <TouchableOpacity onPress={() => termofuse('www.google.com')} style={{ marginTop: wp('2%') }}>
+              {Platform.OS === 'ios' ? <TouchableOpacity onPress={() => termofuse()} style={{ marginTop: wp('2%') }}>
                 <AppText style={[styles.linkText, { color: theme.colors.Highlighterwords }]}>
                   Terms of Use (EULA)
                 </AppText>

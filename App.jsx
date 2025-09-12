@@ -59,15 +59,8 @@ const App = () => {
   useEffect(() => {
     console.log('🚀 [App] Setting up notifications...');
     requestPermission();
-
-    const testTimer = setTimeout(() => {
-     // testLocalNotification();
-    }, 3000);
-
     const unsubscribe = setupNotificationListeners();
-
     return () => {
-      clearTimeout(testTimer);
       unsubscribe();
     };
   }, []);

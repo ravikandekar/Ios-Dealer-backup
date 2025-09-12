@@ -2,7 +2,7 @@
 import { Alert } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import { navigate } from './NavigationService';
-
+import notifee, { AndroidImportance } from '@notifee/react-native';
 export function handleNotificationData(data) {
   if (!data?.notificationType) return;
 
@@ -78,40 +78,17 @@ export function handleNotificationData(data) {
       navigate('SparePreviewScreen', { spareId: data.listingId, vehicleType: "spare" });
       break;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     default:
       console.log('⚠️ Unknown notification type:', data.notificationType);
   }
 }
 
-export function listenForegroundNotifications() {
-  messaging().onMessage(async remoteMessage => {
-    console.log('📩 Foreground DATA message:', remoteMessage.data);
-    handleNotificationData(remoteMessage.data);
-  });
-}
+// export function listenForegroundNotifications() {
+//   messaging().onMessage(async remoteMessage => {
+//     console.log('📩 Foreground DATA message:', remoteMessage.data);
+//     handleNotificationData(remoteMessage.data);
+//   });
+// }
 
 export function listenBackgroundNotifications() {
   messaging().onNotificationOpenedApp(remoteMessage => {
@@ -120,15 +97,32 @@ export function listenBackgroundNotifications() {
   });
 }
 
-// export async function checkInitialNotification() {
-//   const remoteMessage = await messaging().getInitialNotification();
-//   if (remoteMessage?.data) {
-//     console.log('📩 Killed state DATA message:', remoteMessage.data);
-//     handleNotificationData(remoteMessage.data);
-//   }
-// }
+export async function checkInitialNotification() {
+  const remoteMessage = await messaging().getInitialNotification();
+  if (remoteMessage?.data) {
+    console.log('📩 Killed state DATA message:', remoteMessage.data);
+    handleNotificationData(remoteMessage.data);
+  }
+}
 
 messaging().setBackgroundMessageHandler(async remoteMessage => {
   console.log('📩 Background/Kill mode DATA message:', remoteMessage.data);
   handleNotificationData(remoteMessage.data);
+    const channelId = await notifee.createChannel({
+    id: 'default_channel',
+    name: 'Default Channel',
+    importance: AndroidImportance.HIGH,
+  });
+
+  await notifee.displayNotification({
+    title: remoteMessage.notification?.title || remoteMessage.data?.notificationTitle || 'Background Notification',
+    body: remoteMessage.notification?.body || remoteMessage.data?.notificationMessage || 'You have a new message.',
+    android: {
+      channelId,
+      pressAction: { id: 'default' }, // 👈 Required for tap
+      smallIcon: 'ic_launcher',
+    },
+    data: remoteMessage.data, // 👈 Pass custom data (important for navigation!)
+  });
+  
 });

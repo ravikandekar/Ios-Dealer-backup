@@ -24,10 +24,11 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
     body: remoteMessage.notification?.body || remoteMessage.data?.notificationMessage || 'You have a new message.',
     android: {
       channelId,
-      pressAction: { id: 'default' },
+      pressAction: { id: 'default' }, // 👈 Required for tap
       smallIcon: 'ic_launcher',
     },
-    data: remoteMessage.data,
+    data: remoteMessage.data, // 👈 Pass custom data (important for navigation!)
   });
 });
+
 AppRegistry.registerComponent(appName, () => App);

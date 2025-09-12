@@ -21,3 +21,7 @@
 # Optional Firebase rules
 -keep class com.google.firebase.** { *; }
 -dontwarn com.google.firebase.**
+
+# Keep Firebase Crashlytics
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
