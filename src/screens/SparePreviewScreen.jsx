@@ -162,12 +162,10 @@ const { formData, updateForm, clearFields } = useFormStore();
   };
 
   const handleSubscribe = () => {
-
-    InteractionManager.runAfterInteractions(() => {
+     navigation.navigate('SubscriptionScreen');
+        InteractionManager.runAfterInteractions(() => {
       setShowSubscriptionModal(false);
     });
-
-    navigation.navigate('SubscriptionScreen');
   };
 
   return (

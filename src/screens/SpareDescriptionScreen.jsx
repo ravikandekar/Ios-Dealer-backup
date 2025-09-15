@@ -135,7 +135,7 @@ const SpareDescriptionScreen = ({ navigation }) => {
 
   return (
     <BackgroundWrapper>
-      <DetailsHeader title="Spare Description" stepText="3/7" rightType="steps" />
+      <DetailsHeader title="Spare Description" stepText="4/5" rightType="steps" />
 
       <ScrollView
         contentContainerStyle={{ paddingBottom: hp('3%') }}

@@ -124,7 +124,7 @@ const SpareTypeSelection = ({ navigation, route }) => {
       <DetailsHeader
         title={`${headerName}`}
         onBackPress={() => navigation.goBack()}
-        stepText="1/7"
+        stepText="1/5"
         rightType="steps"
       />
 

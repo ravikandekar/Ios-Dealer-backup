@@ -81,7 +81,7 @@ const App = () => {
         }}
       >
         <AppContent />
-        <InternetStatus />
+         <InternetStatus />
       </NavigationContainer>
     </AuthProvider>
   );

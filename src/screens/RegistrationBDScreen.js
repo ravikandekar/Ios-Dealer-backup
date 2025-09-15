@@ -109,6 +109,7 @@ const RegistrationBDScreen = ({ navigation }) => {
         onChangeText={text => handleChange('shopName', text)}
         iconName="store"
         maxLength={50}
+        returnKeyType="done"
       />
 
       <CustomEditField
@@ -119,6 +120,7 @@ const RegistrationBDScreen = ({ navigation }) => {
         iconName="phone"
         keyboardType="phone-pad"
         maxLength={10}
+        returnKeyType="done"
       />
 
       <View style={styles.checkboxContainer}>
@@ -148,6 +150,7 @@ const RegistrationBDScreen = ({ navigation }) => {
           iconName="whatsapp"
           keyboardType="phone-pad"
           maxLength={10}
+          returnKeyType="done"
         />
       )}
 

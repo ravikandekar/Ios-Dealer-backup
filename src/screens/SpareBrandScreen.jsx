@@ -124,7 +124,7 @@ const SpareBrandScreen = ({ navigation, route }) => {
       <DetailsHeader
         title={`${headerName} Details`}
         onBackPress={() => navigation.goBack()}
-        stepText="1/7"
+        stepText="2/5"
         rightType="steps"
       />
 

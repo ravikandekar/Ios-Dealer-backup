@@ -6,6 +6,7 @@ import { navigate } from './NavigationService';
 import { handleNotificationData } from './notifications';
 import apiClient from './apiClient';
 import { showToast } from './toastService';
+import { getToken } from './storage';
 // import { navigate } from '../navigations/RootNavigation';
 
 /**
@@ -127,7 +128,8 @@ export const requestPermission = async () => {
       console.log('🎫 [FCM] Token:', token);
 
       // ✅ Register token with backend
-      await registerDeviceToken(token, Platform.OS);
+        const isTokenValid = await getToken();
+        {isTokenValid && await registerDeviceToken(token, Platform.OS);}
 
       await messaging().subscribeToTopic('GlobalTopic');
       console.log('✅ [FCM] Subscribed to GlobalTopic');

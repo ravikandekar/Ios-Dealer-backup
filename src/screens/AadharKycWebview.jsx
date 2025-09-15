@@ -60,15 +60,16 @@ const AadharKycWebview = ({ route, navigation }) => {
             if (success && appCode === 1000 && data?.transaction_status) {
                 const status = data.transaction_status;
                 if (status === "SUCCESS") {
+                    showToast('success', '', 'Aadhaar KYC completed successfully.');
                     // navigation.replace("KycSuccessScreen", { requestId });
-                   navigation.dispatch(
-                                CommonActions.reset({
-                                    index: 0,
-                                    routes: [
-                                        { name: "RegistrationBDScreen", params: { requestId } },
-                                    ],
-                                })
-                            );
+                //    navigation.dispatch(
+                //                 CommonActions.reset({
+                //                     index: 0,
+                //                     routes: [
+                //                         { name: "RegistrationBDScreen", params: { requestId } },
+                //                     ],
+                //                 })
+                //             );
                 } else if (status === "DIGILOCKER_FAILURE") {
                     Alert.alert("KYC Failed", "Please retry using the reload button.");
                 }

@@ -202,12 +202,12 @@ const HomeScreen = ({ navigation }) => {
     checkVersionAndVerify();
   }, [formData]);
 
-const bottomsheet=(data)=>{
-  console.log('data',data);
-  
-   setBottomSheetVisible(true)
-     setOverviewStats(data);
-}
+  const bottomsheet = (data) => {
+    console.log('data', data);
+
+    setBottomSheetVisible(true)
+    setOverviewStats(data);
+  }
 
 
   const toggleDropdown = () => {
@@ -222,7 +222,7 @@ const bottomsheet=(data)=>{
     clearFields([
       'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
       'model_name', 'price', 'kmsDriven', 'transmissionId',
-      'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id'
+      'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id', 'model_name'
     ]);
 
     InteractionManager.runAfterInteractions(() => {
@@ -280,6 +280,7 @@ const bottomsheet=(data)=>{
                     style={{ height: hp('22%'), marginTop: wp('1') }}
                     imageStyle={{ width: '100%', height: hp('22%') }}
                     paginationshow={false}
+                    watermark={false}
                   />
 
                   {isSubscribed && (
@@ -311,7 +312,7 @@ const bottomsheet=(data)=>{
                       apiClient={apiClient}
                       showToast={showToast}
                       solddeletedmodal={(data) => bottomsheet(data)
-                       }
+                      }
                     />
                   </View>
 
@@ -323,6 +324,15 @@ const bottomsheet=(data)=>{
                       selectedCategory={selectedCategory}
                       buttonText="Add Details"
                       onPress={() => {
+                        clearFields([
+                          'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
+                          'model_name', 'price', 'kmsDriven', 'transmissionId',
+                          'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id', 'model_name',
+                          'SpareBrandId', 'Sparedescription', 'Spareyear_of_manufacture',
+                          'spareProductTypeId', 'Spareprice', 'spareConditionId',
+                          'SparePartNameId', 'Sparename', 'subproducttypeId', 'SpareyearId'
+                        ]);
+
                         if (isSubscriberRequired === true) {
                           setShowSubscriptionModal(true);
                         } else {

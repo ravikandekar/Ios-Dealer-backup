@@ -24,12 +24,13 @@ import Loader from '../components/Loader';
 import PriceChnageModal from '../components/PriceChnageModal';
 import { useFormStore } from '../store/formStore';
 import SubscriptionModal from '../components/SubscriptionModal';
+import { InteractionManager } from 'react-native';
 
 const PAGE_SIZE = 20;
 
 const MyAssetsScreen = ({ navigation }) => {
     const { theme, selectedCategory, userID } = useContext(AuthContext);
-    const { formData, updateForm } = useFormStore();
+    const { formData, updateForm ,clearFields} = useFormStore();
     const isSubscribed = formData?.subscriptionActive !== undefined ? formData?.subscriptionActive : true;
     const [activeTab, setActiveTab] = useState('publish');
     const [publishedAssets, setPublishedAssets] = useState([]);

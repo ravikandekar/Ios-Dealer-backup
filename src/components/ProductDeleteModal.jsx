@@ -2,10 +2,12 @@ import React, { useState, useContext } from 'react';
 import {
   Modal,
   View,
-
   StyleSheet,
   TextInput,
   TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  Keyboard,
+  Platform,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -15,13 +17,14 @@ import { AuthContext } from '../context/AuthContext';
 import ActionButton from './ActionButton';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AppText from './AppText';
+
 const ProductDeleteModal = ({
   visible,
   onClose,
   onDelete,
   onSold,
   productTitle,
-  isDraft = false
+  isDraft = false,
 }) => {
   const { theme } = useContext(AuthContext);
   const [step, setStep] = useState(1);
@@ -40,30 +43,35 @@ const ProductDeleteModal = ({
     setDescription('');
   };
 
-  const colors = theme?.colors
+  const colors = theme?.colors;
 
   return (
     <Modal visible={visible} transparent animationType="fade">
-      <TouchableWithoutFeedback onPress={resetModal}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.overlay}>
-          <TouchableWithoutFeedback>
-            <View style={[styles.container, { backgroundColor: colors.background }]}>
-              {/* Bottom Sheet Indicator */}
-              {/* <View style={styles.sheetIndicator} /> */}
-
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            style={{ flex: 1, justifyContent: 'flex-end' }}
+          >
+            <View style={[styles.container, { backgroundColor: colors.card }]}>
+              {/* Header */}
               <View style={styles.headerRow}>
                 <AppText style={[styles.title, { color: colors.text }]}>
                   Are you sure you want to Remove?
                 </AppText>
-                <TouchableWithoutFeedback onPress={resetModal}>
-                  <Icon name="close" size={wp('6.4%')} color={colors.text} />
-                </TouchableWithoutFeedback>
+                <Icon
+                  name="close"
+                  size={wp('6.4%')}
+                  color={colors.text}
+                  onPress={resetModal}
+                />
               </View>
 
               <AppText style={[styles.productName, { color: colors.text }]}>
                 “{productTitle}”
               </AppText>
 
+              {/* Step 1 */}
               {step === 1 && (
                 <>
                   <View style={styles.bulletList}>
@@ -74,12 +82,19 @@ const ProductDeleteModal = ({
                       'Please choose an action below.',
                     ].map((text, i) => (
                       <View key={i} style={styles.bulletItem}>
-                        <AppText style={[styles.bulletSymbol, { color: colors.text }]}>•</AppText>
-                        <AppText style={[styles.bulletText, { color: colors.text }]}>{text}</AppText>
+                        <AppText
+                          style={[styles.bulletSymbol, { color: colors.text }]}
+                        >
+                          •
+                        </AppText>
+                        <AppText
+                          style={[styles.bulletText, { color: colors.text }]}
+                        >
+                          {text}
+                        </AppText>
                       </View>
                     ))}
                   </View>
-
 
                   <View style={styles.buttonRow}>
                     <ActionButton
@@ -87,23 +102,29 @@ const ProductDeleteModal = ({
                       onPress={handleDeletePress}
                       style={[styles.button, { backgroundColor: colors.danger }]}
                     />
-                    {isDraft === false && (
+                    {!isDraft && (
                       <ActionButton
                         label="Mark as Sold"
                         onPress={() => {
                           onSold();
                           resetModal();
                         }}
-                        style={[styles.button, { backgroundColor: colors.success }]}
-                      />)
-                    }
+                        style={[
+                          styles.button,
+                          { backgroundColor: colors.success },
+                        ]}
+                      />
+                    )}
                   </View>
                 </>
               )}
 
+              {/* Step 2 */}
               {step === 2 && (
-                < View style={{ marginTop: hp('2%') }}>
-                  <AppText style={[styles.label, { color: colors.placeholder }]}>
+                <View style={{ marginTop: hp('2%') }}>
+                  <AppText
+                    style={[styles.label, { color: colors.placeholder }]}
+                  >
                     Description:
                   </AppText>
                   <TextInput
@@ -119,6 +140,7 @@ const ProductDeleteModal = ({
                         color: colors.text,
                       },
                     ]}
+                    returnKeyType="done"
                   />
 
                   <ActionButton
@@ -132,7 +154,7 @@ const ProductDeleteModal = ({
                 </View>
               )}
             </View>
-          </TouchableWithoutFeedback>
+          </KeyboardAvoidingView>
         </View>
       </TouchableWithoutFeedback>
     </Modal>
@@ -144,7 +166,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'flex-end',
-
   },
   container: {
     width: '100%',
@@ -153,24 +174,14 @@ const styles = StyleSheet.create({
     padding: wp('5%'),
     paddingBottom: hp('5%'),
   },
-  sheetIndicator: {
-    width: wp('12%'),
-    height: hp('0.7%'),
-    backgroundColor: '#ccc',
-    borderRadius: wp('5%'),
-    alignSelf: 'center',
-    marginBottom: hp('2%'),
-  },
   title: {
     fontSize: wp('4.8%'),
     fontWeight: '500',
-    textAlign: 'left',
     marginBottom: hp('1%'),
   },
   productName: {
     fontSize: wp('5%'),
     fontWeight: '700',
-    // textAlign: 'center',
     marginBottom: hp('2%'),
   },
   bulletList: {
@@ -183,7 +194,6 @@ const styles = StyleSheet.create({
   },
   bulletSymbol: {
     fontSize: wp('5%'),
-    lineHeight: hp('3%'),
     marginRight: wp('2%'),
     top: 2,
     fontWeight: 'bold',
@@ -193,7 +203,6 @@ const styles = StyleSheet.create({
     fontSize: wp('4%'),
     lineHeight: hp('2.8%'),
   },
-
   label: {
     fontSize: wp('3.8%'),
     marginBottom: hp('1%'),
@@ -223,8 +232,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: hp('2%'),
+    alignItems: 'center',
   },
-
 });
 
 export default ProductDeleteModal;

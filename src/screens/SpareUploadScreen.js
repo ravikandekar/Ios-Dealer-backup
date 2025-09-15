@@ -372,11 +372,11 @@ const SpareUploadScreen = ({ navigation }) => {
         }
     };
     const handleSubscribe = () => {
-        clearFields([
-            'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
-            'model_name', 'price', 'kmsDriven', 'transmissionId',
-            'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id'
-        ]);
+      clearFields([
+                    'SpareBrandId', 'Sparedescription', 'Spareyear_of_manufacture',
+                    'spareProductTypeId', 'Spareprice', 'spareConditionId',
+                    'SparePartNameId', 'Sparename', 'subproducttypeId', 'SpareyearId'
+                ]);
 
         InteractionManager.runAfterInteractions(() => {
             setShowSubscriptionModal(false);
@@ -386,7 +386,7 @@ const SpareUploadScreen = ({ navigation }) => {
     };
     return (
         <BackgroundWrapper>
-            <DetailsHeader title={'Spare Parts'} stepText="6/6" rightType="steps" />
+            <DetailsHeader title={'Spare Parts'} stepText="5/5" rightType="steps" />
             <AppText style={[styles.title, { color: theme.colors.text }]}>
                 Upload Spare Parts photos.
             </AppText>
@@ -479,10 +479,11 @@ const SpareUploadScreen = ({ navigation }) => {
                         <TouchableOpacity
                             style={styles.bottomModalButton}
                             onPress={() => {
+                                handlePublish('save');
                                 InteractionManager.runAfterInteractions(() => {
                                     setShowConfirmModal(false);
-                                })
-                                handlePublish('save');
+
+                                });
                             }}
                             disabled={loading}
                         >

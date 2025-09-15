@@ -169,7 +169,7 @@ const SparePartName = ({ navigation, route }) => {
     <BackgroundWrapper>
       <DetailsHeader
         title={isCar ? 'Car Spare Details' : 'Bike Spare Details'}
-        stepText="2/7"
+        stepText="3/5"
         rightType="steps"
         onBackPress={() => navigation.goBack()}
       />

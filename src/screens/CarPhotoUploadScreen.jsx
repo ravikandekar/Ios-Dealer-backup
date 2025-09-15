@@ -106,12 +106,12 @@ const CarPhotoUploadScreen = ({ navigation }) => {
             console.warn("Permission error:", err);
             return false;
         }
-    }; 
+    };
     const pickImage = async (source) => {
-         if (Platform.OS === "android") {
-           const hasPermission = await requestCameraAndStoragePermissions();
-           if (!hasPermission) return;
-         }
+        if (Platform.OS === "android") {
+            const hasPermission = await requestCameraAndStoragePermissions();
+            if (!hasPermission) return;
+        }
         const options = { mediaType: 'photo', selectionLimit: isBike ? 5 : 10 };
         const callback = (response) => {
             if (!response.didCancel && !response.errorCode && response.assets?.length) {
@@ -338,12 +338,12 @@ const CarPhotoUploadScreen = ({ navigation }) => {
             // ✅ Check success based on appCode
             if (responseData?.appCode === 1000) {
                 const createdVehicle = isBike
-                    ? responseData.data?.createdBike  ||responseData.data?.updatedBike
-                    : responseData.data?.createdCar ||responseData.data?.updatedCar;
+                    ? responseData.data?.createdBike || responseData.data?.updatedBike
+                    : responseData.data?.createdCar || responseData.data?.updatedCar;
 
                 showToast(
                     'success',
-                    'Success', 
+                    'Success',
                     `${vehicleType} ${actionType === 'save' ? 'saved' : 'published'} successfully!`
                 );
 
@@ -351,7 +351,7 @@ const CarPhotoUploadScreen = ({ navigation }) => {
                 clearFields([
                     'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
                     'model_name', 'price', 'kmsDriven', 'transmissionId',
-                    'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id'
+                    'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id', 'model_name'
                 ]);
                 updateForm('images', []);
                 updateForm('isEdit', false);
@@ -448,7 +448,7 @@ const CarPhotoUploadScreen = ({ navigation }) => {
         clearFields([
             'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
             'model_name', 'price', 'kmsDriven', 'transmissionId',
-            'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id'
+            'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id', 'model_name'
         ]);
 
         InteractionManager.runAfterInteractions(() => {
@@ -552,8 +552,11 @@ const CarPhotoUploadScreen = ({ navigation }) => {
                         <TouchableOpacity
                             style={styles.bottomModalButton}
                             onPress={() => {
-                                setShowConfirmModal(false);
                                 handlePublish('save');
+                                InteractionManager.runAfterInteractions(() => {
+                                    setShowConfirmModal(false);
+
+                                });
                             }}
                             disabled={loading}
                         >
@@ -574,7 +577,7 @@ const CarPhotoUploadScreen = ({ navigation }) => {
                 title="Permission Required"
                 message="Camera and storage permissions are required. Please enable them in settings."
             />
-            <Loader visible={loading}/>
+            <Loader visible={loading} />
 
         </BackgroundWrapper>
     );

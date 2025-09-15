@@ -160,8 +160,8 @@ const CarHistoryAndColor = ({ navigation }) => {
                     styles.colorCircle,
                     {
                       backgroundColor: colorCode,
-                      borderWidth: selectedColorId === color._id ? 2 : 0,
-                      borderColor: theme.colors.primary,
+                      borderWidth: selectedColorId === color._id ? 1.5 : 1,
+                      borderColor: selectedColorId === color._id ? theme.colors.primary : '#D3D3D3',
                     },
                   ]}
                   onPress={() => handleColorSelect(color)}
