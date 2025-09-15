@@ -4,11 +4,33 @@ import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messag
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native';
 import { navigate } from './NavigationService';
 import { handleNotificationData } from './notifications';
+import apiClient from './apiClient';
+import { showToast } from './toastService';
 // import { navigate } from '../navigations/RootNavigation';
 
 /**
  * 🔔 Display local notification
  */
+
+export const registerDeviceToken = async (token: string, type: string) => {
+  try {
+
+    const payload = { token, type };
+
+    console.log('📡 [API] Registering device token:', payload);
+
+    const res = await apiClient.post('/api/dealer/devicetokenRoute/devicetoken', payload);
+
+    if (res?.data?.appCode !== 1000) {
+      showToast('error', '', res?.data?.message || 'Failed to save device token');
+    } else {
+      console.log('✅ [API] Device token registered successfully');
+    }
+  } catch (err) {
+    console.error('❌ [API] Failed to save device token:', err);
+  }
+};
+
 export const displayLocalNotification = async (
   title: string,
   body: string,
@@ -103,6 +125,10 @@ export const requestPermission = async () => {
     ) {
       const token = await messaging().getToken();
       console.log('🎫 [FCM] Token:', token);
+
+      // ✅ Register token with backend
+      await registerDeviceToken(token, Platform.OS);
+
       await messaging().subscribeToTopic('GlobalTopic');
       console.log('✅ [FCM] Subscribed to GlobalTopic');
     } else {
@@ -115,6 +141,7 @@ export const requestPermission = async () => {
     console.error('❌ [FCM] Permission error:', err);
   }
 };
+
 
 /**
  * 📲 Setup listeners
