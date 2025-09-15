@@ -445,17 +445,17 @@ const CarPhotoUploadScreen = ({ navigation }) => {
         }
     };
     const handleSubscribe = () => {
-        clearFields([
-            'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
-            'model_name', 'price', 'kmsDriven', 'transmissionId',
-            'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id', 'model_name'
-        ]);
+        // clearFields([
+        //     'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
+        //     'model_name', 'price', 'kmsDriven', 'transmissionId',
+        //     'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id', 'model_name'
+        // ]);
 
         InteractionManager.runAfterInteractions(() => {
             setShowSubscriptionModal(false);
         });
 
-        navigation.navigate('SubscriptionScreen');
+        navigation.replace('SubscriptionScreen');
     };
     return (
         <BackgroundWrapper>

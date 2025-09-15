@@ -308,16 +308,16 @@ const ProfileDetailsScreen = () => {
       onRightIconPress: onRightIconPress,
       maxLength: 10,
     },
-    {
-      key: 'aadharNumber',
-      label: 'Aadhar Number :',
-      placeholder: 'Enter Aadhar number',
-      iconName: 'card-account-details',
-      keyboardType: 'numeric',
-      rightIcon: 'information-outline',
-      onRightIconPress: onRightIconPress,
-      maxLength: 12,
-    },
+    // {
+    //   key: 'aadharNumber',
+    //   label: 'Aadhar Number :',
+    //   placeholder: 'Enter Aadhar number',
+    //   iconName: 'card-account-details',
+    //   keyboardType: 'numeric',
+    //   rightIcon: 'information-outline',
+    //   onRightIconPress: onRightIconPress,
+    //   maxLength: 12,
+    // },
     {
       key: 'city',
       label: 'City :',
@@ -585,7 +585,7 @@ const ProfileDetailsScreen = () => {
             </>
           )}
 
-          <ActionButton label="Save" onPress={handleSave} />
+          <ActionButton label="Save" onPress={handleSave} style={{ marginBottom: wp('10%') }} />
         </ScrollView>
       )}
 

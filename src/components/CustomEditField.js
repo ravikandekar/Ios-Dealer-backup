@@ -109,6 +109,7 @@ const CustomEditField = ({
           autoCapitalize={keyboardType === 'email-address' ? 'none' : 'sentences'}
           autoCorrect={keyboardType !== 'email-address' && keyboardType !== 'password'}
           maxLength={maxLength}
+          textTransform={keyboardType === 'email-address' ? 'none' : 'capitalize'}
         />
 
         <View style={styles.actionsContainer}>

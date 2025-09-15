@@ -12,7 +12,6 @@ import { showToast } from './toastService';
  * - Prevents app from crashing on failure
  */
 export const verifyPurchaseOnBackend = async ({ productId, purchaseToken, userID }) => {
-  showToast('error', '', productId);
   const payload = {
     dealer_id: userID, 
     packageName: 'com.gadilobharat.dealers',

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -6,6 +6,10 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Platform,
+  Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -27,7 +31,7 @@ import Loader from '../components/Loader';
 const NewTicketScreen = ({ navigation }) => {
   const { theme, userID } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
-
+  const pickerRef = useRef(null);
   useEffect(() => {
     const fetchIssues = async () => {
       try {
@@ -151,128 +155,176 @@ const NewTicketScreen = ({ navigation }) => {
   };
 
   return (
-    <BackgroundWrapper
+   <BackgroundWrapper
       style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <DetailsHeader title="New Ticket" rightType="none" />
 
-      <View style={styles.contentContainer}>
-        {/* Dropdown */}
-        <ScrollView>
-          <AppText style={[styles.label, { color: theme.colors.text }]}>
-            Select a issue :
-          </AppText>
-          <RNPickerSelect
-            // onValueChange={value => setSelectedIssue(value)}
-            onValueChange={value => {
-              const selected = issueOptions.find(item => item.value === value);
-              setSelectedIssue(selected);
-            }}
-            items={issueOptions}
-            placeholder={{
-              label: 'Select an issue...',
-              value: null,
-              color: theme.colors.placeholder,
+      {/* ✅ Keyboard avoiding & dismiss wrapper */}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? hp('5%') : 0}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <View style={styles.contentContainer}>
+            <ScrollView
+              contentContainerStyle={{ paddingBottom: hp('3%') }}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}>
+              
+              {/* Dropdown */}
+              <AppText style={[styles.label, { color: theme.colors.text }]}>
+                Select a issue :
+              </AppText>
 
-            }}
-            useNativeAndroidPickerStyle={false}
-            style={{
-              inputIOS: [
-                styles.pickerInput,
-                { backgroundColor: theme.colors.inputBg, color: theme.colors.text },
-              ],
-              inputAndroid: [
-                styles.pickerInput,
-                { backgroundColor: theme.colors.inputBg, color: theme.colors.text },
-              ],
-              placeholder: {
-                color: theme.colors.placeholder, // placeholder text color
-              },
-              iconContainer: {
-                top: hp('2%'),
-                right: wp('3%'),
-              },
-            }}
-            Icon={() => (
-              <Icon name="chevron-down" size={20} color={theme.colors.text} />
-            )}
-          />
-
-          {/* Description */}
-          <View style={styles.descriptionHeader}>
-            <AppText style={[styles.label, { color: theme.colors.text }]}>
-              Description :
-            </AppText>
-            <AppText
-              style={{ color: theme.colors.placeholder, fontSize: wp('3.5%') }}>
-              (1500 characters)
-            </AppText>
-          </View>
-          <TextInput
-            style={[styles.textArea, { backgroundColor: theme.colors.inputBg, color: theme.colors.text }]}
-            placeholder="Description here"
-            placeholderTextColor={theme.colors.placeholder}
-            multiline
-            maxLength={1500}
-            numberOfLines={6}
-            textAlignVertical="top"
-            value={description}
-            onChangeText={setDescription}
-          />
-
-          {/* File Upload */}
-          <AppText
-            style={[
-              styles.label,
-              { color: theme.colors.text, marginTop: hp('2%') },
-            ]}>
-            Upload file :
-          </AppText>
-          {/* <TouchableOpacity onPress={pickFile} style={styles.uploadButton}>
-          <Icon name="cloud-upload-outline" size={wp('6%')} color="#fff" />
-          <AppText style={styles.uploadText}>Upload File</AppText>
-        </TouchableOpacity> */}
-          <TouchableOpacity
-            style={[styles.uploadBox, { backgroundColor: theme.colors.inputBg }]}
-            onPress={pickFile}>
-            <View style={styles.uploadIconContainer}>
-              <Icon name="attach" size={20} color="#242424" />
-            </View>
-            <AppText
-              style={[styles.uploadText, { color: theme.colors.placeholder }]}>
-              Attach screenshot or file
-            </AppText>
-          </TouchableOpacity>
-
-          {selectedFiles.length > 0 && (
-            <View style={styles.previewContainer}>
-              {selectedFiles.map((file, index) => (
-                <View key={index} style={styles.fileItem}>
-                  {file.type?.startsWith('image') ? (
-                    <Image
-                      source={{ uri: file.uri }}
-                      style={styles.imagePreview}
-                    />
-                  ) : (
-                    <Icon
-                      name="document-text-outline"
-                      size={wp('8%')}
-                      color="#333"
-                    />
-                  )}
-                  <AppText style={styles.fileName}>{file.name}</AppText>
-                  <TouchableOpacity onPress={() => removeFile(index)}>
-                    <Icon name="close-circle" size={wp('5%')} color="red" />
-                  </TouchableOpacity>
+              {/* Wrapper to make picker open anywhere pressed */}
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => pickerRef.current?.togglePicker()} // 👈 Force open
+                style={{ marginBottom: hp('2%') }}>
+                <View pointerEvents="none">
+                  <RNPickerSelect
+                    ref={pickerRef}
+                    onValueChange={(value) => {
+                      const selected = issueOptions.find(
+                        (item) => item.value === value
+                      );
+                      setSelectedIssue(selected);
+                    }}
+                    items={issueOptions}
+                    placeholder={{
+                      label: 'Select an issue...',
+                      value: null,
+                      color: theme.colors.placeholder,
+                    }}
+                    useNativeAndroidPickerStyle={false}
+                    style={{
+                      inputIOS: [
+                        styles.pickerInput,
+                        {
+                          backgroundColor: theme.colors.inputBg,
+                          color: theme.colors.text,
+                        },
+                      ],
+                      inputAndroid: [
+                        styles.pickerInput,
+                        {
+                          backgroundColor: theme.colors.inputBg,
+                          color: theme.colors.text,
+                        },
+                      ],
+                      placeholder: {
+                        color: theme.colors.placeholder,
+                      },
+                      iconContainer: {
+                        top: hp('2%'),
+                        right: wp('3%'),
+                      },
+                    }}
+                    Icon={() => (
+                      <Icon
+                        name="chevron-down"
+                        size={20}
+                        color={theme.colors.text}
+                      />
+                    )}
+                  />
                 </View>
-              ))}
-            </View>
-          )}
-        </ScrollView>
+              </TouchableOpacity>
 
-        {/* <ActionButton label="Submit Ticket" onPress={() => navigation.navigate('TicketListScreen')} /> */}
-        <ActionButton label="Submit Ticket" onPress={handleSubmit} />
-        {loading && <Loader visible={true} />}
-      </View>
+              {/* Description */}
+              <View style={styles.descriptionHeader}>
+                <AppText style={[styles.label, { color: theme.colors.text }]}>
+                  Description :
+                </AppText>
+                <AppText
+                  style={{
+                    color: theme.colors.placeholder,
+                    fontSize: wp('3.5%'),
+                  }}>
+                  (1500 characters)
+                </AppText>
+              </View>
+              <TextInput
+                style={[
+                  styles.textArea,
+                  {
+                    backgroundColor: theme.colors.inputBg,
+                    color: theme.colors.text,
+                  },
+                ]}
+                placeholder="Description here"
+                placeholderTextColor={theme.colors.placeholder}
+                multiline
+                maxLength={1500}
+                numberOfLines={6}
+                textAlignVertical="top"
+                value={description}
+                keyboardType="default"
+                onChangeText={setDescription}
+              />
+
+              {/* File Upload */}
+              <AppText
+                style={[
+                  styles.label,
+                  { color: theme.colors.text, marginTop: hp('2%') },
+                ]}>
+                Upload file :
+              </AppText>
+
+              <TouchableOpacity
+                style={[
+                  styles.uploadBox,
+                  { backgroundColor: theme.colors.inputBg },
+                ]}
+                onPress={pickFile}>
+                <View style={styles.uploadIconContainer}>
+                  <Icon name="attach" size={20} color="#242424" />
+                </View>
+                <AppText
+                  style={[
+                    styles.uploadText,
+                    { color: theme.colors.placeholder },
+                  ]}>
+                  Attach screenshot or file
+                </AppText>
+              </TouchableOpacity>
+
+              {selectedFiles.length > 0 && (
+                <View style={styles.previewContainer}>
+                  {selectedFiles.map((file, index) => (
+                    <View key={index} style={styles.fileItem}>
+                      {file.type?.startsWith('image') ? (
+                        <Image
+                          source={{ uri: file.uri }}
+                          style={styles.imagePreview}
+                        />
+                      ) : (
+                        <Icon
+                          name="document-text-outline"
+                          size={wp('8%')}
+                          color="#333"
+                        />
+                      )}
+                      <AppText style={styles.fileName}>{file.name}</AppText>
+                      <TouchableOpacity onPress={() => removeFile(index)}>
+                        <Icon
+                          name="close-circle"
+                          size={wp('5%')}
+                          color="red"
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </ScrollView>
+
+            <ActionButton label="Submit Ticket" onPress={handleSubmit} />
+            {loading && <Loader visible={true} />}
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </BackgroundWrapper>
   );
 };

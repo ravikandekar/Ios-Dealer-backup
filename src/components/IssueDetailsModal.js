@@ -159,7 +159,7 @@ const stripHtmlTags = (str) => {
         <ScrollView showsVerticalScrollIndicator={false}>
           {/* Subject */}
           <AppText style={[styles.label, {color: theme.colors.text}]}>Your Issue</AppText>
-          <AppText style={[styles.value, {color: theme.colors.text}]}>{ticket?.sender || 'N/A'}</AppText>
+          <AppText style={[styles.value, {color: theme.colors.text}]}>{ticket?.subject || 'N/A'}</AppText>
 
           {/* Description */}
           <AppText style={[styles.label, {color: theme.colors.text}]}>Description</AppText>
