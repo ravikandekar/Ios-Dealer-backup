@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: wp('2%'),
     paddingVertical: hp('1.6%'),
-    paddingHorizontal: wp('30%'),
+    paddingHorizontal: wp('25%'),
     marginTop: hp('8%'),
   },
   buttonText: {

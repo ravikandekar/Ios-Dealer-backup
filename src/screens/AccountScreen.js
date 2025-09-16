@@ -219,7 +219,7 @@ const AccountScreen = () => {
   }
 
   return (
-    <BackgroundWrapper>
+    <BackgroundWrapper style={{ padding: wp('1%') }}>
       <DetailsHeader title="Accounts" onBackPress={() => navigation.goBack()} />
       <DeleteAccountModal
         visible={deleteModalVisible}

@@ -498,7 +498,7 @@ const LeadsScreen = () => {
 
     if (loading) {
         return (
-            <BackgroundWrapper style={{ padding: wp('2%') }}>
+            <BackgroundWrapper style={{ padding: wp('1%') }}>
                 <DetailsHeader
                     title="Leads"
                     stepText="Loading..."
@@ -513,7 +513,7 @@ const LeadsScreen = () => {
     }
 
     return (
-        <BackgroundWrapper style={{ padding: wp('2%') }}>
+        <BackgroundWrapper style={{ padding: wp('1%') }}>
             <DetailsHeader
                 title="Leads"
                 stepText={hasDateFilter

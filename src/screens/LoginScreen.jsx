@@ -187,7 +187,7 @@ const handleLogin = async () => {
               label="Get OTP"
               disabled={!isChecked}
               style={{
-                paddingHorizontal: wp('1%'),
+               
                 backgroundColor: isChecked ? theme.colors.themeIcon : '#ccc',
               }}
               labelStyle={{

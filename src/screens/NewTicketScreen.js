@@ -155,7 +155,7 @@ const NewTicketScreen = ({ navigation }) => {
   };
 
   return (
-   <BackgroundWrapper
+    <BackgroundWrapper
       style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <DetailsHeader title="New Ticket" rightType="none" />
 
@@ -167,10 +167,10 @@ const NewTicketScreen = ({ navigation }) => {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.contentContainer}>
             <ScrollView
-              contentContainerStyle={{ paddingBottom: hp('3%') }}
+              contentContainerStyle={{ paddingBottom: hp('1%') }}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}>
-              
+
               {/* Dropdown */}
               <AppText style={[styles.label, { color: theme.colors.text }]}>
                 Select a issue :
@@ -179,56 +179,59 @@ const NewTicketScreen = ({ navigation }) => {
               {/* Wrapper to make picker open anywhere pressed */}
               <TouchableOpacity
                 activeOpacity={0.8}
-                onPress={() => pickerRef.current?.togglePicker()} // 👈 Force open
-                style={{ marginBottom: hp('2%') }}>
-                <View pointerEvents="none">
-                  <RNPickerSelect
-                    ref={pickerRef}
-                    onValueChange={(value) => {
-                      const selected = issueOptions.find(
-                        (item) => item.value === value
-                      );
-                      setSelectedIssue(selected);
-                    }}
-                    items={issueOptions}
-                    placeholder={{
-                      label: 'Select an issue...',
-                      value: null,
+                style={{ marginBottom: hp('2%') }}
+                onPress={() => {
+                  if (pickerRef.current) {
+                    pickerRef.current.togglePicker();
+                  }
+                }}
+              >
+                <RNPickerSelect
+                  ref={pickerRef}
+                  onValueChange={(value) => {
+                    const selected = issueOptions.find((item) => item.value === value);
+                    setSelectedIssue(selected);
+                  }}
+                  items={issueOptions}
+                  placeholder={{
+                    label: 'Select an issue...',
+                    value: null,
+                    color: theme.colors.placeholder,
+                  }}
+                  useNativeAndroidPickerStyle={false}
+                  pickerProps={{
+                    mode: 'dialog',
+                  }}
+                  disabled={false} // ✅ Ensure picker is not disabled
+                  style={{
+                    inputIOS: [
+                      styles.pickerInput,
+                      {
+                        backgroundColor: theme.colors.inputBg,
+                        color: theme.colors.text,
+                        // ✅ Ensure pointer events are enabled
+                        pointerEvents: 'none', // This prevents double handling
+                      },
+                    ],
+                    inputAndroid: [
+                      styles.pickerInput,
+                      {
+                        backgroundColor: theme.colors.inputBg,
+                        color: theme.colors.text,
+                      },
+                    ],
+                    placeholder: {
                       color: theme.colors.placeholder,
-                    }}
-                    useNativeAndroidPickerStyle={false}
-                    style={{
-                      inputIOS: [
-                        styles.pickerInput,
-                        {
-                          backgroundColor: theme.colors.inputBg,
-                          color: theme.colors.text,
-                        },
-                      ],
-                      inputAndroid: [
-                        styles.pickerInput,
-                        {
-                          backgroundColor: theme.colors.inputBg,
-                          color: theme.colors.text,
-                        },
-                      ],
-                      placeholder: {
-                        color: theme.colors.placeholder,
-                      },
-                      iconContainer: {
-                        top: hp('2%'),
-                        right: wp('3%'),
-                      },
-                    }}
-                    Icon={() => (
-                      <Icon
-                        name="chevron-down"
-                        size={20}
-                        color={theme.colors.text}
-                      />
-                    )}
-                  />
-                </View>
+                    },
+                    iconContainer: {
+                      top: hp('2%'),
+                      right: wp('3%'),
+                    },
+                  }}
+                  Icon={() => (
+                    <Icon name="chevron-down" size={20} color={theme.colors.text} />
+                  )}
+                />
               </TouchableOpacity>
 
               {/* Description */}
@@ -318,9 +321,10 @@ const NewTicketScreen = ({ navigation }) => {
                   ))}
                 </View>
               )}
+              <ActionButton label="Submit Ticket" onPress={handleSubmit} style={{ marginTop: wp('8%') }} />
             </ScrollView>
 
-            <ActionButton label="Submit Ticket" onPress={handleSubmit} />
+
             {loading && <Loader visible={true} />}
           </View>
         </TouchableWithoutFeedback>

@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
     borderRadius: wp('3%'),
     padding: wp('4%'),
     marginHorizontal: wp('5%'),
-    marginBottom: hp('2%'),
+    marginBottom: hp('8%'),
   },
   emailText: {
     flex: 1,

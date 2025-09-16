@@ -1,17 +1,16 @@
-import React, { useState, useContext, useRef, useEffect } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import {
   View,
-
   TextInput,
   StyleSheet,
   TouchableOpacity,
   Dimensions,
-  StatusBar,
   Image,
   Keyboard,
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
   ScrollView,
+  Platform,
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { AuthContext } from '../context/AuthContext';
@@ -21,7 +20,7 @@ import ActionButton from '../components/ActionButton';
 import { logo } from '../../public_assets/media';
 import apiClient from '../utils/apiClient';
 import { showToast } from '../utils/toastService';
-import { getToken, storeRefreshToken, storeToken } from '../utils/storage';
+import { getToken, storeRefreshToken } from '../utils/storage';
 import AppText from '../components/AppText';
 import { initApp } from '../utils/appInitializer';
 import { useFormStore } from '../store/formStore';
@@ -29,8 +28,10 @@ import { useFormStore } from '../store/formStore';
 const { width } = Dimensions.get('window');
 
 const OtpScreen = ({ navigation, route }) => {
-  const { theme, isDark, login, setUserID,
-
+  const {
+    theme,
+    login,
+    setUserID,
     setUserName,
     setcityselected,
     setProfileCompleted,
@@ -39,9 +40,8 @@ const OtpScreen = ({ navigation, route }) => {
     setregister,
     setSelectedCategory,
     setIsAppInitialized,
-    checkToken
-
   } = useContext(AuthContext);
+
   const [otp, setOtp] = useState(['', '', '', '']);
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
@@ -50,18 +50,6 @@ const OtpScreen = ({ navigation, route }) => {
   const inputRefs = useRef([]);
   const mobileNumber = route.params?.mobileNumber;
   const { updateForm } = useFormStore();
-
-  // useEffect(() => {
-  //   const initializeApp = async () => {
-  //     setLoading(true);
-
-
-
-  //     setLoading(false);
-  //   };
-
-  //   initializeApp();
-  // }, []);
 
   const handleOtpChange = (text, index) => {
     if (!/^[0-9]?$/.test(text)) return;
@@ -98,16 +86,12 @@ const OtpScreen = ({ navigation, route }) => {
     try {
       const response = await apiClient.post('/api/dealer/auth/request-otp', { phone: mobileNumber });
       if (response.data.success) {
-        console.log('response', response.data.data);
-
         showToast('success', '', 'OTP sent successfully');
-        showToast('success', '', response.data.data.message);
-        startResendTimer(); // Start timer after successful resend
+        startResendTimer();
       } else {
         showToast('error', '', response.data.message || 'Failed to resend OTP');
       }
     } catch (error) {
-      console.error('Resend OTP Error:', error);
       showToast('error', '', error.response?.data?.message || 'Something went wrong. Please try again.');
     } finally {
       setResendLoading(false);
@@ -122,26 +106,19 @@ const OtpScreen = ({ navigation, route }) => {
     }
 
     Keyboard.dismiss();
-    console.log('finalOtp:', finalOtp);
-
     setLoading(true);
     try {
       const response = await apiClient.post('/api/dealer/auth/verify-otp', {
         phone: mobileNumber,
-        enteredOtp: finalOtp,  // ✅ Make sure to send correct param name as per backend
+        enteredOtp: finalOtp,
       });
-
-      console.log('API Response:', response.data);
 
       const { success, appCode, data, message } = response.data;
 
       if (success && appCode === 1000) {
         const { accessToken, refreshToken, dealer } = data;
-
         login(accessToken);
-
         const token = await getToken();
-
 
         await initApp({
           setUserID,
@@ -159,66 +136,52 @@ const OtpScreen = ({ navigation, route }) => {
         storeRefreshToken(refreshToken);
         showToast('success', '', 'OTP Verified Successfully');
         setUserID(dealer?._id);
-
+      } else if (appCode === 1018) {
+        showToast('error', '', 'Your OTP has expired or already been used.');
+      } else if (appCode === 1021) {
+        showToast('error', '', 'Incorrect OTP entered. Please try again.');
       } else {
-        // ✅ Handle Specific Error Codes
-        if (appCode === 1018) {
-          showToast('error', '', 'Your OTP has expired or already been used.');
-        } else if (appCode === 1021) {
-          showToast('error', '', 'Incorrect OTP entered. Please try again.');
-        } else {
-          showToast('error', '', message || 'Invalid OTP, please try again.');
-        }
+        showToast('error', '', message || 'Invalid OTP, please try again.');
       }
-
     } catch (error) {
-      console.error('OTP Verify Error:', error);
       const apiError = error.response?.data;
-      showToast(
-        'error',
-        '',
-        apiError?.message || 'Something went wrong. Please try again.'
-      );
+      showToast('error', '', apiError?.message || 'Something went wrong. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-        {/* StatusBar can go here if needed */}
-
         {/* Header */}
         <View style={styles.svgCurve}>
           <WaveHeaderBackground />
           <Image source={logo} style={styles.logo} resizeMode="contain" />
         </View>
 
-        {/* ✅ Keyboard-Aware Main Content */}
+        {/* Content */}
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           style={{ flex: 1 }}
-          keyboardVerticalOffset={Platform.OS === 'ios' ? hp('3%') : 0}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
         >
           <ScrollView
-            contentContainerStyle={styles.content}
+            contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            {/* Main Form Content */}
             <View style={styles.headerRow}>
               <AppText style={[styles.loginTitle, { color: theme.colors.themeIcon }]}>VERIFY</AppText>
               <AppText style={[styles.pagenavigate, { color: theme.colors.placeholder }]}>2/3</AppText>
             </View>
 
-            <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: hp('1%') }}>
+            <View style={styles.mobileRow}>
               <AppText style={[styles.mobileInfo, { color: theme.colors.text }]}>
-                OTP Sent to {mobileNumber}{' '}
+                OTP sent to {mobileNumber}{' '}
               </AppText>
               <TouchableOpacity onPress={() => navigation.goBack()}>
-                <AppText style={{ color: theme.colors.Highlighterwords, fontWeight: '500', fontSize: wp('4.5%') }}>Edit</AppText>
+                <AppText style={[styles.linkText, { color: theme.colors.Highlighterwords }]}>Edit</AppText>
               </TouchableOpacity>
             </View>
 
@@ -254,27 +217,19 @@ const OtpScreen = ({ navigation, route }) => {
               label={loading ? 'Verifying...' : 'Confirm'}
               onPress={handleConfirm}
               disabled={loading}
-              style={{ marginBottom: hp('2%') }}
+              style={{ backgroundColor: theme.colors.themeIcon }}
               isLoading={loading}
             />
 
-            {/* Resend & Help */}
+            {/* Resend OTP */}
             <View style={styles.bottomRow}>
               {resendTimer > 0 ? (
-                <AppText style={{
-                  color: theme.colors.placeholder,
-                  fontSize: wp('4%'),
-                  fontWeight: '500',
-                }}>
+                <AppText style={[styles.resendText, { color: theme.colors.placeholder }]}>
                   Resend OTP in 00:{resendTimer < 10 ? `0${resendTimer}` : resendTimer} sec
                 </AppText>
               ) : (
                 <TouchableOpacity onPress={resendOtp} disabled={resendLoading}>
-                  <AppText style={{
-                    color: theme.colors.Highlighterwords,
-                    fontSize: wp('4%'),
-                    fontWeight: '500',
-                  }}>
+                  <AppText style={[styles.linkText, { color: theme.colors.Highlighterwords }]}>
                     {resendLoading ? 'Resending...' : 'Resend OTP'}
                   </AppText>
                 </TouchableOpacity>
@@ -300,12 +255,9 @@ const OtpScreen = ({ navigation, route }) => {
       </View>
     </TouchableWithoutFeedback>
   );
-
 };
 
 export default OtpScreen;
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -322,31 +274,34 @@ const styles = StyleSheet.create({
     bottom: wp('4%'),
     marginLeft: wp('10%'),
   },
-  content: {
-    flex: 1,
+  scrollContent: {
+    flexGrow: 1,
     paddingHorizontal: wp('8%'),
-    paddingTop: hp('11%'),
+    paddingTop: hp('6%'),
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: hp('1.5%'),
+    marginBottom: hp('3%'),
   },
   loginTitle: {
     fontSize: wp('7%'),
     fontWeight: '700',
-  },
-  mobileInfo: {
-    fontSize: wp('3.8%'),
-
-
-
+    letterSpacing: 0.5,
   },
   pagenavigate: {
     fontSize: wp('4.5%'),
     fontWeight: '500',
     letterSpacing: 0.5,
+  },
+  mobileRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: hp('1.5%'),
+  },
+  mobileInfo: {
+    fontSize: wp('3.8%'),
   },
   infoNote: {
     fontSize: wp('3.5%'),
@@ -368,9 +323,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bottomRow: {
-    // flexDirection: 'row',
+    marginTop: hp('2%'),
+    flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+  },
+  resendText: {
+    fontSize: wp('4%'),
+    fontWeight: '500',
+  },
+  linkText: {
+    textDecorationLine: 'underline',
+    fontWeight: '500',
+    fontSize: wp('4%'),
   },
   helpText: {
     fontSize: wp('3.5%'),

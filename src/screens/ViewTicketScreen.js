@@ -388,81 +388,90 @@ const ViewTicketScreen = ({ route }) => {
 
   const renderReplySection = useMemo(() => (
     <View style={styles.replyContainer}>
-      <TextInput
-        placeholder="Write a reply..."
-        placeholderTextColor={theme.colors.placeholder}
-        value={replyMessage}
-        onChangeText={setReplyMessage}
-        style={[
-          styles.replyInput,
-          {
-            color: theme.colors.text,
-            backgroundColor: theme.colors.inputBg || '#f8f8f8',
-            borderColor: theme.colors.border || '#ccc',
-          }
-        ]}
-        multiline
-        numberOfLines={3}
-        textAlignVertical="top"
-        editable={!submittingReply}
-      />
+      {ticketId?.status === 'Resolved' ? null : (
+        <>
+          <TextInput
+            placeholder="Write a reply..."
+            placeholderTextColor={theme.colors.placeholder}
+            value={replyMessage}
+            onChangeText={setReplyMessage}
+            style={[
+              styles.replyInput,
+              {
+                color: theme.colors.text,
+                backgroundColor: theme.colors.inputBg || '#f8f8f8',
+                borderColor: theme.colors.border || '#ccc',
+              },
+            ]}
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
+            editable={!submittingReply}
+          />
 
-      {replyAttachments.length > 0 && (
-        <View style={styles.attachmentPreview}>
-          <View style={styles.attachmentInfo}>
-            {replyAttachments.map((file, index) => (
-              <View key={`attachment-${index}`} style={styles.attachmentInfo}>
-                <AppText style={[styles.attachmentText, { color: theme.colors.text }]}>
-                  📎 {file.name}
-                </AppText>
-                <TouchableOpacity onPress={() => removeAttachment(index)}>
-                  <AppText style={styles.removeAttachment}>✕</AppText>
-                </TouchableOpacity>
+          {replyAttachments.length > 0 && (
+            <View style={styles.attachmentPreview}>
+              <View style={styles.attachmentInfo}>
+                {replyAttachments.map((file, index) => (
+                  <View key={`attachment-${index}`} style={styles.attachmentInfo}>
+                    <AppText
+                      style={[styles.attachmentText, { color: theme.colors.text }]}
+                    >
+                      📎 {file.name}
+                    </AppText>
+                    <TouchableOpacity onPress={() => removeAttachment(index)}>
+                      <AppText style={styles.removeAttachment}>✕</AppText>
+                    </TouchableOpacity>
+                  </View>
+                ))}
               </View>
-            ))}
-            {/* <TouchableOpacity onPress={removeAttachment}>
-              <AppText style={styles.removeAttachment}>✕</AppText>
-            </TouchableOpacity> */}
+            </View>
+          )}
+
+          <View style={styles.replyActions}>
+            <TouchableOpacity
+              onPress={pickReplyFile}
+              style={styles.attachButton}
+              disabled={submittingReply}
+            >
+              <AppText
+                style={[
+                  styles.attachButtonText,
+                  { opacity: submittingReply ? 0.5 : 1 },
+                ]}
+              >
+                Attach File
+              </AppText>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={submitReply}
+              style={[
+                styles.sendButton,
+                {
+                  backgroundColor:
+                    submittingReply || ticketId?.status === 'Resolved'
+                      ? '#ccc'
+                      : '#044B85',
+                  opacity:
+                    submittingReply || ticketId?.status === 'Resolved' ? 0.7 : 1,
+                },
+              ]}
+              disabled={submittingReply || ticketId?.status === 'Resolved'}
+            >
+              <AppText style={styles.sendButtonText}>
+                {submittingReply
+                  ? 'Sending...'
+                  : ticketId?.status === 'Resolved'
+                    ? 'Closed'
+                    : 'Send'}
+              </AppText>
+            </TouchableOpacity>
           </View>
-        </View>
+        </>
       )}
-
-      <View style={styles.replyActions}>
-        <TouchableOpacity
-          onPress={pickReplyFile}
-          style={styles.attachButton}
-          disabled={submittingReply}>
-          <AppText style={[
-            styles.attachButtonText,
-            { opacity: submittingReply ? 0.5 : 1 }
-          ]}>
-            Attach File
-          </AppText>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={submitReply}
-          style={[
-            styles.sendButton,
-            {
-              backgroundColor:
-                submittingReply || ticketId?.status === 'Resolved' ? '#ccc' : '#044B85',
-              opacity: submittingReply || ticketId?.status === 'Resolved' ? 0.7 : 1,
-            },
-          ]}
-          disabled={submittingReply || ticketId?.status === 'Resolved'} // 👈 disable both cases
-        >
-          <AppText style={styles.sendButtonText}>
-            {submittingReply
-              ? 'Sending...'
-              : ticketId?.status === 'Resolved'
-                ? 'Closed' // 👈 optional: change label if resolved
-                : 'Send'}
-          </AppText>
-        </TouchableOpacity>
-
-      </View>
     </View>
+
   ), [replyMessage, replyAttachments, submittingReply, theme.colors, removeAttachment, pickReplyFile, submitReply]);
 
   // Loading state
@@ -494,20 +503,6 @@ const ViewTicketScreen = ({ route }) => {
         style={[styles.container, { backgroundColor: theme.colors.background }]}>
         <DetailsHeader title={ticketTitle} rightType='action' actionIcon='refresh' onActionPress={onRefresh} />
 
-        {/* <ScrollView 
-          ref={scrollViewRef}
-          style={styles.scrollContainer}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={[theme.colors.primary]}
-              tintColor={theme.colors.primary}
-            />
-          }>
-          {allMessages.map(renderMessage)}
-        </ScrollView> */}
 
         <FlatList
           data={[...allMessages].reverse()} // or just use inverted
@@ -604,7 +599,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#C8C8C8',
     padding: wp('2%'),
-    borderTopRightRadius: wp('5%'),
+    borderTopRightRadius: wp('4%'),
   },
   adminName: {
     fontSize: wp('3.8%'),
@@ -677,7 +672,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#ccc',
     padding: wp('2%'),
-    // marginBottom: hp('2%'),
+    marginBottom: hp('5%'),
     // elevation: 3,
     shadowColor: '#000',
     // shadowOffset: { width: 0, height: -2 },

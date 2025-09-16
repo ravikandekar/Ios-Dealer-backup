@@ -93,7 +93,10 @@ const DATE_RANGE_OPTIONS = [
   }
 ];
 
-const ListingOverviewCard = ({ selectedCategory, apiClient, showToast, solddeletedmodal }) => {
+const ListingOverviewCard = ({ selectedCategory, apiClient, showToast, solddeletedmodal, Viewsmodal }) => {
+
+  console.log('shankru');
+  
   const { theme } = useContext(AuthContext);
   const navigation = useNavigation();
 
@@ -111,7 +114,7 @@ const ListingOverviewCard = ({ selectedCategory, apiClient, showToast, solddelet
   // Analytics states
   const [overviewStats, setOverviewStats] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  console.log('overviewStats:', overviewStats);
   const navigateTo = (screenName) => {
     navigation.navigate(screenName);
   };
@@ -192,7 +195,7 @@ const getDateRangeDisplayText = () => {
   // Load initial data
   useEffect(() => {
     getDealerOverviewStats();
-  }, []);
+  }, [selectedCategory]);
 
   // Handle date range option selection
   const handleDateRangeSelect = (option) => {
@@ -424,7 +427,7 @@ const getDateRangeDisplayText = () => {
         {/* Grid Body */}
         <View style={styles.grid}>
           {/* Views */}
-          <TouchableOpacity style={styles.itemCard}>
+          <TouchableOpacity style={styles.itemCard} onPress={() => Viewsmodal(overviewStats)}>
             <View style={styles.topRow}>
               <View style={styles.iconCircle}>
                 <Icon name="eye" size={wp('5%')} color="#000" />

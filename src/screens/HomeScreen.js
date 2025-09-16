@@ -54,6 +54,7 @@ import { initApp } from '../utils/appInitializer';
 import { useIsFocused } from "@react-navigation/native";
 import SubscriptionModal from '../components/SubscriptionModal';
 import { verifyPurchaseOnBackendIOS } from '../utils/purchaseVerificationIOS';
+import ViewsBottomSheet from '../components/ViewsBottomSheet';
 // import { firebase } from '@react-native-firebase/crashlytics';
 const HomeScreen = ({ navigation }) => {
   const { theme, isDark, setSelectedCategory, selectedCategory, userID, checkToken, setUserID, setUserName, setregister, setcityselected, setProfileCompleted, setisAadharVerified, setBussinessdetails,
@@ -65,8 +66,10 @@ const HomeScreen = ({ navigation }) => {
   const isFocused = useIsFocused();
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [overviewStats, setOverviewStats] = useState(null);
+  const [overviewViewStats, setOverviewViewStats] = useState(null);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [bottomSheetVisible, setBottomSheetVisible] = useState(false);
+  const [isViewsModalVisible, setIsViewsModalVisible] = useState(false);
   const [showUpdate, setShowUpdate] = useState(false);
   const [bannerImages, setBannerImages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -75,7 +78,6 @@ const HomeScreen = ({ navigation }) => {
 
   const isSubscribed = formData?.subscriptionActive !== undefined ? formData?.subscriptionActive : true;
   const isSubscriberRequired = formData?.isSubscriberRequired;
-  console.log('home 222222 selectedCategoryactivesubscription_plN:', formData.subscription_plan);
 
   const oneAutoText = 'One Auto World \nOne Smart Platform';
   const indiasTrustText = 'India’s Trusted Platform to Buy & Sell Used Cars, Bikes, Spare Parts & Accessories';
@@ -130,27 +132,6 @@ const HomeScreen = ({ navigation }) => {
     }
   };
 
-  // const getDealerOverviewStats = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await apiClient.get('/api/dealer/getDealerAnalyticsRoute/analytics');
-  //     const { success, data } = response.data;
-
-  //     if (success && data?.analytics) {
-  //       setOverviewStats(data.analytics);
-  //       console.log('overviewStats from HomeScreen', data.analytics);
-  //     } else {
-  //       showToast('error', '', 'No analytics data found');
-  //       setOverviewStats(null);
-  //     }
-  //   } catch (error) {
-  //     console.error('Analytics fetch error:', error);
-  //     showToast('error', '', error?.response?.data?.message || 'Failed to load analytics data');
-  //     setOverviewStats(null);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   useEffect(() => {
     fetchBanners();
@@ -207,6 +188,12 @@ const HomeScreen = ({ navigation }) => {
 
     setBottomSheetVisible(true)
     setOverviewStats(data);
+  }
+  const Viewbottomsheet = (data) => {
+    console.log('data', data);
+
+    setIsViewsModalVisible(true)
+    setOverviewViewStats(data);
   }
 
 
@@ -311,8 +298,9 @@ const HomeScreen = ({ navigation }) => {
                       selectedCategory={selectedCategory}
                       apiClient={apiClient}
                       showToast={showToast}
-                      solddeletedmodal={(data) => bottomsheet(data)
-                      }
+                      solddeletedmodal={(data) => bottomsheet(data)}
+                        Viewsmodal={(data) => Viewbottomsheet(data)}
+                    
                     />
                   </View>
 
@@ -372,6 +360,12 @@ const HomeScreen = ({ navigation }) => {
                     onClose={() => setBottomSheetVisible(false)}
                     data={overviewStats?.assets || {}}
                   />
+                  <ViewsBottomSheet
+                    visible={isViewsModalVisible}
+                    onClose={() => setIsViewsModalVisible(false)}
+                    views={overviewViewStats?.views || 0}
+                  />
+
 
                 </View>
               </ScrollView>
