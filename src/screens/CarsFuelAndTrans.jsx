@@ -20,6 +20,7 @@ import { DetailsHeader } from '../components/DetailsHeader';
 import { useFormStore } from '../store/formStore';
 import apiClient from '../utils/apiClient';
 import { showToast } from '../utils/toastService';
+import BrandInputModal from '../components/BrandInputModal';
 
 const CarsFuelAndTrans = ({ navigation }) => {
   const { formData, updateForm } = useFormStore();
@@ -31,10 +32,11 @@ const CarsFuelAndTrans = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const { theme, selectedCategory } = useContext(AuthContext);
-
+  const [fuelType, setFuelType] = useState('');
   const category = selectedCategory || 'Car';
   const isBike = category.toLowerCase() === 'bike';
-
+  const [otherfuel, setOtherFuel] = useState('');
+  const [ShowModal, setShowModal] = useState(false);
   const fetchData = async (isRefresh = false) => {
     try {
       if (!isRefresh) setLoading(true);
@@ -85,6 +87,7 @@ const CarsFuelAndTrans = ({ navigation }) => {
   };
 
   const handleFuelPress = (item) => {
+
     if (!isBike && !selectedTrans) {
       showToast('error', 'Select Transmission', 'Please select a car transmission first.');
       return;
@@ -94,13 +97,24 @@ const CarsFuelAndTrans = ({ navigation }) => {
       showToast('error', 'Enter Model', 'Please enter model name.');
       return;
     }
-
+    if (item?.isOthers === true) {
+      setFuelType(item?._id);
+      setShowModal(true);
+      return;
+    }
     setSelectedFuel(item._id);
     updateForm('fuelTypeId', item._id);
     navigation.navigate('CarHistoryAndColor');
   };
 
-
+  const otherbrand = (fuelInput) => {
+    setShowModal(false);
+    if (fuelInput.trim()) {
+      updateForm('fuelTypeId', fuelType);
+      updateForm('carAndbike_fuel_other_text', fuelInput);
+      navigation.navigate('CarHistoryAndColor');
+    }
+  };
   const renderCard = (item, selectedId, onPress, labelKey = 'car_transmission') => {
     const name = item[labelKey];
     const isSelected = selectedId === item._id;
@@ -152,31 +166,31 @@ const CarsFuelAndTrans = ({ navigation }) => {
           />
         }
       >
-      
-          <View>
-            <AppText style={[styles.subHeader, { color: theme.colors.text }]}>
-              Enter your model name.
-            </AppText>
-            <AppText style={[styles.subHeader, { color: theme.colors.text, fontSize: wp('4.9%'), fontWeight: '500', marginBottom: 8 }]}>
-              Enter Model :
-            </AppText>
-            <View style={[styles.inputContainer, { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.placeholder }]}>
-              <TextInput
-                style={[styles.searchBox, { color: theme.colors.text }]}
-                placeholder="Enter Model"
-                value={formData.model_name|| ''}
-                onChangeText={(text) => {
-                  setSearchText(text);
-                  updateForm('model_name', text);
-                  
-                }}
-                keyboardType='default'
-                placeholderTextColor={theme.colors.placeholder}
-              />
 
-            </View>
+        <View>
+          <AppText style={[styles.subHeader, { color: theme.colors.text }]}>
+            Enter your model name.
+          </AppText>
+          <AppText style={[styles.subHeader, { color: theme.colors.text, fontSize: wp('4.9%'), fontWeight: '500', marginBottom: 8 }]}>
+            Enter Model :
+          </AppText>
+          <View style={[styles.inputContainer, { backgroundColor: theme.colors.inputBackground, borderColor: theme.colors.placeholder }]}>
+            <TextInput
+              style={[styles.searchBox, { color: theme.colors.text }]}
+              placeholder="Enter Model"
+              value={formData.model_name || ''}
+              onChangeText={(text) => {
+                setSearchText(text);
+                updateForm('model_name', text);
+
+              }}
+              keyboardType='default'
+              placeholderTextColor={theme.colors.placeholder}
+            />
+
           </View>
-     
+        </View>
+
 
         {!isBike && (
           <>
@@ -210,6 +224,15 @@ const CarsFuelAndTrans = ({ navigation }) => {
           </View>
         )}
       </ScrollView>
+      <BrandInputModal
+        visible={ShowModal}
+        onClose={() => setShowModal(false)}
+        brandInput={fuelType}
+        setBrandInput={setOtherFuel}
+        onNextPress={() => otherbrand(fuelType)}
+        onBackPress={() => navigation.goBack()}
+        theme={theme}
+      />
     </BackgroundWrapper>
   );
 };

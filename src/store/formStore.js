@@ -9,13 +9,15 @@ const initialFormState = {
   category_id: '',
   otherbrand: '',
   carAndbike_other_text: '',
+
   subscriptionActive: false,
   forceUpdateObject: {},
   isEdit: false,
   isEditSpare: false,
   carandbikeproductid: '',
   isSubscriberRequired:false,
-
+   carAndbike_fuel_other_text: '',
+   carAndbike_ownership_other_text: '',
 
 
 

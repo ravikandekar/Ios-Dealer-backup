@@ -26,7 +26,7 @@ import BrandInputModal from '../components/BrandInputModal';
 
 const CarNameScreen = ({ navigation, route }) => {
   const { formData, updateForm } = useFormStore();
-  const { theme ,selectedCategory} = useContext(AuthContext);
+  const { theme, selectedCategory } = useContext(AuthContext);
 
   const [searchText, setSearchText] = useState('');
   const [nameList, setNameList] = useState([]);
@@ -99,11 +99,11 @@ const CarNameScreen = ({ navigation, route }) => {
 
   const handleSelect = (item) => {
     if (item?.isOthers === true) {
-      setCarID(item?._id)
+      setCarID(item?._id);
       setShowModal(true);
       return;
     }
-      updateForm('carandBikeId', item._id);
+    updateForm('carandBikeId', item?._id);
     navigation.navigate('CarsFuelAndTrans');
   };
 
@@ -216,12 +216,12 @@ const CarNameScreen = ({ navigation, route }) => {
           }
         />
       )}
-       <BrandInputModal
+      <BrandInputModal
         visible={ShowModal}
         onClose={() => setShowModal(false)}
         brandInput={carInput}
         setBrandInput={setBrandInput}
-        onNextPress={() => otherbrand(carInput) }
+        onNextPress={() => otherbrand(carInput)}
         onBackPress={() => navigation.goBack()}
         theme={theme}
       />

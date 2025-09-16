@@ -230,6 +230,7 @@ const CarPhotoUploadScreen = ({ navigation }) => {
             formPayload.append('ownership_id', formData?.ownerHistoryId);
             formPayload.append('brand_other_text', formData?.otherbrand);
             formPayload.append('subscription_plan', formData?.subscription_plan);
+            formPayload.append('ownership_other_text', formData?.carAndbike_ownership_other_text);
             formPayload.append('isPublished', actionType === 'save' ? 'false' : 'false');
             formPayload.append('isDraft', actionType === 'save' ? 'true' : 'false');
 

@@ -19,11 +19,12 @@ import { useFormStore } from '../store/formStore';
 import AppText from '../components/AppText';
 import apiClient from '../utils/apiClient';
 import { showToast } from '../utils/toastService';
+import BrandInputModal from '../components/BrandInputModal';
 
 const CarHistoryAndColor = ({ navigation }) => {
   const { theme, selectedCategory } = useContext(AuthContext);
   const { formData, updateForm } = useFormStore();
-
+  const [ShowModal, setShowModal] = useState(false);
   const isBike = selectedCategory?.toLowerCase() === 'bike';
 
   const [selectedColorId, setSelectedColorId] = useState(formData.carColorId || null);
@@ -36,6 +37,8 @@ const CarHistoryAndColor = ({ navigation }) => {
 
   const [colors, setColors] = useState([]);
   const [ownerships, setOwnerships] = useState([]);
+  const [otherOwnership, setOtherOwnership] = useState('');
+  const [otherOwnershipinput, setOtherOwnershipinput] = useState('');
   const [years, setYears] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -91,8 +94,22 @@ const CarHistoryAndColor = ({ navigation }) => {
   };
 
   const handleOwnerSelect = (owner) => {
-    setSelectedOwnerId(owner._id);
-    updateForm('ownerHistoryId', owner._id);
+    if (owner?.isOthers === true) {
+      setOtherOwnership(owner?._id)
+      setShowModal(true);
+      return;
+    }
+    setSelectedOwnerId(owner?._id);
+    updateForm('ownerHistoryId', owner?._id);
+
+  };
+  const otherownership = (otherOwnershipinput) => {
+    setShowModal(false);
+    if (otherOwnershipinput.trim()) {
+      updateForm('ownerHistoryId', otherOwnership);
+      updateForm('carAndbike_ownership_other_text', otherOwnershipinput);
+
+    }
   };
 
   const handleYearSelect = (year) => {
@@ -111,8 +128,8 @@ const CarHistoryAndColor = ({ navigation }) => {
       return;
     }
 
-    setSelectedYearId(year._id);
-    updateForm('yearId', year._id);
+    setSelectedYearId(year?._id);
+    updateForm('yearId', year?._id);
     navigation.navigate('RangeSelectorScreen');
   };
 
@@ -280,6 +297,15 @@ const CarHistoryAndColor = ({ navigation }) => {
 
         </View>
       </ScrollView>
+      <BrandInputModal
+        visible={ShowModal}
+        onClose={() => setShowModal(false)}
+        brandInput={otherOwnershipinput}
+        setBrandInput={setOtherOwnershipinput}
+        onNextPress={() => otherownership(otherOwnershipinput)}
+        onBackPress={() => navigation.goBack()}
+        theme={theme}
+      />
     </BackgroundWrapper>
   );
 };
