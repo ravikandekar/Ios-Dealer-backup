@@ -299,8 +299,8 @@ const HomeScreen = ({ navigation }) => {
                       apiClient={apiClient}
                       showToast={showToast}
                       solddeletedmodal={(data) => bottomsheet(data)}
-                        Viewsmodal={(data) => Viewbottomsheet(data)}
-                    
+                      Viewsmodal={(data) => Viewbottomsheet(data)}
+
                     />
                   </View>
 
@@ -314,10 +314,10 @@ const HomeScreen = ({ navigation }) => {
                       onPress={() => {
                         clearFields([
                           'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
-                          'model_name', 'price', 'kmsDriven', 'transmissionId',
-                          'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id', 'model_name',
+                          'model_name', 'price', 'kmsDriven', 'transmissionId', 'bikeTypeId',
+                          'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id',
                           'SpareBrandId', 'Sparedescription', 'Spareyear_of_manufacture',
-                          'spareProductTypeId', 'Spareprice', 'spareConditionId',
+                          'spareProductTypeId', 'Spareprice', 'spareConditionId', 'images',
                           'SparePartNameId', 'Sparename', 'subproducttypeId', 'SpareyearId'
                         ]);
 

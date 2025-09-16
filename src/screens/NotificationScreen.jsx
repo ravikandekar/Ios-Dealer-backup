@@ -226,8 +226,8 @@ const NotificationScreen = () => {
         <View style={[styles.logo, { backgroundColor: theme.colors.themeIcon }]}>
           <Image
             source={logowhite}
-            style={{ width: "100%", height: "100%" }}
-            resizeMode="center"
+            style={{ width: "100%", height: "100%" ,}}
+            resizeMode="contain"
           />
         </View>
         <View style={styles.textContainer}>
