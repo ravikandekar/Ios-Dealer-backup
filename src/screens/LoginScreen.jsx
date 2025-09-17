@@ -72,9 +72,9 @@ const handleLogin = async () => {
       phone: mobile,
     });
 
-    const { success, appCode, message, data } = response.data;
-
-    if (success && appCode === 1000) {
+    const {  appCode, message, data } = response.data;
+    
+    if ( appCode === 1000) {
       // ✅ OTP success
       const otpMatch = data?.message?.match(/\d{4,6}/);
       const otp = otpMatch ? otpMatch[0] : null;

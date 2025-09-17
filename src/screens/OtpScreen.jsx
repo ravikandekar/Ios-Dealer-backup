@@ -119,7 +119,7 @@ const OtpScreen = ({ navigation, route }) => {
         const { accessToken, refreshToken, dealer } = data;
         login(accessToken);
         const token = await getToken();
-
+ 
         await initApp({
           setUserID,
           setUserName,

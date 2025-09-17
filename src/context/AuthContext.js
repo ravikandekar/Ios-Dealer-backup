@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (token) => {
     console.log('🔐 Logging in with token:', token);
     await storeToken(token);
-    setIsAuthenticated(true);
+    // setIsAuthenticated(true);
     console.log('✅ Authenticated set to true');
   };
 

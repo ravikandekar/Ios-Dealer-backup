@@ -30,7 +30,7 @@ const PAGE_SIZE = 20;
 
 const MyAssetsScreen = ({ navigation }) => {
     const { theme, selectedCategory, userID } = useContext(AuthContext);
-    const { formData, updateForm ,clearFields} = useFormStore();
+    const { formData, updateForm, clearFields } = useFormStore();
     const isSubscribed = formData?.subscriptionActive !== undefined ? formData?.subscriptionActive : true;
     const [activeTab, setActiveTab] = useState('publish');
     const [publishedAssets, setPublishedAssets] = useState([]);
@@ -48,6 +48,7 @@ const MyAssetsScreen = ({ navigation }) => {
 
     const [selectedAssetId, setSelectedAssetId] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    console.log('publishedAssets in MyAssetsScreen:', publishedAssets);
 
     // ✅ Handle typing
     const formatNumberWithCommas = (text) => {
@@ -156,15 +157,18 @@ const MyAssetsScreen = ({ navigation }) => {
     const handleSubscribe = () => {
         clearFields([
             'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
-            'model_name', 'price', 'kmsDriven', 'transmissionId',
-            'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id'
+            'model_name', 'price', 'kmsDriven', 'transmissionId', 'bikeTypeId',
+            'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id',
+            'SpareBrandId', 'Sparedescription', 'Spareyear_of_manufacture',
+            'spareProductTypeId', 'Spareprice', 'spareConditionId', 'images',
+            'SparePartNameId', 'Sparename', 'subproducttypeId', 'SpareyearId'
         ]);
 
         InteractionManager.runAfterInteractions(() => {
             setShowSubscriptionModal(false);
         });
 
-        navigation.navigate('SubscriptionScreen');
+        navigation.replace('SubscriptionScreen');
     };
     const fetchInventory = async (page = 1, refreshing = false) => {
         try {
@@ -327,7 +331,7 @@ const MyAssetsScreen = ({ navigation }) => {
                     }
                 } else {
                     navigation.navigate('AssetsPreviewScreen', {
-                        id: item.id,
+                        id: item?.id,
                         selectedCategory: categoryRoute,
                     });
                 }

@@ -14,23 +14,24 @@ import LinearGradient from 'react-native-linear-gradient';
 import ImageSlider from './ImageSlider';
 import AppText from './AppText';
 
-const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPressEdit, isDraft }) => {
+const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPressEdit, isDraft, }) => {
   const isSold = data?.isSold;
   const isDeleted = data?.isDeleted;
-const shareVehicleDetails = async () => {
-  try {
-    const shareData = {
-      title: data.title,
-      image: data.images[0],
-      description: data.description,
-    };
-    await Share.share({
-      message: JSON.stringify(shareData),
-    });
-  } catch (error) {
-    console.error('Error sharing vehicle details:', error);
+  const isActive = data?.isActive;
+  const shareVehicleDetails = async () => {
+    try {
+      const shareData = {
+        title: data.title,
+        image: data.images[0],
+        description: data.description,
+      };
+      await Share.share({
+        message: JSON.stringify(shareData),
+      });
+    } catch (error) {
+      console.error('Error sharing vehicle details:', error);
+    }
   }
-}
   return (
     <TouchableOpacity style={[styles.cardContainer, { backgroundColor: theme.colors.card }]} onPress={onPress}>
       {isSold && (
@@ -51,7 +52,11 @@ const shareVehicleDetails = async () => {
           />
         </View>
       )}
-
+      {!isActive && (
+        <View style={[styles.overlayContainer, { backgroundColor: '#00000080' }]}>
+          <AppText style={styles.inactiveText}>Inactive</AppText>
+        </View>
+      )}
       <View style={{ paddingTop: wp('3%') }}>
         <ImageSlider
           images={data.images || []}
@@ -73,6 +78,7 @@ const shareVehicleDetails = async () => {
             </TouchableOpacity>
           )}
         </View>
+
         <AppText style={[styles.subtitle, { color: theme.colors.placeholder }]}>
           {data.variant}
         </AppText>
@@ -210,6 +216,13 @@ const styles = StyleSheet.create({
     width: wp('35%'),
     height: hp('20%'),
   },
+  inactiveText: {
+    fontSize: wp('6%'),
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+    textTransform: 'uppercase',
+  },
+
 });
 
 export default VehicleCard;

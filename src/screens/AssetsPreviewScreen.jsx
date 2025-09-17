@@ -16,6 +16,7 @@ import apiClient from '../utils/apiClient';
 import PriceChnageModal from '../components/PriceChnageModal';
 import { showToast } from '../utils/toastService';
 import Loader from '../components/Loader';
+import InfoBanner from '../components/InfoBanner';
 
 const AssetsPreviewScreen = ({ navigation }) => {
   const { theme } = useContext(AuthContext);
@@ -36,6 +37,7 @@ const AssetsPreviewScreen = ({ navigation }) => {
   const [editModalData, seteditModalData] = useState(null);
   const [dataedit, setdataedit] = useState(null);
   console.log('dataedit', dataedit);
+  const isActive = dataedit?.isActive;
 
   useEffect(() => {
     fetchAssetDetails();
@@ -143,7 +145,7 @@ const AssetsPreviewScreen = ({ navigation }) => {
                   : [],
           description: asset.description || null,
           interested: asset.leadCount || null,
-          isSold: asset.isSold || null
+          isSold: asset.isSold || null,
 
         };
 
@@ -231,6 +233,24 @@ const AssetsPreviewScreen = ({ navigation }) => {
             }}
           />
 
+        )}
+        {!dataedit?.isActive && (
+          <InfoBanner
+            iconName="info"
+            iconType="feather"
+            iconColor="red"
+            title="Your post has been disabled by our review team, and it's not live for buyers. Please raise a ticket or contact us at support@gadilobharat.com"
+            subtitle=""
+            buttonText="Contact"
+            rightsideiconcolor={theme.colors.themeIcon}
+            onPress={() => navigation.navigate('TicketListScreen')}
+            customStyle={{
+              height: hp('14.5%'),
+              marginTop: hp('1%'),
+              borderRadius: wp('3%'),
+              paddingRight: wp('3%'),
+            }}
+          />
         )}
         <PriceChnageModal
           visible={priceModalVisible}

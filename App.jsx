@@ -26,7 +26,7 @@ const AppContent = () => {
     setSelectedCategory, setIsAppInitialized, isAppInitialized,
     userID, selectedCategory
   } = useContext(AuthContext);
-
+ 
   useEffect(() => {
     const initialize = async () => {
       try {

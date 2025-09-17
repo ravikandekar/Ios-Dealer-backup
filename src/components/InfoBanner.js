@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { View, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import CustomIcon from './CustomIcon';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { AuthContext } from '../context/AuthContext';
@@ -20,12 +20,17 @@ const InfoBanner = ({
   rightsideiconcolor,
   rightsideswitch = false, // ✅ toggle mode
   switchValue = false, // ✅ toggle state
-  onSwitchChange = () => { }, // ✅ callback
+  onSwitchChange = () => {}, // ✅ callback
+  showRightSide = true, // ✅ NEW param (default true)
 }) => {
   const { theme } = useContext(AuthContext);
 
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.container, { backgroundColor: bgColor }, customStyle]}>
+    <TouchableOpacity
+      onPress={onPress}
+      style={[styles.container, { backgroundColor: bgColor }, customStyle]}
+      activeOpacity={0.9}
+    >
       {/* Left Icon */}
       <View style={styles.iconWrapper}>
         <CustomIcon
@@ -51,34 +56,36 @@ const InfoBanner = ({
         {subtitle ? <AppText style={styles.subtitle}>{subtitle}</AppText> : null}
       </View>
 
-      {/* ✅ Right Side */}
-      {!rightsideswitch ? (
-        // default button + arrow
-        <View onPress={onPress} style={styles.buttonWrapper}>
-          <AppText style={styles.buttonText}>{buttonText}</AppText>
-          <CustomIcon
-            iconType={"feather"}
-            iconName={'chevron-right'}
-            size={hp('3%')}
-            color={isDestructive ? '#FF2929' : rightsideiconcolor}
-          />
-        </View>
-      ) : (
-        // ✅ Custom Toggle Switch with Icon
-        <TouchableOpacity
-          style={[styles.toggleContainer, switchValue ? styles.toggleOn : styles.toggleOff]}
-          onPress={() => onSwitchChange(!switchValue)}
-          activeOpacity={0.8}
-        >
-          <View style={[styles.toggleThumb, switchValue ? styles.thumbOn : styles.thumbOff]}>
+      {/* ✅ Right Side (conditionally visible) */}
+      {showRightSide && (
+        !rightsideswitch ? (
+          // default button + arrow
+          <View style={styles.buttonWrapper}>
+            <AppText style={styles.buttonText}>{buttonText}</AppText>
             <CustomIcon
-              iconType="feather"
-              iconName={switchValue ? 'moon' : 'sun'} // 🌙 or ☀️
-              size={hp('2.5%')}
-              color={theme.colors.Highlighterwords} // white moon / orange sun
+              iconType={"feather"}
+              iconName={'chevron-right'}
+              size={hp('3%')}
+              color={isDestructive ? '#FF2929' : rightsideiconcolor}
             />
           </View>
-        </TouchableOpacity>
+        ) : (
+          // ✅ Custom Toggle Switch with Icon
+          <TouchableOpacity
+            style={[styles.toggleContainer, switchValue ? styles.toggleOn : styles.toggleOff]}
+            onPress={() => onSwitchChange(!switchValue)}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.toggleThumb, switchValue ? styles.thumbOn : styles.thumbOff]}>
+              <CustomIcon
+                iconType="feather"
+                iconName={switchValue ? 'moon' : 'sun'} // 🌙 or ☀️
+                size={hp('2.5%')}
+                color={theme.colors.Highlighterwords} // theme highlight color
+              />
+            </View>
+          </TouchableOpacity>
+        )
       )}
     </TouchableOpacity>
   );

@@ -32,7 +32,7 @@ const SparePreviewScreen = ({ navigation, route }) => {
   const [editSpareDetails, seteditSpareDetails] = useState(null);
   const [isPublishing, setIsPublishing] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-const { formData, updateForm, clearFields } = useFormStore();
+  const { formData, updateForm, clearFields } = useFormStore();
   useEffect(() => {
     if (!spareId) {
       showToast('error', 'Missing Info', 'Spare ID not found');
@@ -162,8 +162,8 @@ const { formData, updateForm, clearFields } = useFormStore();
   };
 
   const handleSubscribe = () => {
-     navigation.navigate('SubscriptionScreen');
-        InteractionManager.runAfterInteractions(() => {
+    navigation.navigate('SubscriptionScreen');
+    InteractionManager.runAfterInteractions(() => {
       setShowSubscriptionModal(false);
     });
   };
