@@ -143,7 +143,7 @@ const NewTicketScreen = ({ navigation }) => {
 
       console.log('Response:', response.data);
       showToast('success', 'Success', 'Ticket submitted successfully');
-      navigation.navigate('TicketListScreen');
+      navigation.replace('TicketListScreen');
     } catch (error) {
       if (error.response) {
         console.error('API Error:', error.response.data);
