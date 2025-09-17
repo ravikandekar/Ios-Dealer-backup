@@ -33,6 +33,7 @@ const ViewTicketScreen = ({ route }) => {
 
   // State management
   const [ticket, setTicket] = useState(null);
+  const [hideAttachments, setHideAttachments] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -41,7 +42,7 @@ const ViewTicketScreen = ({ route }) => {
   const [replyMessage, setReplyMessage] = useState('');
   const [replyAttachments, setReplyAttachments] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
-  console.log('ticket222:', ticket);
+  console.log('ticket222:', hideAttachments);
 
   const scrollViewRef = useRef(null);
 
@@ -101,6 +102,7 @@ const ViewTicketScreen = ({ route }) => {
 
       if (response?.data?.success && response?.data?.data) {
         setTicket(response.data.data);
+        setHideAttachments(response.data.data.status)
         setTimeout(() => {
           scrollViewRef.current?.scrollToEnd({ animated: true });
         }, 100);
@@ -388,7 +390,7 @@ const ViewTicketScreen = ({ route }) => {
 
   const renderReplySection = useMemo(() => (
     <View style={styles.replyContainer}>
-      {ticketId?.status === 'Resolved' ? null : (
+      {hideAttachments === 'Resolved' ? null : (
         <>
           <TextInput
             placeholder="Write a reply..."
@@ -472,7 +474,7 @@ const ViewTicketScreen = ({ route }) => {
       )}
     </View>
 
-  ), [replyMessage, replyAttachments, submittingReply, theme.colors, removeAttachment, pickReplyFile, submitReply]);
+  ), [replyMessage, replyAttachments, submittingReply, theme.colors, removeAttachment, pickReplyFile, submitReply,hideAttachments]);
 
   // Loading state
   if (loading && !ticket) return <Loader visible={true} />;

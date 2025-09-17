@@ -47,7 +47,7 @@ const AppContent = () => {
       }
     };
     initialize();
-  }, [selectedCategory, userID]);
+  }, [selectedCategory]);
 
   if (!isAppReady || !isAppInitialized) return <SplashScreen />;
   return <RootNavigation />;
@@ -58,31 +58,16 @@ const App = () => {
   const [fcmToken, setFcmToken] = useState(null);
 
 
-  // useEffect(() => {
-  //   console.log('🚀 [App] Setting up notifications...');
-  //   requestPermission(setSettingsModalVisible, setFcmToken);
-  //   const unsubscribe = setupNotificationListeners();
-  //   return () => {
-  //     unsubscribe();
-  //   };
-  // }, []);
 
   useEffect(() => {
     console.log('🚀 [App] Setting up notifications...');
+
+    // 🔑 Ask permission on startup
     requestPermission(setSettingsModalVisible, setFcmToken);
-    const subscription = AppState.addEventListener('change', async state => {
-      if (state === 'active') {
-        const granted = await requestPermission(setSettingsModalVisible, setFcmToken);
-        if (granted) {
-          setSettingsModalVisible(false); // ✅ auto-close modal
-        }
-      }
-    });
+
+    // 📡 Setup listeners
     const unsubscribe = setupNotificationListeners();
-    return () => {
-      subscription.remove();
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, []);
 
   return (
@@ -106,6 +91,8 @@ const App = () => {
           onClose={() => setSettingsModalVisible(false)}
           title="Enable Notifications"
           message="To stay updated with important alerts and updates from Gadilo Bharat, please enable notifications in your device settings. This ensures you never miss out on critical information and offers."
+          onRefresh={() => requestPermission(setSettingsModalVisible, setFcmToken)}
+          refreshShow={true}
         />
       </NavigationContainer>
     </AuthProvider>

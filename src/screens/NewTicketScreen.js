@@ -167,7 +167,7 @@ const NewTicketScreen = ({ navigation }) => {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.contentContainer}>
             <ScrollView
-              contentContainerStyle={{ paddingBottom: hp('1%') }}
+              contentContainerStyle={{ paddingBottom: hp('10%') }}
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}>
 
@@ -321,7 +321,7 @@ const NewTicketScreen = ({ navigation }) => {
                   ))}
                 </View>
               )}
-              <ActionButton label="Submit Ticket" onPress={handleSubmit} style={{ marginTop: wp('8%') }} />
+              <ActionButton label="Submit Ticket" onPress={handleSubmit} style={{ marginTop: wp('2%') }} />
             </ScrollView>
 
 

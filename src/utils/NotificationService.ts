@@ -103,7 +103,10 @@ export const extractNotificationData = (msg: FirebaseMessagingTypes.RemoteMessag
   return { title, body, customData };
 };
 
-export const requestPermission = async (setSettingsModalVisible: any, setFcmToken: any) => {
+export const requestPermission = async (
+  setSettingsModalVisible: any,
+  setFcmToken: any
+) => {
   console.log('🔑 [FCM] Requesting permissions...');
   try {
     let granted = false;
@@ -150,6 +153,7 @@ export const requestPermission = async (setSettingsModalVisible: any, setFcmToke
     if (granted) {
       const token = await messaging().getToken();
       console.log('🎫 [FCM] Token:', token);
+      setFcmToken(token); // ✅ Save token
 
       const isTokenValid = await getToken();
       if (isTokenValid) {
@@ -161,6 +165,9 @@ export const requestPermission = async (setSettingsModalVisible: any, setFcmToke
       // ✅ Notifee permissions
       const nfPerm = await notifee.requestPermission();
       console.log('🔔 [Notifee] Permission:', nfPerm);
+
+      // ✅ Close modal if permission is granted
+      setSettingsModalVisible(false);
     } else {
       console.warn('⚠️ [FCM] Permission not granted');
     }
@@ -168,9 +175,11 @@ export const requestPermission = async (setSettingsModalVisible: any, setFcmToke
     return granted;
   } catch (err) {
     console.error('❌ [FCM] Permission error:', err);
+    setSettingsModalVisible(true);
     return false;
   }
 };
+
 
 
 /**

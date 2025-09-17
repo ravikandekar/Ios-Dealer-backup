@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useCallback } from 'react';
 import {
   View,
   StyleSheet,
@@ -19,6 +19,7 @@ import BackgroundWrapper from '../components/BackgroundWrapper';
 import AppText from '../components/AppText';
 import SupportCard from '../components/SupportCard';
 import apiClient from '../utils/apiClient';
+import { useFocusEffect } from '@react-navigation/native';
 
 const TicketListScreen = ({ navigation }) => {
   const { theme, userID } = useContext(AuthContext);
@@ -70,9 +71,11 @@ const TicketListScreen = ({ navigation }) => {
     }
   };
 
-  useEffect(() => {
+useFocusEffect(
+  useCallback(() => {
     fetchIssues(1);
-  }, []);
+  }, [])
+);
 
   const handleCreateTicket = () => {
     navigation.navigate('NewTicketScreen');
