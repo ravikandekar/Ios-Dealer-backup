@@ -8,7 +8,8 @@ import {
     Modal,
     Pressable,
     InteractionManager,
-    AppState
+    AppState,
+    PermissionsAndroid
 } from 'react-native';
 import AppText from '../components/AppText';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
@@ -372,11 +373,11 @@ const SpareUploadScreen = ({ navigation }) => {
         }
     };
     const handleSubscribe = () => {
-      clearFields([
-                    'SpareBrandId', 'Sparedescription', 'Spareyear_of_manufacture',
-                    'spareProductTypeId', 'Spareprice', 'spareConditionId',
-                    'SparePartNameId', 'Sparename', 'subproducttypeId', 'SpareyearId'
-                ]);
+        clearFields([
+            'SpareBrandId', 'Sparedescription', 'Spareyear_of_manufacture',
+            'spareProductTypeId', 'Spareprice', 'spareConditionId',
+            'SparePartNameId', 'Sparename', 'subproducttypeId', 'SpareyearId'
+        ]);
 
         InteractionManager.runAfterInteractions(() => {
             setShowSubscriptionModal(false);
@@ -390,7 +391,7 @@ const SpareUploadScreen = ({ navigation }) => {
             <AppText style={[styles.title, { color: theme.colors.text }]}>
                 Upload Spare Parts photos.
             </AppText>
-            <AppText style={[styles.subtitle, { color: theme.colors.placeholder }]}>(max 5)</AppText>
+            <AppText style={[styles.subtitle, { color: theme.colors.placeholder }]}>(max 3)</AppText>
 
             <TouchableOpacity
                 style={[styles.uploadBox, { backgroundColor: theme.colors.card }]}

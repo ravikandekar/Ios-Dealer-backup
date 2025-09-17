@@ -15,6 +15,7 @@ import messaging from '@react-native-firebase/messaging';
 import InternetStatus from './src/components/InternetStatus';
 import { requestPermission, setupNotificationListeners } from './src/utils/NotificationService';
 import { handleNotificationData } from './src/utils/notifications';
+import { AppState } from 'react-native';
 
 const AppContent = () => {
   const [isAppReady, setIsAppReady] = useState(false);
@@ -26,7 +27,7 @@ const AppContent = () => {
     setSelectedCategory, setIsAppInitialized, isAppInitialized,
     userID, selectedCategory
   } = useContext(AuthContext);
- 
+
   useEffect(() => {
     const initialize = async () => {
       try {
@@ -53,18 +54,36 @@ const AppContent = () => {
 };
 
 const App = () => {
+  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
+  const [fcmToken, setFcmToken] = useState(null);
 
 
+  // useEffect(() => {
+  //   console.log('🚀 [App] Setting up notifications...');
+  //   requestPermission(setSettingsModalVisible, setFcmToken);
+  //   const unsubscribe = setupNotificationListeners();
+  //   return () => {
+  //     unsubscribe();
+  //   };
+  // }, []);
 
   useEffect(() => {
     console.log('🚀 [App] Setting up notifications...');
-    requestPermission();
+    requestPermission(setSettingsModalVisible, setFcmToken);
+    const subscription = AppState.addEventListener('change', async state => {
+      if (state === 'active') {
+        const granted = await requestPermission(setSettingsModalVisible, setFcmToken);
+        if (granted) {
+          setSettingsModalVisible(false); // ✅ auto-close modal
+        }
+      }
+    });
     const unsubscribe = setupNotificationListeners();
     return () => {
+      subscription.remove();
       unsubscribe();
     };
   }, []);
-
 
   return (
     <AuthProvider>
@@ -81,7 +100,13 @@ const App = () => {
         }}
       >
         <AppContent />
-         <InternetStatus />
+        <InternetStatus />
+        <PermissionSettingsModal
+          visible={settingsModalVisible}
+          onClose={() => setSettingsModalVisible(false)}
+          title="Enable Notifications"
+          message="To stay updated with important alerts and updates from Gadilo Bharat, please enable notifications in your device settings. This ensures you never miss out on critical information and offers."
+        />
       </NavigationContainer>
     </AuthProvider>
   );

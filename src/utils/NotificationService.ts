@@ -7,6 +7,7 @@ import { handleNotificationData } from './notifications';
 import apiClient from './apiClient';
 import { showToast } from './toastService';
 import { getToken } from './storage';
+import { PermissionsAndroid } from 'react-native';
 // import { navigate } from '../navigations/RootNavigation';
 
 /**
@@ -102,45 +103,72 @@ export const extractNotificationData = (msg: FirebaseMessagingTypes.RemoteMessag
   return { title, body, customData };
 };
 
-export const requestPermission = async () => {
+export const requestPermission = async (setSettingsModalVisible: any, setFcmToken: any) => {
   console.log('🔑 [FCM] Requesting permissions...');
   try {
-    if (Platform.OS === 'ios') {
+    let granted = false;
+
+    if (Platform.OS === 'android' && Platform.Version >= 33) {
+      // ✅ Android 13+ requires explicit notification permission
+      const result = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+      );
+
+      if (result === PermissionsAndroid.RESULTS.NEVER_ASK_AGAIN) {
+        setSettingsModalVisible(true);
+        return false;
+      }
+
+      granted = result === PermissionsAndroid.RESULTS.GRANTED;
+    } else if (Platform.OS === 'ios') {
+      // ✅ iOS notification permissions
       const isRegistered = messaging().isDeviceRegisteredForRemoteMessages;
       console.log('📱 [iOS] Registered for remote:', isRegistered);
       if (!isRegistered) await messaging().registerDeviceForRemoteMessages();
+
+      const authStatus = await messaging().requestPermission({
+        alert: true,
+        sound: true,
+        badge: true,
+        announcement: true,
+        criticalAlert: true,
+      });
+      console.log('🔐 [FCM] Auth status:', authStatus);
+
+      granted =
+        authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+        authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+      if (!granted) {
+        setSettingsModalVisible(true);
+      }
+    } else {
+      // ✅ Android < 13 auto-granted
+      granted = true;
     }
 
-    const authStatus = await messaging().requestPermission({
-      alert: true,
-      sound: true,
-      badge: true,
-      announcement: true,
-      criticalAlert: true,
-    });
-    console.log('🔐 [FCM] Auth status:', authStatus);
-
-    if (
-      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-      authStatus === messaging.AuthorizationStatus.PROVISIONAL
-    ) {
+    if (granted) {
       const token = await messaging().getToken();
       console.log('🎫 [FCM] Token:', token);
 
-      // ✅ Register token with backend
-        const isTokenValid = await getToken();
-        {isTokenValid && await registerDeviceToken(token, Platform.OS);}
+      const isTokenValid = await getToken();
+      if (isTokenValid) {
+        await registerDeviceToken(token, Platform.OS);
+        await messaging().subscribeToTopic('GlobalTopic');
+        console.log('✅ [FCM] Subscribed to GlobalTopic');
+      }
 
-      await messaging().subscribeToTopic('GlobalTopic');
-      console.log('✅ [FCM] Subscribed to GlobalTopic');
+      // ✅ Notifee permissions
+      const nfPerm = await notifee.requestPermission();
+      console.log('🔔 [Notifee] Permission:', nfPerm);
     } else {
       console.warn('⚠️ [FCM] Permission not granted');
     }
 
-    const nfPerm = await notifee.requestPermission();
-    console.log('🔔 [Notifee] Permission:', nfPerm);
+    return granted;
   } catch (err) {
     console.error('❌ [FCM] Permission error:', err);
+    return false;
   }
 };
 

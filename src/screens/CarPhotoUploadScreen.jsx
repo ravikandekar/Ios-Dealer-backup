@@ -464,7 +464,7 @@ const CarPhotoUploadScreen = ({ navigation }) => {
             <AppText style={[styles.title, { color: theme.colors.text }]}>
                 Upload {isBike ? 'bike' : 'car'} photos.
             </AppText>
-            <AppText style={[styles.subtitle, { color: theme.colors.placeholder }]}>(max 5)</AppText>
+            <AppText style={[styles.subtitle, { color: theme.colors.placeholder }]}>({isBike ? 5 : 10})</AppText>
 
             <TouchableOpacity
                 style={[styles.uploadBox, { backgroundColor: theme.colors.card }]}

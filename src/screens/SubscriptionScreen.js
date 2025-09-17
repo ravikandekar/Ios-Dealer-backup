@@ -341,7 +341,7 @@ const SubscriptionScreen = ({ navigation }) => {
       if (isMountedRef.current) {
         safeSetLoading(false);
         isProcessingPurchaseRef.current = false;
-      setProcessingStatus(false);
+        setProcessingStatus(false);
 
         // Handle specific error cases
         if (err.code === 'E_USER_CANCELLED') {
@@ -475,6 +475,7 @@ const SubscriptionScreen = ({ navigation }) => {
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
+
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -483,6 +484,8 @@ const SubscriptionScreen = ({ navigation }) => {
             tintColor={theme?.colors?.primary || '#007BFF'}
           />
         }
+        showsVerticalScrollIndicator={false}   // 👈 hide vertical indicator
+        showsHorizontalScrollIndicator={false}
       >
         {activeTab === 'active' && (
           <>
