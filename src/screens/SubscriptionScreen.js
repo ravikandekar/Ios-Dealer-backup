@@ -31,7 +31,7 @@ const SubscriptionScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [iapProducts, setIapProducts] = useState([]);
-
+  const [processingStatus, setProcessingStatus] = useState(false);
   // Use ref to track component mount status
   const isMountedRef = useRef(true);
   const purchaseUpdateSubscriptionRef = useRef(null);
@@ -155,7 +155,7 @@ const SubscriptionScreen = ({ navigation }) => {
               // ✅ Optimistically mark plan as subscribed
               safeSetSubPlanCardList(prevPlans =>
                 prevPlans.map(plan => {
-                 
+
                   return plan.sku === productId
                     ? { ...plan, isSubscribed: true }
                     : plan;
@@ -183,6 +183,7 @@ const SubscriptionScreen = ({ navigation }) => {
             console.error("❌ Verification failed:", err);
           } finally {
             setLoading(false);
+            setProcessingStatus(false);
             isProcessingPurchaseRef.current = false;
           }
         });
@@ -311,6 +312,7 @@ const SubscriptionScreen = ({ navigation }) => {
 
     try {
       isProcessingPurchaseRef.current = true;
+      setProcessingStatus(true);
       safeSetLoading(true);
 
       let purchaseRequest;
@@ -336,10 +338,10 @@ const SubscriptionScreen = ({ navigation }) => {
 
     } catch (err) {
       console.log('❌ Purchase error:', err);
-
       if (isMountedRef.current) {
         safeSetLoading(false);
         isProcessingPurchaseRef.current = false;
+      setProcessingStatus(false);
 
         // Handle specific error cases
         if (err.code === 'E_USER_CANCELLED') {
@@ -534,13 +536,20 @@ const SubscriptionScreen = ({ navigation }) => {
                 <AppText style={[styles.sectionTitle, { color: theme?.colors.text, fontSize: wp('7.5%'), fontWeight: '600', marginLeft: wp('3%'), marginBottom: wp('0.1%') }]}>
                   Subscription plans
                 </AppText>
-                <AppText style={[styles.sectionTitle, { color: theme?.colors.placeholder, fontSize: wp('4%'), marginLeft: wp('3%'), marginBottom: wp('1%'), width: '90%', opacity: 0.7 }]}>
+
+                {processingStatus ? (
+                  <AppText style={[styles.sectionTitle, { color: theme?.colors.Highlighterwords, fontSize: wp('5.5%'), fontWeight: '600', marginLeft: wp('3%'), marginBottom: wp('0.1%'), textAlign: 'center' }]}>
+                    Purchase Processing...
+                  </AppText>
+                ) : <AppText style={[styles.sectionTitle, { color: theme?.colors.placeholder, fontSize: wp('4%'), marginLeft: wp('3%'), marginBottom: wp('1%'), width: '90%', opacity: 0.7 }]}>
                   Choose a plan based on the type of inventory you sell
-                </AppText>
+                </AppText>}
+
+
 
                 {subPlanCardList.map((plan) => (
                   <SubscriptionPlanCard
-                     key={`${plan._id}-${plan.isSubscribed}`} 
+                    key={`${plan._id}-${plan.isSubscribed}`}
                     title={plan?.subscriptiontitle}
                     duration={`${Math.round(plan.validity_in_days / 30)} week`}
                     listing={`${plan.listings_allowed} ${plan.category_id?.category_name || ''}`}
