@@ -95,7 +95,7 @@ const DATE_RANGE_OPTIONS = [
 
 const ListingOverviewCard = ({ selectedCategory, apiClient, showToast, solddeletedmodal, Viewsmodal }) => {
 
-  console.log('shankru');
+  console.log('uuuuuuuareeeeeeeeedjfhkzcvbjklzchvb');
   
   const { theme } = useContext(AuthContext);
   const navigation = useNavigation();

@@ -5,8 +5,13 @@ import {
     StyleSheet,
     TouchableOpacity,
     ActivityIndicator,
-    RefreshControl
+    RefreshControl,
+    Linking,
+    Modal,
+    SafeAreaView,
+    Platform,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import AppText from '../components/AppText';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -18,422 +23,395 @@ import {
 import { AuthContext } from '../context/AuthContext';
 import BackgroundWrapper from '../components/BackgroundWrapper';
 import { DetailsHeader } from '../components/DetailsHeader';
-import DatePickerComponent from '../components/DatePickerComponent';
 import apiClient from '../utils/apiClient';
 import { showToast } from '../utils/toastService';
-import Loader from '../components/Loader';
-
-const formatDate = date =>
-    `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1)
-        .toString()
-        .padStart(2, '0')}-${date.getFullYear()}`;
-
-const formatDateForAPI = date =>
-    `${date.getFullYear()}-${(date.getMonth() + 1)
-        .toString()
-        .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-
-const parseDate = dateString => {
-    const [d, m, y] = dateString.split('-');
-    return new Date(y, m - 1, d);
-};
 
 const LeadsScreen = () => {
     const { theme, userID } = useContext(AuthContext);
     const [selectedInterestedIds, setSelectedInterestedIds] = useState({});
-    const [showDateSelectionModal, setShowDateSelectionModal] = useState(false);
-    const [fromDateString, setFromDateString] = useState(formatDate(new Date()));
-    const [toDateString, setToDateString] = useState(formatDate(new Date()));
     const [leadsData, setLeadsData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [loadingIds, setLoadingIds] = useState({});
-    const [applyingDateFilter, setApplyingDateFilter] = useState(false);
-    const [hasDateFilter, setHasDateFilter] = useState(false);
-    const [clearingFilter, setClearingFilter] = useState(false);
 
-    // Simplified pagination states
+    // Pagination states
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
     const [loadingMore, setLoadingMore] = useState(false);
     const [hasMoreData, setHasMoreData] = useState(true);
 
+    // Date filter states
+    const [showDateSelectionModal, setShowDateSelectionModal] = useState(false);
+    const [hasDateFilter, setHasDateFilter] = useState(false);
+    const [datePickerVisible, setDatePickerVisible] = useState(false);
+    const [datePickerType, setDatePickerType] = useState(null);
+    const [tempSelectedDate, setTempSelectedDate] = useState(new Date());
+
+    const today = new Date();
+    const [fromDateString, setFromDateString] = useState(formatDate(today));
+    const [toDateString, setToDateString] = useState(formatDate(today));
+
     const ITEMS_PER_PAGE = 12;
     const loadingMoreRef = useRef(false);
 
-    const getFromDate = () => parseDate(fromDateString);
-    const getToDate = () => parseDate(toDateString);
+    // Date utility functions
+    function formatDate(date) {
+        const d = date.getDate().toString().padStart(2, '0');
+        const m = (date.getMonth() + 1).toString().padStart(2, '0');
+        const y = date.getFullYear();
+        return `${d}-${m}-${y}`;
+    }
 
+    const parseDisplayDate = (str) => {
+        const [d, m, y] = str.split('-').map((s) => parseInt(s, 10));
+        return new Date(y, m - 1, d);
+    };
+
+    const getFromDate = () => parseDisplayDate(fromDateString);
+    const getToDate = () => parseDisplayDate(toDateString);
+
+    // Date modal functions
     const openDateSelectionModal = () => setShowDateSelectionModal(true);
-    const closeDateSelectionModal = () => setShowDateSelectionModal(false);
+    const closeDateSelectionModal = () => {
+        setShowDateSelectionModal(false);
+        setDatePickerVisible(false);
+        setDatePickerType(null);
+    };
 
-    const handleApplyDateFilter = async (fromDate, toDate) => {
-        setApplyingDateFilter(true);
-        try {
-            // Update the date strings
-            setFromDateString(fromDate);
-            setToDateString(toDate);
+    const openPlatformPicker = (type) => {
+        setDatePickerType(type);
+        const initial = type === 'from' ? getFromDate() : getToDate();
+        setTempSelectedDate(initial || today);
+        setDatePickerVisible(true);
+    };
 
-            setCurrentPage(1);
-            setLeadsData([]);
-            setHasMoreData(true);
-            loadingMoreRef.current = false;
-
-            // Call API with date filter explicitly enabled
-            const tempFromDate = parseDate(fromDate);
-            const tempToDate = parseDate(toDate);
-
-            await fetchLeadDataWithDates(false, true, 1, false, tempFromDate, tempToDate);
-            setHasDateFilter(true);
-            setShowDateSelectionModal(false);
-            showToast('success', '', 'Date filter applied successfully');
-        } catch (error) {
-            showToast('error', '', 'Failed to apply date filter');
-        } finally {
-            setApplyingDateFilter(false);
+    const onDateChange = (event, selected) => {
+        if (Platform.OS === 'android') {
+            setDatePickerVisible(false);
+            setDatePickerType(null);
+            if (selected) {
+                const ds = formatDate(selected);
+                if (datePickerType === 'from') setFromDateString(ds);
+                else if (datePickerType === 'to') setToDateString(ds);
+            }
+        } else {
+            if (selected) {
+                // ✅ just update temp value while user scrolls
+                setTempSelectedDate(selected);
+            }
         }
     };
 
-    // Helper function to fetch data with specific dates
-    const fetchLeadDataWithDates = useCallback(async (isRefreshing = false, isFiltered = false, page = 1, append = false, fromDate = null, toDate = null) => {
-        try {
-            // Prevent duplicate requests for load more
-            if (append && loadingMoreRef.current) {
-                return;
-            }
 
-            if (append) {
-                loadingMoreRef.current = true;
-                setLoadingMore(true);
-            } else if (!isRefreshing && !clearingFilter) {
-                setLoading(true);
-            }
 
-            // Base API URL with pagination
-            let apiUrl = `/api/dealer/dealerleadRoute/getall_leads_bydelerid/${userID}`;
-            const params = new URLSearchParams({
-                page: page.toString(),
-                limit: ITEMS_PER_PAGE.toString()
-            });
+    const handleApplyDateFilter = async () => {
+        const from = parseDisplayDate(fromDateString);
+        const to = parseDisplayDate(toDateString);
 
-            // Only add date filters when explicitly filtered or hasDateFilter is true
-            if (isFiltered || hasDateFilter) {
-                const fromDateToUse = fromDate || getFromDate();
-                const toDateToUse = toDate || getToDate();
-                const fromDateAPI = formatDateForAPI(fromDateToUse);
-                const toDateAPI = formatDateForAPI(toDateToUse);
+        if (from > to) return showToast('info', '', 'From date cannot be after To date');
 
-                params.append('fromDate', fromDateAPI);
-                params.append('toDate', toDateAPI);
-            }
+        setHasDateFilter(true);
+        setCurrentPage(1);
+        setLeadsData([]);
+        setHasMoreData(true);
+        loadingMoreRef.current = false;
 
-            const finalUrl = `${apiUrl}?${params.toString()}`;
-            console.log('API Call:', finalUrl); // For debugging
+        await fetchLeadData(false, 1, false, true);
+        closeDateSelectionModal();
+        showToast('success', '', 'Date filter applied successfully');
+    };
 
-            const res = await apiClient.get(finalUrl);
-            const responseData = res?.data?.data || {};
-            const leads = responseData.leads || [];
-            const pagination = res?.data?.pagination || {};
+    const handleClearDateFilter = async () => {
+        setHasDateFilter(false);
+        const t = new Date();
+        setFromDateString(formatDate(t));
+        setToDateString(formatDate(t));
 
-            // Update pagination info
-            setCurrentPage(pagination.currentPage || page);
-            setTotalPages(pagination.totalPages || 1);
-            setTotalItems(pagination.totalItems || 0);
+        setCurrentPage(1);
+        setLeadsData([]);
+        setHasMoreData(true);
+        loadingMoreRef.current = false;
 
-            // Check if more data is available
-            const hasMore = (pagination.currentPage || page) < (pagination.totalPages || 1);
-            setHasMoreData(hasMore);
+        await fetchLeadData(false, 1, false, false);
+        showToast('success', '', 'Date filter cleared');
+        closeDateSelectionModal();
+    };
 
-            if (append) {
-                // Append new data
-                setLeadsData(prevData => {
-                    const combinedData = [...prevData, ...leads];
+    // ✅ Fetch leads with pagination and date filter
+    const fetchLeadData = useCallback(
+        async (isRefreshing = false, page = 1, append = false, withDateFilter = hasDateFilter) => {
+            try {
+                if (append && loadingMoreRef.current) return;
 
-                    // Update interest map for new items
-                    const newInterestMap = {};
-                    leads.forEach((lead, i) => {
-                        const globalIndex = prevData.length + i;
-                        newInterestMap[globalIndex] = lead.interested;
+                if (append) {
+                    loadingMoreRef.current = true;
+                    setLoadingMore(true);
+                } else if (!isRefreshing) {
+                    setLoading(true);
+                }
+
+                const apiUrl = `/api/dealer/dealerleadRoute/getall_leads_bydelerid/${userID}`;
+                const params = new URLSearchParams({
+                    page: page.toString(),
+                    limit: ITEMS_PER_PAGE.toString(),
+                });
+
+                // Add date filter params if enabled
+                if (withDateFilter) {
+                    const fromDate = getFromDate();
+                    const toDate = getToDate();
+                    params.append('fromDate', fromDate.toISOString().split('T')[0]);
+                    params.append('toDate', toDate.toISOString().split('T')[0]);
+                }
+
+                const finalUrl = `${apiUrl}?${params.toString()}`;
+                console.log('API Call:', finalUrl);
+
+                const res = await apiClient.get(finalUrl);
+                const responseData = res?.data?.data || {};
+                const leads = responseData.leads || [];
+                const pagination = res?.data?.pagination || {};
+
+                setCurrentPage(pagination.currentPage || page);
+                setTotalPages(pagination.totalPages || 1);
+                setTotalItems(pagination.totalItems || 0);
+
+                const hasMore = (pagination.currentPage || page) < (pagination.totalPages || 1);
+                setHasMoreData(hasMore);
+
+                if (append) {
+                    setLeadsData(prevData => {
+                        const combinedData = [...prevData, ...leads];
+                        const newInterestMap = {};
+                        leads.forEach((lead, i) => {
+                            const globalIndex = prevData.length + i;
+                            newInterestMap[globalIndex] = lead.interested;
+                        });
+                        setSelectedInterestedIds(prev => ({ ...prev, ...newInterestMap }));
+                        return combinedData;
                     });
-                    setSelectedInterestedIds(prev => ({ ...prev, ...newInterestMap }));
-
-                    return combinedData;
-                });
-            } else {
-                // Replace data
-                setLeadsData(leads);
-
-                // Initialize interest map
-                const initialInterestMap = {};
-                leads.forEach((lead, i) => {
-                    initialInterestMap[i] = lead.interested;
-                });
-                setSelectedInterestedIds(initialInterestMap);
+                } else {
+                    setLeadsData(leads);
+                    const initialInterestMap = {};
+                    leads.forEach((lead, i) => {
+                        initialInterestMap[i] = lead.interested;
+                    });
+                    setSelectedInterestedIds(initialInterestMap);
+                }
+            } catch (error) {
+                console.error('Leads fetch error:', error);
+                showToast('error', '', 'Failed to load leads. Please try again.');
+                if (!append) setLeadsData([]);
+            } finally {
+                if (!isRefreshing && !append) setLoading(false);
+                if (append) {
+                    setLoadingMore(false);
+                    loadingMoreRef.current = false;
+                }
             }
+        },
+        [userID, hasDateFilter, fromDateString, toDateString],
+    );
 
-        } catch (error) {
-            console.error('Leads fetch error:', error);
-            showToast('error', '', 'Failed to load leads. Please try again.');
-            if (!append) {
-                setLeadsData([]);
-            }
-        } finally {
-            if (!isRefreshing && !clearingFilter && !append) {
-                setLoading(false);
-            }
-            if (append) {
-                setLoadingMore(false);
-                loadingMoreRef.current = false;
-            }
-        }
-    }, [userID, fromDateString, toDateString, hasDateFilter, clearingFilter]);
-
-    // Regular fetch function for non-date filter calls
-    const fetchLeadData = useCallback(async (isRefreshing = false, isFiltered = false, page = 1, append = false) => {
-        return fetchLeadDataWithDates(isRefreshing, isFiltered, page, append);
-    }, [fetchLeadDataWithDates]);
-
+    // ✅ Refresh
     const onRefresh = useCallback(async () => {
         setRefreshing(true);
         setCurrentPage(1);
         setLeadsData([]);
         setHasMoreData(true);
         loadingMoreRef.current = false;
-        await fetchLeadData(true, hasDateFilter, 1);
+        await fetchLeadData(true, 1);
         setRefreshing(false);
-    }, [fetchLeadData, clearingFilter]);
+    }, [fetchLeadData]);
 
-    // Simplified load more function
+    // ✅ Load more
     const loadMoreData = useCallback(() => {
-        if (loadingMoreRef.current || !hasMoreData || loading || refreshing) {
-            return;
-        }
-
+        if (loadingMoreRef.current || !hasMoreData || loading || refreshing) return;
         const nextPage = currentPage + 1;
-        fetchLeadData(false, hasDateFilter, nextPage, true);
-    }, [hasMoreData, loading, refreshing, currentPage, fetchLeadData, hasDateFilter]);
+        fetchLeadData(false, nextPage, true);
+    }, [hasMoreData, loading, refreshing, currentPage, fetchLeadData]);
 
-    // Handle end reached
-    const handleEndReached = useCallback(() => {
-        loadMoreData();
-    }, [loadMoreData]);
-
-    // Initial data fetch
     useEffect(() => {
-        fetchLeadData(false, false, 1);
+        fetchLeadData(false, 1);
     }, []);
 
-    const handleCall = useCallback(async (item) => {
-        const phoneNumber = item?.phone || '';
-        if (!phoneNumber) {
-            showToast('info', '', 'No phone number available');
-            return;
-        }
-
-        try {
-            const response = await apiClient.post('/api/dealer/deaeractivityogRoute/contact-buyer', {
-                dealerId: userID,
-                buyerId: item?.buyerId,
-            });
-
-            if (response?.data?.success) {
-                Linking.openURL(`tel:${phoneNumber}`);
-            } else {
-                showToast('error', '', response.data.message || 'Failed to log contact');
+    // ✅ Call Buyer
+    const handleCall = useCallback(
+        async item => {
+            const phoneNumber = item?.phone || '';
+            if (!phoneNumber) {
+                showToast('info', '', 'No phone number available');
+                return;
             }
-        } catch (error) {
-            console.error('Contact log failed:', error?.message);
-            showToast('error', '', error?.response?.data?.message || 'Something went wrong');
-        }
-    }, [userID]);
 
-    const handleToggleInterest = useCallback(async (item, index) => {
-        const leadId = item?.leadId || item?._id;
-        if (!leadId) return showToast('error', '', 'Invalid lead ID');
+            try {
+                const response = await apiClient.post('/api/dealer/deaeractivityogRoute/contact-buyer', {
+                    dealerId: userID,
+                    buyerId: item?.buyerId,
+                });
 
-        const currentInterest = selectedInterestedIds[index] ?? item?.interested;
-        const newInterest = !currentInterest;
-
-        setLoadingIds(prev => ({ ...prev, [index]: true }));
-
-        try {
-            const response = await apiClient.patch(`/api/dealer/dealerleadRoute/update-interest/${leadId}`);
-            if (response?.data?.success) {
-                setSelectedInterestedIds(prev => ({ ...prev, [index]: newInterest }));
-                showToast('success', '', newInterest ? 'Marked as Interested' : 'Unmarked as Interested');
-            } else {
-                showToast('error', '', response?.data?.message || 'Failed to update interest');
+                if (response?.data?.success) {
+                    Linking.openURL(`tel:${phoneNumber}`);
+                } else {
+                    showToast('error', '', response.data.message || 'Failed to log contact');
+                }
+            } catch (error) {
+                console.error('Contact log failed:', error?.message);
+                showToast('error', '', error?.response?.data?.message || 'Something went wrong');
             }
-        } catch (error) {
-            console.error('Interest toggle failed:', error);
-            showToast('error', '', error?.response?.data?.message || 'Something went wrong');
-        } finally {
-            setLoadingIds(prev => ({ ...prev, [index]: false }));
-        }
-    }, [selectedInterestedIds]);
+        },
+        [userID],
+    );
 
-    const handleClearDateFilter = async () => {
-        setClearingFilter(true);
-        setHasDateFilter(false); // ensure filter state is OFF
-        setCurrentPage(1);
-        setLeadsData([]);
-        setHasMoreData(true);
-        loadingMoreRef.current = false;
+    // ✅ Toggle Interest
+    const handleToggleInterest = useCallback(
+        async (item, index) => {
+            const leadId = item?.leadId || item?._id;
+            if (!leadId) return showToast('error', '', 'Invalid lead ID');
 
-        try {
-            // Reset dates to today (optional)
-            const today = new Date();
-            setFromDateString(formatDate(today));
-            setToDateString(formatDate(today));
+            const currentInterest = selectedInterestedIds[index] ?? item?.interested;
+            const newInterest = !currentInterest;
 
-            // 🚀 Call normal API like initial load
-            await fetchLeadData(false, false, 1);
+            setLoadingIds(prev => ({ ...prev, [index]: true }));
 
-            showToast('success', '', 'Date filter cleared');
-        } catch (error) {
-            console.error('Clear filter error:', error);
-            showToast('error', '', 'Failed to clear filter');
-            setHasDateFilter(true); // rollback if failed
-        } finally {
-            setClearingFilter(false);
-        }
-    };
+            try {
+                const response = await apiClient.patch(
+                    `/api/dealer/dealerleadRoute/update-interest/${leadId}`,
+                );
+                if (response?.data?.success) {
+                    setSelectedInterestedIds(prev => ({ ...prev, [index]: newInterest }));
+                    showToast('success', '', newInterest ? 'Marked as Interested' : 'Unmarked');
+                } else {
+                    showToast('error', '', response?.data?.message || 'Failed to update interest');
+                }
+            } catch (error) {
+                console.error('Interest toggle failed:', error);
+                showToast('error', '', error?.response?.data?.message || 'Something went wrong');
+            } finally {
+                setLoadingIds(prev => ({ ...prev, [index]: false }));
+            }
+        },
+        [selectedInterestedIds],
+    );
 
+    // ✅ Render Lead Card
+    const renderItem = useCallback(
+        ({ item, index }) => {
+            const isInterested = selectedInterestedIds[index] ?? item?.interested;
+            const isLoading = loadingIds[index];
 
-    const renderItem = useCallback(({ item, index }) => {
-        const isInterested = selectedInterestedIds[index] ?? item?.interested;
-        const isLoading = loadingIds[index];
-
-        return (
-            <View style={[styles.card, { backgroundColor: theme.colors.card }]}>
-                <View style={styles.cardTop}>
-                    <AppText style={[styles.index, { color: theme.colors.placeholder }]}>
-                        {index + 1}
-                    </AppText>
-                    <AppText style={[styles.date, { color: theme.colors.text }]}>
-                        {item?.date}
-                    </AppText>
-                </View>
-
-                <AppText style={[styles.name, { color: theme.colors.text }]}>
-                    {item?.buyerName || 'No Name'}
-                </AppText>
-
-                <AppText style={[styles.subText, { color: theme.colors.placeholder }]}>
-                    For {item?.brandName || 'N/A'} {item?.modelName || ''}
-                </AppText>
-
-                <View style={styles.actionRow}>
-                    <View style={styles.badges}>
-                        <TouchableOpacity
-                            onPress={() => handleToggleInterest(item, index)}
-                            disabled={isLoading}
-                            style={[
-                                styles.interestedBadge,
-                                {
-                                    backgroundColor: isInterested ? '#A9FFA9' : null,
-                                    borderColor: isInterested ? '#047D04' : theme.colors.themeIcon,
-                                },
-                            ]}
-                        >
-                            {isLoading ? (
-                                <ActivityIndicator size="small" color="#047D04" />
-                            ) : (
-                                <>
-                                    <AppText
-                                        style={[
-                                            styles.interestedText,
-                                            { color: isInterested ? '#047D04' : theme.colors.themeIcon },
-                                        ]}
-                                    >
-                                        {isInterested ? 'Interested' : 'Interested ?'}
-                                    </AppText>
-                                    <MaterialIcons
-                                        name={isInterested ? 'check-circle' : 'thumb-up-off-alt'}
-                                        size={wp('4.5%')}
-                                        color={isInterested ? '#047D04' : theme.colors.themeIcon}
-                                        style={{ transform: isInterested ? [] : [{ scaleX: -1 }] }}
-                                    />
-                                </>
-                            )}
-                        </TouchableOpacity>
-
-                        <View style={styles.secondaryBtn}>
-                            <Icon
-                                name={
-                                    {
-                                        Call: 'phone',
-                                        WhatsApp: 'whatsapp',
-                                        Map: 'map-marker',
-                                        Share: 'share-variant',
-                                        Bookmark: 'bookmark',
-                                    }[item?.interactionType] || 'phone'
-                                }
-                                size={wp('4.5%')}
-                                color="#333"
-                            />
-                            <AppText style={styles.secondaryBtnText}>
-                                {item?.interactionType || 'Call'}
-                            </AppText>
-                        </View>
+            return (
+                <View style={[styles.card, { backgroundColor: theme.colors.card }]}>
+                    <View style={styles.cardTop}>
+                        <AppText style={[styles.index, { color: theme.colors.placeholder }]}>
+                            {index + 1}
+                        </AppText>
+                        <AppText style={[styles.date, { color: theme.colors.text }]}>
+                            {item?.date}
+                        </AppText>
                     </View>
 
-                    <TouchableOpacity
-                        style={[styles.iconBtn, { borderColor: theme.colors.primary }]}
-                        onPress={() => handleCall(item)}
-                        disabled={isLoading}
-                    >
-                        {isLoading ? (
-                            <ActivityIndicator size="small" color={theme.colors.primary} />
-                        ) : (
-                            <Icon name="phone" size={wp('8%')} color={theme.colors.primary} />
-                        )}
-                    </TouchableOpacity>
-                </View>
-            </View>
-        );
-    }, [selectedInterestedIds, loadingIds, theme, handleCall, handleToggleInterest]);
+                    <AppText style={[styles.name, { color: theme.colors.text }]}>
+                        {item?.buyerName || 'No Name'}
+                    </AppText>
 
+                    <AppText style={[styles.subText, { color: theme.colors.placeholder }]}>
+                        For {item?.brandName || 'N/A'} {item?.modelName || ''}
+                    </AppText>
+
+                    <View style={styles.actionRow}>
+                        <View style={styles.badges}>
+                            <TouchableOpacity
+                                onPress={() => handleToggleInterest(item, index)}
+                                disabled={isLoading}
+                                style={[
+                                    styles.interestedBadge,
+                                    {
+                                        backgroundColor: isInterested ? '#A9FFA9' : null,
+                                        borderColor: isInterested ? '#047D04' : theme.colors.themeIcon,
+                                    },
+                                ]}
+                            >
+                                {isLoading ? (
+                                    <ActivityIndicator size="small" color="#047D04" />
+                                ) : (
+                                    <>
+                                        <AppText
+                                            style={[
+                                                styles.interestedText,
+                                                { color: isInterested ? '#047D04' : theme.colors.themeIcon },
+                                            ]}
+                                        >
+                                            {isInterested ? 'Interested' : 'Interested ?'}
+                                        </AppText>
+                                        <MaterialIcons
+                                            name={isInterested ? 'check-circle' : 'thumb-up-off-alt'}
+                                            size={wp('4.5%')}
+                                            color={isInterested ? '#047D04' : theme.colors.themeIcon}
+                                            style={{ transform: isInterested ? [] : [{ scaleX: -1 }] }}
+                                        />
+                                    </>
+                                )}
+                            </TouchableOpacity>
+
+                            <View style={styles.secondaryBtn}>
+                                <Icon
+                                    name={
+                                        {
+                                            Call: 'phone',
+                                            WhatsApp: 'whatsapp',
+                                            Map: 'map-marker',
+                                            Share: 'share-variant',
+                                            Bookmark: 'bookmark',
+                                        }[item?.interactionType] || 'phone'
+                                    }
+                                    size={wp('4.5%')}
+                                    color="#333"
+                                />
+                                <AppText style={styles.secondaryBtnText}>
+                                    {item?.interactionType || 'Call'}
+                                </AppText>
+                            </View>
+                        </View>
+
+                        <TouchableOpacity
+                            style={[styles.iconBtn, { borderColor: theme.colors.primary }]}
+                            onPress={() => handleCall(item)}
+                            disabled={isLoading}
+                        >
+                            {isLoading ? (
+                                <ActivityIndicator size="small" color={theme.colors.primary} />
+                            ) : (
+                                <Icon name="phone" size={wp('8%')} color={theme.colors.primary} />
+                            )}
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            );
+        },
+        [selectedInterestedIds, loadingIds, theme, handleCall, handleToggleInterest],
+    );
+
+    // ✅ Empty State
     const renderEmptyState = () => (
         <View style={styles.emptyStateContainer}>
-            <Icon
-                name="account-search-outline"
-                size={hp('8%')}
-                color={theme.colors.placeholder}
-            />
+            <Icon name="account-search-outline" size={hp('8%')} color={theme.colors.placeholder} />
             <AppText style={[styles.emptyStateTitle, { color: theme.colors.text }]}>
                 No Leads Found
             </AppText>
             <AppText style={[styles.emptyStateSubtitle, { color: theme.colors.placeholder }]}>
                 {hasDateFilter
-                    ? "No leads available for the selected date range. Try selecting a different date range or clear the filter."
-                    : "No leads available at the moment. Pull down to refresh or try again later."
+                    ? 'No leads found for the selected date range. Try adjusting your filter.'
+                    : 'No leads available at the moment. Pull down to refresh or try again later.'
                 }
             </AppText>
-            <View style={styles.emptyStateActions}>
-                {hasDateFilter && (
-                    <TouchableOpacity
-                        style={[styles.clearFilterButton, { borderColor: theme.colors.primary }]}
-                        onPress={handleClearDateFilter}
-                        disabled={clearingFilter}
-                    >
-                        {clearingFilter ? (
-                            <ActivityIndicator size="small" color={theme.colors.primary} />
-                        ) : (
-                            <Icon name="filter-remove" size={wp('5%')} color={theme.colors.primary} />
-                        )}
-                        <AppText style={[styles.clearFilterButtonText, { color: theme.colors.primary }]}>
-                            {clearingFilter ? 'Clearing...' : 'Clear Filter'}
-                        </AppText>
-                    </TouchableOpacity>
-                )}
-            </View>
         </View>
     );
 
+    // ✅ Header
     const renderHeader = () => (
-        <View>
+        <>
             <LinearGradient
                 colors={['#E6F1FF', '#C8E2FF']}
                 start={{ x: 1, y: 1 }}
@@ -442,43 +420,53 @@ const LeadsScreen = () => {
             >
                 <View style={styles.contentWrapper}>
                     <View>
-                        <AppText style={[styles.leftTextTop]}>
-                            Connect with your
+                        <AppText style={styles.leftTextTop}>Connect with your</AppText>
+                        <AppText style={[styles.leftTextBottom, { color: theme.colors.primary }]}>
+                            Potential Buyers!
                         </AppText>
-                        <AppText style={[styles.leftTextBottom, { color: theme.colors.primary }]}>Potential Buyers!</AppText>
                     </View>
-                    <Icon
-                        name="account-group"
-                        size={hp('7%')}
-                        color={theme.colors.primary}
-                    />
+                    <Icon name="account-group" size={hp('7%')} color={theme.colors.primary} />
                 </View>
             </LinearGradient>
 
-            {hasDateFilter && (
-                <View style={[styles.currentDateRangeContainer, { backgroundColor: theme.colors.card }]}>
-                    <View style={styles.dateRangeRow}>
-                        <Icon name="calendar-range" size={wp('5%')} color={theme.colors.primary} />
-                        <AppText style={[styles.dateRangeText, { color: theme.colors.text }]}>
-                            {fromDateString} - {toDateString}
-                        </AppText>
+            {/* Date Filter Button */}
+            {hasDateFilter && (<View style={styles.filterContainer}>
+                <TouchableOpacity
+                    style={[
+                        styles.dateFilterBtn,
+                        {
+                            backgroundColor: hasDateFilter ? theme.colors.primary : theme.colors.card,
+                            borderColor: theme.colors.primary
+                        }
+                    ]}
+                    onPress={openDateSelectionModal}
+                >
+                    <Icon
+                        name="calendar-range"
+                        size={wp('5%')}
+                        color={hasDateFilter ? '#fff' : theme.colors.primary}
+                    />
+                    <AppText style={[
+                        styles.dateFilterText,
+                        { color: hasDateFilter ? '#fff' : theme.colors.primary }
+                    ]}>
+                        {hasDateFilter ? `${fromDateString} - ${toDateString}` : 'Filter by Date'}
+                    </AppText>
+                    {hasDateFilter && (
                         <TouchableOpacity
-                            onPress={handleClearDateFilter}
-                            style={styles.clearFilterIcon}
-                            disabled={clearingFilter}
+                            onPress={() => handleClearDateFilter()}
+                            style={styles.clearFilterBtn}
                         >
-                            {clearingFilter ? (
-                                <ActivityIndicator size="small" color={theme.colors.placeholder} />
-                            ) : (
-                                <Icon name="close-circle" size={wp('5%')} color={theme.colors.placeholder} />
-                            )}
+                            <Icon name="close-circle" size={wp('4%')} color="#fff" />
                         </TouchableOpacity>
-                    </View>
-                </View>
-            )}
-        </View>
+                    )}
+                </TouchableOpacity>
+            </View>)}
+
+        </>
     );
 
+    // ✅ Footer Loader
     const renderFooter = () => {
         if (loadingMore) {
             return (
@@ -490,36 +478,19 @@ const LeadsScreen = () => {
                 </View>
             );
         }
-
         return <View style={{ height: hp('8%') }} />;
     };
 
-    const keyExtractor = useCallback((item, index) => `${item?.leadId || item?._id || index}-${index}`, []);
-
-    if (loading) {
-        return (
-            <BackgroundWrapper style={{ padding: wp('1%') }}>
-                <DetailsHeader
-                    title="Leads"
-                    stepText="Loading..."
-                    rightType="action"
-                    actionIcon="calendar-outline"
-                    onActionPress={openDateSelectionModal}
-                   
-                />
-                <Loader visible />
-            </BackgroundWrapper>
-        );
-    }
+    const keyExtractor = useCallback(
+        (item, index) => `${item?.leadId || item?._id || index}-${index}`,
+        [],
+    );
 
     return (
         <BackgroundWrapper style={{ padding: wp('1%') }}>
             <DetailsHeader
                 title="Leads"
-                stepText={hasDateFilter
-                    ? `${totalItems} filtered leads (${leadsData.length} loaded)`
-                    : `${totalItems} leads (${leadsData.length} loaded)`
-                }
+                stepText={`${totalItems} leads (${leadsData.length} loaded)${hasDateFilter ? ' - Filtered' : ''}`}
                 rightType="action"
                 actionIcon="calendar-outline"
                 onActionPress={openDateSelectionModal}
@@ -540,7 +511,7 @@ const LeadsScreen = () => {
                         colors={[theme.colors.primary]}
                     />
                 }
-                onEndReached={handleEndReached}
+                onEndReached={loadMoreData}
                 onEndReachedThreshold={0.2}
                 removeClippedSubviews={true}
                 maxToRenderPerBatch={10}
@@ -550,15 +521,122 @@ const LeadsScreen = () => {
                 contentContainerStyle={leadsData.length === 0 ? { flex: 1 } : {}}
             />
 
-            {/* Date Picker Component */}
-            <DatePickerComponent
+            {/* Date Selection Modal */}
+            <Modal
                 visible={showDateSelectionModal}
-                onClose={closeDateSelectionModal}
-                fromDateString={fromDateString}
-                toDateString={toDateString}
-                onApplyFilter={handleApplyDateFilter}
-                applyingDateFilter={applyingDateFilter}
-            />
+                transparent
+                animationType="fade"
+                onRequestClose={closeDateSelectionModal}
+            >
+                <SafeAreaView style={styles.modalOverlay}>
+                    <LinearGradient
+                        colors={['#00000099', '#00000099']}
+                        style={styles.modalBackground}
+                    >
+                        <View style={[styles.modalContent, { backgroundColor: theme.colors.card }]}>
+                            <AppText style={[styles.modalTitle, { color: theme.colors.text }]}>
+                                Select Date Range
+                            </AppText>
+
+                            <View style={styles.modalRow}>
+                                <TouchableOpacity
+                                    style={[styles.datePickerBtn, { borderColor: theme.colors.primary }]}
+                                    onPress={() => openPlatformPicker('from')}
+                                >
+                                    <Icon name="calendar" size={wp('4%')} color={theme.colors.primary} />
+                                    <View>
+                                        <AppText style={[styles.dateLabel, { color: theme.colors.placeholder }]}>
+                                            From
+                                        </AppText>
+                                        <AppText style={[styles.dateValue, { color: theme.colors.text }]}>
+                                            {fromDateString}
+                                        </AppText>
+                                    </View>
+                                </TouchableOpacity>
+
+                                <TouchableOpacity
+                                    style={[styles.datePickerBtn, { borderColor: theme.colors.primary }]}
+                                    onPress={() => openPlatformPicker('to')}
+                                >
+                                    <Icon name="calendar" size={wp('4%')} color={theme.colors.primary} />
+                                    <View>
+                                        <AppText style={[styles.dateLabel, { color: theme.colors.placeholder }]}>
+                                            To
+                                        </AppText>
+                                        <AppText style={[styles.dateValue, { color: theme.colors.text }]}>
+                                            {toDateString}
+                                        </AppText>
+                                    </View>
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={styles.modalActions}>
+                                <TouchableOpacity
+                                    style={[styles.modalBtn, styles.clearBtn, { borderColor: theme.colors.border }]}
+                                    onPress={handleClearDateFilter}
+                                >
+                                    <AppText style={[styles.modalBtnText, { color: theme.colors.text }]}>
+                                        Clear
+                                    </AppText>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.modalBtn, styles.applyBtn, { backgroundColor: theme.colors.primary }]}
+                                    onPress={handleApplyDateFilter}
+                                >
+                                    <AppText style={[styles.modalBtnText, { color: '#fff' }]}>
+                                        Apply
+                                    </AppText>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </LinearGradient>
+
+                    {datePickerVisible && (
+                        <View
+                            style={{
+                                width: '100%', // full width
+                                backgroundColor: theme.colors.card,
+                                borderRadius: wp('2%'),
+                                paddingHorizontal: wp('3%'),
+                                marginBottom: hp('6%'),
+                                alignItems: 'center'
+                            }}
+                        >
+                            <DateTimePicker
+                                value={tempSelectedDate}
+                                mode="date"
+                                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                                maximumDate={today}
+                                onChange={onDateChange}
+                                themeVariant="dark"
+                                textColor={theme.colors.text}
+                                style={{ width: '100%' }} // the picker takes parent width
+                            />
+                            {Platform.OS === 'ios' && (
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        const ds = formatDate(tempSelectedDate);
+                                        if (datePickerType === 'from') setFromDateString(ds);
+                                        else if (datePickerType === 'to') setToDateString(ds);
+
+                                        setDatePickerVisible(false);
+                                        setDatePickerType(null);
+                                    }}
+                                    style={{
+                                        paddingVertical: hp('1%'),
+                                        paddingHorizontal: wp('5%'),
+                                        backgroundColor: theme.colors.primary,
+                                        borderRadius: wp('2%'),
+                                    }}
+                                >
+                                    <AppText style={{ color: '#fff', fontWeight: '600' }}>Done</AppText>
+                                </TouchableOpacity>
+                            )}
+
+                        </View>
+                    )}
+                </SafeAreaView>
+            </Modal>
         </BackgroundWrapper>
     );
 };
@@ -649,7 +727,7 @@ const styles = StyleSheet.create({
         shadowRadius: 2,
         elevation: 4,
         width: '100%',
-        marginBottom: hp('2%'),
+        marginBottom: hp('1%'),
         alignSelf: 'center',
     },
     contentWrapper: {
@@ -670,32 +748,27 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         opacity: 0.7,
     },
-    // Current Date Range Display
-    currentDateRangeContainer: {
-        marginHorizontal: wp('2%'),
+    filterContainer: {
+        paddingHorizontal: wp('2%'),
         marginBottom: hp('2%'),
-        padding: wp('4%'),
-        borderRadius: wp('2%'),
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        elevation: 2,
     },
-    dateRangeRow: {
+    dateFilterBtn: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center',
+        paddingHorizontal: wp('4%'),
+        paddingVertical: hp('1.2%'),
+        borderRadius: wp('2.5%'),
+        borderWidth: 1,
+        gap: wp('2%'),
     },
-    dateRangeText: {
-        fontSize: wp('4%'),
-        fontWeight: '600',
-        marginLeft: wp('2%'),
+    dateFilterText: {
+        fontSize: wp('3.8%'),
+        fontWeight: '500',
         flex: 1,
-        textAlign: 'center',
     },
-    clearFilterIcon: {
-        marginLeft: wp('2%'),
+    clearFilterBtn: {
+        padding: wp('1%'),
     },
-    // Footer Loader Styles
     footerLoader: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -707,7 +780,6 @@ const styles = StyleSheet.create({
         fontSize: wp('3.5%'),
         fontWeight: '500',
     },
-    // Empty State Styles
     emptyStateContainer: {
         alignItems: 'center',
         justifyContent: 'center',
@@ -728,25 +800,79 @@ const styles = StyleSheet.create({
         lineHeight: wp('5.5%'),
         marginBottom: hp('3%'),
     },
-    emptyStateActions: {
-        flexDirection: 'row',
-        gap: wp('3%'),
-        flexWrap: 'wrap',
+    // Modal Styles
+    modalOverlay: {
+        flex: 1,
         justifyContent: 'center',
+        alignItems: 'center',
     },
-    clearFilterButton: {
+    modalBackground: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+    },
+    modalContent: {
+        width: wp('90%'),
+        borderRadius: wp('3%'),
+        padding: wp('5%'),
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    modalTitle: {
+        fontSize: wp('5%'),
+        fontWeight: '600',
+        textAlign: 'center',
+        marginBottom: hp('3%'),
+    },
+    modalRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: hp('3%'),
+        gap: wp('3%'),
+    },
+    datePickerBtn: {
+        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: wp('6%'),
-        paddingVertical: hp('1.5%'),
-        borderRadius: wp('8%'),
+        padding: wp('3%'),
+        borderRadius: wp('2%'),
         borderWidth: 1,
         gap: wp('2%'),
     },
-    clearFilterButtonText: {
+    dateLabel: {
+        fontSize: wp('3.2%'),
+        fontWeight: '400',
+    },
+    dateValue: {
+        fontSize: wp('3.8%'),
+        fontWeight: '600',
+    },
+    modalActions: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        gap: wp('3%'),
+    },
+    modalBtn: {
+        flex: 1,
+        paddingVertical: hp('1.5%'),
+        borderRadius: wp('2%'),
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    clearBtn: {
+        backgroundColor: 'transparent',
+        borderWidth: 1,
+    },
+    applyBtn: {
+        // backgroundColor set dynamically
+    },
+    modalBtnText: {
         fontSize: wp('4%'),
         fontWeight: '600',
     },
 });
-
 export default LeadsScreen;
