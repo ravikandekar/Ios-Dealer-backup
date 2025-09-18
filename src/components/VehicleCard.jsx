@@ -17,7 +17,7 @@ import AppText from './AppText';
 const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPressEdit, isDraft, }) => {
   const isSold = data?.isSold;
   const isDeleted = data?.isDeleted;
-  const isActive = data?.isActive;
+  const isActive = data?.isdisable;
   const shareVehicleDetails = async () => {
     try {
       const shareData = {
@@ -52,7 +52,7 @@ const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPres
           />
         </View>
       )}
-      {!isActive && (
+      {isActive && (
         <View style={[styles.overlayContainer, { backgroundColor: '#00000080' }]}>
           <AppText style={styles.inactiveText}>Inactive</AppText>
         </View>

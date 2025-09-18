@@ -551,7 +551,7 @@ const ProfileDetailsScreen = () => {
                   {businessTypes.map(type => (
                     <View key={type} style={[styles.businessTag,{ backgroundColor: theme.colors.inputBackground }]}>
                       <AppText style={[styles.tagText,{ color: theme.colors.text }]}>{type}</AppText>
-                      <TouchableOpacity
+                      {/* <TouchableOpacity
                         onPress={() => removeBusinessType(type)}
                         style={styles.removeButton}>
                         <Icon
@@ -559,10 +559,10 @@ const ProfileDetailsScreen = () => {
                           size={hp('2%')}
                           color={theme.colors.text}
                         />
-                      </TouchableOpacity>
+                      </TouchableOpacity> */}
                     </View>
                   ))}
-                  {businessTypes.length < 3 && (
+                  {/* {businessTypes.length < 3 && (
                     <TouchableOpacity
                       style={styles.businessTag}
                       onPress={() => setShowBusinessModal(true)}>
@@ -579,7 +579,7 @@ const ProfileDetailsScreen = () => {
                         color={theme.colors.primary}
                       />
                     </TouchableOpacity>
-                  )}
+                  )} */}
                 </View>
               </View>
             </>

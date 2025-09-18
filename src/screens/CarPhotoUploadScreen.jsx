@@ -382,7 +382,7 @@ const CarPhotoUploadScreen = ({ navigation }) => {
 
             } else {
                 // ✅ Handle plan not purchased (appCode === 1126)
-                if (responseData?.appCode === 1126 || responseData?.appCode === 1003 || responseData?.appCode === 1134) {
+                if (responseData?.appCode === 1126 || responseData?.appCode === 1003 || responseData?.appCode === 1134 || responseData?.appCode === 1068) {
                     setShowSubscriptionModal(true);
                     return;
                 }

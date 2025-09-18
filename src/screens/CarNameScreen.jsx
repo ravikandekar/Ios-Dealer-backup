@@ -45,6 +45,7 @@ const CarNameScreen = ({ navigation, route }) => {
   console.log('isBike', isBike);
   const fetchData = async (search = '', pageNumber = 1, isRefresh = false) => {
     try {
+      setLoading(true);
       if (!isRefresh) setLoading(true);
 
       if (isBike) {
@@ -86,6 +87,7 @@ const CarNameScreen = ({ navigation, route }) => {
       console.error('Fetch names error:', error);
       showToast('error', '', error?.response?.data?.message || 'Something went wrong');
     } finally {
+      setLoading(false);
       if (!isRefresh) setLoading(false);
       setIsRefreshing(false);
     }

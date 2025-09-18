@@ -5,7 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  ActivityIndicator, // Added
+  ActivityIndicator,
+  Modal, // Added
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {
@@ -17,8 +18,10 @@ import AppText from './AppText';
 import { categoryIcons } from '../constants/strings';
 import { fetchCategories } from '../constants/categoryApi';
 import { showToast } from '../utils/toastService';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import apiClient from '../utils/apiClient';
 import { useFormStore } from '../store/formStore';
+import { color } from 'react-native-elements/dist/helpers';
 
 const CategoryDropdownMenu = ({
   selectedCategory,
@@ -30,6 +33,8 @@ const CategoryDropdownMenu = ({
   const [loading, setLoading] = useState(false); // Added state
   const [mainLoading, setMainLoading] = useState(false); // Added state
   const { formData, updateForm } = useFormStore();
+  const [registrationModalVisible, setRegistrationModalVisible] = useState(false);
+  const [pendingCategory, setPendingCategory] = useState(null);
   console.log('categories iddddd', categories);
 
   useEffect(() => {
@@ -48,7 +53,7 @@ const CategoryDropdownMenu = ({
     }
   };
 
-  const handleCategorySelect = async (categoryId, category_name) => {
+  const handleCategorySelect = async (categoryId, category_name, isRegistered) => {
     console.log('🔄 Switching category to:', categoryId, category_name);
 
     if (!categoryId) {
@@ -56,8 +61,21 @@ const CategoryDropdownMenu = ({
       return;
     }
 
-    setLoading(true); // Show loader
+    // ✅ If not registered → open modal
+    console.log('categoriesdddd', isRegistered);
 
+    if (isRegistered === false) {
+      setPendingCategory({ categoryId, category_name });
+      setRegistrationModalVisible(true);
+      return;
+    }
+
+    // ✅ Else proceed with API
+    await switchCategory(categoryId, category_name);
+  };
+
+  const switchCategory = async (categoryId, category_name) => {
+    setLoading(true);
     try {
       const payload = {
         userId: userID,
@@ -70,29 +88,45 @@ const CategoryDropdownMenu = ({
       );
 
       if (response?.data?.appCode === 1000) {
-        const data = response.data
-        console.log('response for acitive catgory from apiiii', data.data.data.activeCategorySubscriptionPlanId);
+        const data = response.data;
+        console.log(
+          'response for active category from api',
+          data.data.data.activeCategorySubscriptionPlanId
+        );
 
-        showToast('success', 'Category Switched', response?.data?.data?.message || 'Updated successfully');
+        showToast(
+          'success',
+          'Category Switched',
+          response?.data?.data?.message || 'Updated successfully'
+        );
         onSelect(category_name);
         updateForm('subscription_plan', data?.data?.data?.activeCategorySubscriptionPlanId);
         updateForm('category_id', categoryId);
       } else if (response?.data?.appCode === 1003) {
-        const validationMsg = response?.data?.meta?.errors?.[0]?.message || 'Validation error';
+        const validationMsg =
+          response?.data?.meta?.errors?.[0]?.message || 'Validation error';
         showToast('error', 'Validation Error', validationMsg);
       } else {
-        showToast('error', 'Failed to switch category', response?.data?.message || 'Unexpected response');
+        showToast(
+          'error',
+          'Failed to switch category',
+          response?.data?.message || 'Unexpected response'
+        );
       }
     } catch (error) {
-      showToast('error', 'API Error', error?.response?.data?.message || 'Something went wrong');
+      showToast(
+        'error',
+        'API Error',
+        error?.response?.data?.message || 'Something went wrong'
+      );
     } finally {
-      setLoading(false); // Hide loader
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.backdrop}>
-      
+
       <View
         style={[
           styles.categoryContainerBox,
@@ -112,7 +146,7 @@ const CategoryDropdownMenu = ({
             animating={mainLoading}
           />
         )}
-        {categories.map(({ _id, category_name, isActive, isSubscribed }) => {
+        {categories.map(({ _id, category_name, isActive, isSubscribed ,isRegistered}) => {
           if (!category_name) return null;
           const isSelected = selectedCategory === category_name;
           const IconComponent = categoryIcons[category_name];
@@ -125,7 +159,7 @@ const CategoryDropdownMenu = ({
                   styles.categoryCard,
                   isSelected ? styles.subscribed : styles.notSubscribed,
                 ]}
-                onPress={() => handleCategorySelect(_id, category_name)}
+                onPress={() => handleCategorySelect(_id, category_name, isRegistered)}
                 disabled={loading} // Disable while loading
               >
                 <View style={styles.leftSection}>
@@ -216,6 +250,62 @@ const CategoryDropdownMenu = ({
           </AppText>
         </View>
       </ScrollView>
+     <Modal
+  visible={registrationModalVisible}
+  transparent
+  animationType="fade"
+  onRequestClose={() => setRegistrationModalVisible(false)}
+>
+  <View style={styles.modalOverlay}>
+    <View style={[styles.modalContainer, { backgroundColor: theme.colors.background }]}>
+      {/* Close Icon */}
+      <TouchableOpacity
+        style={styles.closeIcon}
+        onPress={() => setRegistrationModalVisible(false)}
+      >
+        <Icon name="close" size={28} color={theme.colors.primary} />
+      </TouchableOpacity>
+
+      {/* Message */}
+      <AppText style={[styles.modalMessage, { color: theme.colors.text }]}>
+        You want registration?
+      </AppText>
+
+      {/* Actions */}
+      <View style={styles.actions}>
+        <TouchableOpacity
+          style={[styles.button, styles.cancelButton]}
+          onPress={() => setRegistrationModalVisible(false)}
+        >
+          <AppText style={[styles.cancelText, { color: theme.colors.text }]}>
+            Cancel
+          </AppText>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            styles.proceedButton,
+            { backgroundColor: theme.colors.primary },
+          ]}
+          onPress={() => {
+            setRegistrationModalVisible(false);
+            if (pendingCategory) {
+              switchCategory(
+                pendingCategory.categoryId,
+                pendingCategory.category_name
+              );
+            }
+          }}
+        >
+          <AppText style={styles.proceedText}>Proceed</AppText>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View>
+</Modal>
+
+
     </View>
   );
 };
@@ -268,8 +358,8 @@ const styles = StyleSheet.create({
   categoryContainerBox: {
     flexDirection: 'column',
     height: wp('90%'),
-    borderBottomLeftRadius:wp('8%'),
-    borderBottomRightRadius:wp('8%'),
+    borderBottomLeftRadius: wp('8%'),
+    borderBottomRightRadius: wp('8%'),
     paddingTop: wp('5%'),
     paddingHorizontal: 20,
     zIndex: 999,
@@ -344,4 +434,64 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: hp('6%'),
   },
+modalOverlay: {
+  flex: 1,
+  backgroundColor: 'rgba(0,0,0,0.6)',
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+modalContainer: {
+  width: '85%',
+  borderRadius: 20,
+  padding: 24,
+  elevation: 10,
+  shadowColor: '#000',
+  shadowOpacity: 0.25,
+  shadowOffset: { width: 0, height: 4 },
+  shadowRadius: 6,
+  alignItems: 'center',
+},
+closeIcon: {
+  position: 'absolute',
+  right: 14,
+  top: 14,
+  padding: 6,
+  borderRadius: 20,
+  backgroundColor: 'rgba(0,0,0,0.05)',
+},
+modalMessage: {
+  fontSize: wp('4.8%'),
+  fontWeight: '700',
+  textAlign: 'center',
+  marginVertical: hp('4%'),
+},
+actions: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  width: '100%',
+  marginTop: hp('1%'),
+},
+button: {
+  flex: 1,
+  marginHorizontal: 6,
+  paddingVertical: hp('1.8%'),
+  borderRadius: 12,
+  alignItems: 'center',
+},
+cancelButton: {
+  backgroundColor: '#f1f1f1',
+},
+proceedButton: {
+  backgroundColor: '#f7941d', // fallback, overridden by theme.colors.primary
+},
+cancelText: {
+  fontSize: wp('3.8%'),
+  fontWeight: '500',
+},
+proceedText: {
+  color: '#fff',
+  fontSize: wp('4%'),
+  fontWeight: '700',
+},
+
 });
