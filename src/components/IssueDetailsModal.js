@@ -163,7 +163,7 @@ const stripHtmlTags = (str) => {
 
           {/* Description */}
           <AppText style={[styles.label, {color: theme.colors.text}]}>Description</AppText>
-          <AppText style={[styles.value, {color: theme.colors.text}]}> {stripHtmlTags(ticket?.description || 'No description provided.')}</AppText>
+          <AppText style={[styles.value, {color: theme.colors.text}]}> {stripHtmlTags(ticket?.description || ticket?.message || 'No description provided.')}</AppText>
 
           {/* Uploaded Images */}
           {ticket?.attachments?.length > 0 && (

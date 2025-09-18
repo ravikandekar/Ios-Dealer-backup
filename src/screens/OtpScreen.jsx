@@ -117,7 +117,7 @@ const OtpScreen = ({ navigation, route }) => {
 
       if (success && appCode === 1000) {
         const { accessToken, refreshToken, dealer } = data;
-        login(accessToken);
+         await login(accessToken);
         const token = await getToken();
  
         await initApp({

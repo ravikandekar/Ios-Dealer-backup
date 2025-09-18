@@ -21,12 +21,28 @@ export const AuthProvider = ({ children }) => {
 
   console.log('🔐 AuthProvider initialized with isDark:', register, cityselected, profileCompleted, isAadharVerified, isBussinessdetails, selectedCategory);
 
-  const login = async (token) => {
-    console.log('🔐 Logging in with token:', token);
+const login = async (token) => {
+  console.log('🔐 Logging in with token:', token);
+
+  try {
+    // ✅ Save token first
     await storeToken(token);
-    // setIsAuthenticated(true);
-    console.log('✅ Authenticated set to true');
-  };
+
+    // ✅ Validate token properly (API call or local check)
+    const isValid = await checkToken(); 
+
+    if (isValid) {
+      setIsAuthenticated(true);
+      console.log('✅ Token valid. Authenticated set to true');
+    } else {
+      setIsAuthenticated(false);
+      console.log('❌ Invalid token. Auth failed');
+    }
+  } catch (error) {
+    console.error('⚠️ Login error:', error);
+    setIsAuthenticated(false);
+  }
+};
 
   const checkToken = async () => {
     const token = await getToken();

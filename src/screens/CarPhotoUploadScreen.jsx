@@ -460,11 +460,11 @@ const CarPhotoUploadScreen = ({ navigation }) => {
     };
     return (
         <BackgroundWrapper>
-            <DetailsHeader title={isBike ? 'Bike Details' : 'Car Details'} stepText="6/6" rightType="steps" />
+            <DetailsHeader title={isBike ? 'Bike Details' : 'Car Details'} stepText={selectedCategory === 'Bike' ? ' 7/7' : ' 6/6'} rightType="steps" />
             <AppText style={[styles.title, { color: theme.colors.text }]}>
                 Upload {isBike ? 'bike' : 'car'} photos.
             </AppText>
-            <AppText style={[styles.subtitle, { color: theme.colors.placeholder }]}>({isBike ? 5 : 10})</AppText>
+            <AppText style={[styles.subtitle, { color: theme.colors.placeholder }]}> (max {isBike ? 5 : 10})</AppText>
 
             <TouchableOpacity
                 style={[styles.uploadBox, { backgroundColor: theme.colors.card }]}

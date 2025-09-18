@@ -114,7 +114,7 @@ const RangeSelectorScreen = ({ navigation }) => {
     );
     return (
         <BackgroundWrapper>
-            <DetailsHeader title="Car Details" stepText="5/6" rightType="steps" />
+            <DetailsHeader title="Car Details" stepText={selectedCategory === 'Bike' ? ' 6/7' : ' 5/6'} rightType="steps" />
             <View
                 contentContainerStyle={{ padding: hp('1%') }}
                 showsVerticalScrollIndicator={false}

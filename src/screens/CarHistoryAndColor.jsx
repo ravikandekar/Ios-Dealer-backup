@@ -136,7 +136,7 @@ const CarHistoryAndColor = ({ navigation }) => {
   if (loading) {
     return (
       <BackgroundWrapper>
-        <DetailsHeader title={`${isBike ? 'Bike' : 'Car'} Details`} stepText={`4/7`} rightType='steps' />
+        <DetailsHeader title={`${isBike ? 'Bike' : 'Car'} Details`} stepText={isBike ? ' 5/7' : ' 4/6'} rightType='steps' />
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
         </View>
@@ -146,7 +146,7 @@ const CarHistoryAndColor = ({ navigation }) => {
 
   return (
     <BackgroundWrapper>
-      <DetailsHeader title={`${isBike ? 'Bike' : 'Car'} Details`} stepText={`4/7`} rightType='steps' />
+      <DetailsHeader title={`${isBike ? 'Bike' : 'Car'} Details`} stepText={isBike ? ' 5/7' : ' 4/6'} rightType='steps' />
       <ScrollView
         contentContainerStyle={{ paddingBottom: hp('6%') }}
         showsVerticalScrollIndicator={false}

@@ -117,7 +117,7 @@ const CarDetailsScreen = ({ navigation, route }) => {
       <DetailsHeader
         title={`${headerName} Details`}
         onBackPress={() => navigation.goBack()}
-        stepText="1/7"
+        stepText={`${selectedCategory === 'Bike' ? ' 2/7' : ' 1/6'}`}
         rightType="steps"
       />
 

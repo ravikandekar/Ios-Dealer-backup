@@ -414,21 +414,20 @@ const ViewTicketScreen = ({ route }) => {
           {replyAttachments.length > 0 && (
             <View style={styles.attachmentPreview}>
               <View style={styles.attachmentInfo}>
-                {replyAttachments.map((file, index) => (
-                  <View key={`attachment-${index}`} style={styles.attachmentInfo}>
-                    <AppText
-                      style={[styles.attachmentText, { color: theme.colors.text }]}
-                    >
-                      📎 {file.name}
-                    </AppText>
-                    <TouchableOpacity onPress={() => removeAttachment(index)}>
-                      <AppText style={styles.removeAttachment}>✕</AppText>
-                    </TouchableOpacity>
-                  </View>
-                ))}
+                <AppText
+                  style={[styles.attachmentText, { color: theme.colors.text }]}
+                >
+                  📎 {replyAttachments.length} file{replyAttachments.length > 1 ? 's' : ''} attached
+                </AppText>
+
+                {/* Optional: show remove all button */}
+                <TouchableOpacity onPress={() => setReplyAttachments([])}>
+                  <AppText style={styles.removeAttachment}>✕</AppText>
+                </TouchableOpacity>
               </View>
             </View>
           )}
+
 
           <View style={styles.replyActions}>
             <TouchableOpacity
@@ -474,7 +473,7 @@ const ViewTicketScreen = ({ route }) => {
       )}
     </View>
 
-  ), [replyMessage, replyAttachments, submittingReply, theme.colors, removeAttachment, pickReplyFile, submitReply,hideAttachments]);
+  ), [replyMessage, replyAttachments, submittingReply, theme.colors, removeAttachment, pickReplyFile, submitReply, hideAttachments]);
 
   // Loading state
   if (loading && !ticket) return <Loader visible={true} />;

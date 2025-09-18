@@ -152,7 +152,7 @@ const CarsFuelAndTrans = ({ navigation }) => {
 
   return (
     <BackgroundWrapper>
-      <DetailsHeader title={`${isBike ? 'Bike' : 'Car'} Details`} stepText="3/7" rightType="steps" />
+      <DetailsHeader title={`${isBike ? 'Bike' : 'Car'} Details`} stepText={selectedCategory === 'Bike' ? ' 4/7' : ' 3/6'} rightType="steps" />
 
       <ScrollView
         contentContainerStyle={{ paddingBottom: hp('6%') }}
