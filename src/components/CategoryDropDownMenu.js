@@ -268,7 +268,7 @@ const CategoryDropdownMenu = ({
 
       {/* Message */}
       <AppText style={[styles.modalMessage, { color: theme.colors.text }]}>
-        You want registration?
+        Do you want to register as a {pendingCategory?.category_name} dealer?
       </AppText>
 
       {/* Actions */}
