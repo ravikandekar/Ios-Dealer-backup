@@ -56,18 +56,30 @@ const CustomEditField = ({
   const combinedError = errorMessage || localError;
 
 const handleTextChange = (text) => {
-  // ✅ If the field is for Name (header is "Full Name :")
-  if (header?.toLowerCase() === 'full name :'.toLowerCase()) {
-    const cleaned = text.replace(/[^A-Za-z\s]/g, ''); // allow only letters + spaces
-    onChangeText(cleaned);
+  let filteredText = text;
+
+  // Restrict alphabets/numbers based on field type
+  if (keyboardType === 'phone-pad') {
+    // ✅ Only allow numbers for phone fields
+    filteredText = text.replace(/[^0-9]/g, '');
+  } else {
+    // Extract header text safely (works if header is <AppText> or string)
+    const headerText = typeof header === 'string' ? header : header?.props?.children;
+
+    if (headerText === 'Shop Name' || headerText === 'Full Name') {
+      // ✅ Only allow alphabets and spaces
+      filteredText = text.replace(/[^A-Za-z\s]/g, '');
+    }
+  }
+
+  if (maxLength !== undefined && filteredText.length > maxLength) {
     return;
   }
 
-  if (maxLength !== undefined && text.length > maxLength) {
-    return;
-  }
-  onChangeText(text);
+  onChangeText(filteredText);
 };
+
+
 
   return (
     <View style={[styles.fieldContainer, containerStyle]}>

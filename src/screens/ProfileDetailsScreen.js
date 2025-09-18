@@ -281,7 +281,7 @@ const ProfileDetailsScreen = () => {
   const personalFields = [
     {
       key: 'name',
-      label: 'Full Name :',
+      label: 'Full Name',
       placeholder: 'Enter your name',
       iconName: 'account',
       rightIcon: 'pencil-outline',

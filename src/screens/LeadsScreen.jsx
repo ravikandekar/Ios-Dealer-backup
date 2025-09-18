@@ -502,7 +502,7 @@ const LeadsScreen = () => {
                 <DetailsHeader
                     title="Leads"
                     stepText="Loading..."
-                    rightType="none"
+                    rightType="action"
                     actionIcon="calendar-outline"
                     onActionPress={openDateSelectionModal}
                    
@@ -520,7 +520,7 @@ const LeadsScreen = () => {
                     ? `${totalItems} filtered leads (${leadsData.length} loaded)`
                     : `${totalItems} leads (${leadsData.length} loaded)`
                 }
-                rightType="none"
+                rightType="action"
                 actionIcon="calendar-outline"
                 onActionPress={openDateSelectionModal}
             />

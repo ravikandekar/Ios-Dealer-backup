@@ -16,7 +16,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { AuthContext } from '../context/AuthContext';
-import Icon from "react-native-vector-icons/MaterialIcons"; 
+import Icon from "react-native-vector-icons/MaterialIcons";
 const LocationSearchInput = ({ onLocationSelected }) => {
   const { theme } = useContext(AuthContext);
   const [query, setQuery] = useState('');
@@ -110,40 +110,40 @@ const LocationSearchInput = ({ onLocationSelected }) => {
   return (
     <View style={styles.wrapper}>
       <View style={styles.container}>
-     <View style={styles.inputWrapper}>
-  {/* Left icon */}
-  <Icon
-    name="location-on"
-    size={22}
-    color={theme.colors.placeholder}
-    style={styles.leftIcon}
-  />
+        <View style={styles.inputWrapper}>
+          {/* Left icon */}
+          <Icon
+            name="location-on"
+            size={22}
+            color={theme.colors.placeholder}
+            style={styles.leftIcon}
+          />
 
-  <TextInput
-    value={query}
-    onChangeText={(text) => {
-      setQuery(text);
-      setSelected(false);
-    }}
-    placeholder="Full address for location verification"
-    placeholderTextColor={theme.colors.placeholder}
-    style={[
-      styles.textInput,
-      {
-        borderColor: theme.colors.border,
-        backgroundColor: theme.colors.inputBackground,
-        color: theme.colors.text,
-        paddingLeft: wp('10%'), // ⬅️ extra padding so text doesn’t overlap icon
-      },
-    ]}
-  />
+          <TextInput
+            value={query}
+            onChangeText={(text) => {
+              setQuery(text);
+              setSelected(false);
+            }}
+            placeholder="Full address for location verification"
+            placeholderTextColor={theme.colors.placeholder}
+            style={[
+              styles.textInput,
+              {
+                borderColor: theme.colors.border,
+                backgroundColor: theme.colors.inputBackground,
+                color: theme.colors.text,
+                paddingLeft: wp('10%'), // ⬅️ extra padding so text doesn’t overlap icon
+              },
+            ]}
+          />
 
-  {selected && query.length > 0 && (
-    <TouchableOpacity onPress={clearInput} style={styles.clearButton}>
-      <Text style={{ color: theme.colors.primary, fontSize: hp('2.5%') }}>✕</Text>
-    </TouchableOpacity>
-  )}
-</View>
+          {selected && query.length > 0 && (
+            <TouchableOpacity onPress={clearInput} style={styles.clearButton}>
+              <Text style={{ color: theme.colors.primary, fontSize: hp('2.5%') }}>✕</Text>
+            </TouchableOpacity>
+          )}
+        </View>
 
         {loading && (
           <ActivityIndicator
@@ -169,7 +169,7 @@ const LocationSearchInput = ({ onLocationSelected }) => {
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ paddingBottom: hp('1%') }}
-              style={{ maxHeight: hp('25%') }}
+              style={{ maxHeight: hp('45%') }}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.item}
@@ -233,11 +233,11 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
   },
   leftIcon: {
-  position: "absolute",
-  left: wp("3%"),
-  top: hp("1.4%"),
-  zIndex: 10,
-},
+    position: "absolute",
+    left: wp("3%"),
+    top: hp("1.4%"),
+    zIndex: 10,
+  },
 });
 
 export default LocationSearchInput;

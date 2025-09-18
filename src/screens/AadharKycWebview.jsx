@@ -26,6 +26,7 @@ import apiClient from "../utils/apiClient";
 import { AuthContext } from "../context/AuthContext";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { CommonActions } from "@react-navigation/native";
+import { showToast } from "../utils/toastService";
 
 const AadharKycWebview = ({ route, navigation }) => {
     const { url, requestId } = route.params ?? {};
@@ -172,14 +173,14 @@ const AadharKycWebview = ({ route, navigation }) => {
                     onNavigationStateChange={(navState) => {
                         const u = navState.url ?? "";
                         if (u.includes("callback-success") || u.includes("success")) {
-                           navigation.dispatch(
-                                CommonActions.reset({
-                                    index: 0,
-                                    routes: [
-                                        { name: "RegistrationBDScreen", params: { requestId } },
-                                    ],
-                                })
-                            );
+                        //    navigation.dispatch(
+                        //         CommonActions.reset({
+                        //             index: 0,
+                        //             routes: [
+                        //                 { name: "RegistrationBDScreen", params: { requestId } },
+                        //             ],
+                        //         })
+                        //     );
                         } else if (u.includes("callback-failed") || u.includes("failed")) {
                             // Alert.alert("KYC Failed", "Please retry using the reload button.");
                         }
