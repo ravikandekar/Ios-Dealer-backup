@@ -32,7 +32,7 @@ import {
   Subscription,
   categoryIcons,
 } from '../constants/strings';
-
+import messaging, { FirebaseMessagingTypes } from '@react-native-firebase/messaging';
 import InfoBanner from '../components/InfoBanner';
 import ListingOverviewCard from '../components/ListingOverViewCard';
 import QuickListingCard from '../components/QuickListingCard';
@@ -55,6 +55,7 @@ import { useIsFocused } from "@react-navigation/native";
 import SubscriptionModal from '../components/SubscriptionModal';
 import { verifyPurchaseOnBackendIOS } from '../utils/purchaseVerificationIOS';
 import ViewsBottomSheet from '../components/ViewsBottomSheet';
+import { registerDeviceToken } from '../utils/NotificationService';
 // import { firebase } from '@react-native-firebase/crashlytics';
 const HomeScreen = ({ navigation }) => {
   const { theme, isDark, setSelectedCategory, selectedCategory, userID, checkToken, setUserID, setUserName, setregister, setcityselected, setProfileCompleted, setisAadharVerified, setBussinessdetails,
@@ -81,6 +82,28 @@ const HomeScreen = ({ navigation }) => {
 
   const oneAutoText = 'One Auto World \nOne Smart Platform';
   const indiasTrustText = 'India’s Trusted Platform to Buy & Sell Used Cars, Bikes, Spare Parts & Accessories';
+
+
+
+
+useEffect(() => {
+  const setupFCM = async () => {
+    try {
+      const token = await messaging().getToken();
+      // ✅ Save token
+      if (token) {
+        await registerDeviceToken(token, Platform.OS);
+        await messaging().subscribeToTopic('GlobalTopic');
+        console.log('✅ [FCM] Subscribed to GlobalTopic');
+      }
+    } catch (error) {
+      console.error('❌ [FCM] Error setting up FCM:', error);
+    }
+  };
+
+  setupFCM();
+}, []);
+
 
   useEffect(() => {
     const initialize = async () => {

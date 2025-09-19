@@ -82,8 +82,8 @@ android {
         applicationId "com.gadilobharat.dealers"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 49
-        versionName "49"
+        versionCode 50
+        versionName "50"
            missingDimensionStrategy 'store', 'play'
     }
     signingConfigs {

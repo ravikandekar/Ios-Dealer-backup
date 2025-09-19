@@ -28,7 +28,7 @@ import BackgroundWrapper from '../components/BackgroundWrapper';
 import FeedbackModal from '../components/FeedbackModal';
 import ThemeToggleModal from '../components/ThemeToggleModal';
 import { config } from '../constants/config';
-import { removeToken } from '../utils/storage';
+import { getRefreshToken, removeToken } from '../utils/storage';
 import { triggerLogout } from '../utils/LogoutFunction';
 import apiClient from '../utils/apiClient';
 import { showToast } from '../utils/toastService';
@@ -145,7 +145,7 @@ const bannerItems = [
   },
 ];
 const AccountScreen = () => {
-  const { theme, isDark, toggleTheme,userID ,userName} = useContext(AuthContext);
+  const { theme, isDark, toggleTheme, userID, userName } = useContext(AuthContext);
   const navigation = useNavigation();
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
@@ -210,13 +210,56 @@ const AccountScreen = () => {
       showToast('error', '', 'Something went wrong while deleting the account.');
     }
   };
-  const alllogout = () => {
-    InteractionManager.runAfterInteractions(() => {
-      setLogoutModalVisible(false);
-    });
-    triggerLogout();
-    console.log('User logged out');
-  }
+  // const alllogout = () => {
+  //   InteractionManager.runAfterInteractions(() => {
+  //     setLogoutModalVisible(false);
+  //   });
+  //   triggerLogout();
+  //   console.log('User logged out');
+  // }
+  const alllogout = async (userId) => {
+    const refreshToken = await getRefreshToken();
+    try {
+      console.log('🚪 Logout pressed');
+
+      if (!userId || !refreshToken) {
+        showToast('error', '', 'Missing user credentials. Logging out locally.');
+      } else {
+        // ✅ Call API logout
+
+        const response = await apiClient.post(
+          '/api/dealer/auth/logout',
+          { userId }, // payload
+          {
+            headers: {
+              'x-refresh-token': refreshToken, // header
+            },
+          }
+        );
+
+        const { success, message, appCode } = response?.data || {};
+
+        if (appCode === 1000) {
+          showToast('success', '', message || 'Logged out successfully.');
+        } else {
+          showToast('error', '', message || 'Logout failed on server. Logging out locally.');
+        }
+      }
+    } catch (error) {
+      console.error('❌ Logout API error:', error);
+      showToast('error', '', 'Something went wrong while logging out.');
+    } finally {
+      // ✅ Always clean up locally
+      InteractionManager.runAfterInteractions(() => {
+        setLogoutModalVisible(false);
+      });
+      triggerLogout();
+      console.log('✅ User logged out (local cleanup)');
+    }
+  };
+
+
+
 
   return (
     <BackgroundWrapper style={{ padding: wp('1%') }}>
@@ -237,7 +280,7 @@ const AccountScreen = () => {
           InteractionManager.runAfterInteractions(() => {
             setLogoutModalVisible(false);
           });
-          alllogout()
+          alllogout(userID,)
         }}
       />
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -258,7 +301,7 @@ const AccountScreen = () => {
                 });
               } else if (item.title === 'Feedback & Ratings') {
                 setFeedbackVisible(true);
-              }  else if (item.title === 'Terms & Conditions') {
+              } else if (item.title === 'Terms & Conditions') {
                 fetchCMSContentAndNavigate('terms');
               } else if (item.title === 'Privacy Policy') {
                 fetchCMSContentAndNavigate('privacy');
@@ -266,7 +309,7 @@ const AccountScreen = () => {
                 navigation.navigate('FAQScreen');
               } else if (item.title === 'Support Tickets') {
                 navigation.navigate('TicketListScreen');
-              } 
+              }
               // else if (item.title === 'LoginEx') {
               //   navigation.navigate('LoginExtra');
               // } 
@@ -276,7 +319,7 @@ const AccountScreen = () => {
               else if (item.title === 'Mark Attendance') {
                 setsShowThemeModal(true);
               }
-               else {
+              else {
                 console.log(`${item.title} pressed`);
               }
             };
@@ -304,7 +347,7 @@ const AccountScreen = () => {
                 onPress={handlePress}
                 rightsideswitch={item.title === 'Appearance' ? true : false}
                 switchValue={isDark}
-                onSwitchChange={ toggleTheme}
+                onSwitchChange={toggleTheme}
               />
             );
           })}
