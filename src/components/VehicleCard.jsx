@@ -17,7 +17,7 @@ import AppText from './AppText';
 const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPressEdit, isDraft, }) => {
   const isSold = data?.isSold;
   const isDeleted = data?.isDeleted;
-  const isActive = data?.isdisable;
+  const isActive = data?.isdisable || false;
   const shareVehicleDetails = async () => {
     try {
       const shareData = {

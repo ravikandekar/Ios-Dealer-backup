@@ -225,6 +225,7 @@ console.log('data');
         images: item?.images?.map(img => img.url) || [],
         isSold: item?.isSold,
         isDeleted: item?.isDeleted,
+        isdisable: item?.isdisable,
       }}
       theme={theme}
       onPressDelete={() => {

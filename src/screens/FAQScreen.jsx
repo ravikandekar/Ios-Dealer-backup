@@ -74,8 +74,10 @@ const FAQScreen = ({ navigation }) => {
         style={[
           styles.faqItem,
           {
-            backgroundColor: theme.colors.card,
+            backgroundColor: theme.colors.background,
             shadowColor: theme.dark ? '#ffffff22' : '#00000022',
+            borderColor: theme.colors.placeholder || '#ccc',
+            borderWidth: 1,
           },
         ]}
       >
@@ -96,7 +98,7 @@ const FAQScreen = ({ navigation }) => {
 
         {isExpanded && (
           <>
-            <View style={[styles.divider, { backgroundColor: theme.colors.placeholder || '#ccc' }]} />
+            <View style={[styles.divider, { backgroundColor: theme.colors.border || '#ccc' }]} />
             <View style={styles.faqAnswerContainer}>
               <AppText style={[styles.faqAnswer, { color: theme.colors.text }]}>
                 {item.answer}

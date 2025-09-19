@@ -302,6 +302,7 @@ const styles = StyleSheet.create({
     fontSize: wp("4.2%"),
     fontWeight: "bold",
     marginBottom: hp("0.5%"),
+    textTransform: 'capitalize'
   },
   message: {
     fontSize: wp("3.5%"),

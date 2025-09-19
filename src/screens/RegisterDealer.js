@@ -159,7 +159,7 @@ const RegisterDealer = ({ name = 'User' }) => {
         </AppText>
       </ScrollView>
 
-      <View style={{ position: 'absolute', bottom: wp('8') }}>
+      <View style={{ position: 'absolute', bottom: wp('12') }}>
         <ActionButton
           label="Confirm"
           style={styles.confirmButton}

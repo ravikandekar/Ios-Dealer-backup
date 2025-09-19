@@ -168,10 +168,11 @@ const TutorialScreen = ({ navigation }) => {
                     {currentIndex === tutorials.length - 1 ? (
                         <TouchableOpacity onPress={handleNext} style={{
                             padding: wp('2%'),
-                            backgroundColor: theme.colors.primary,
+                            backgroundColor: theme.colors.Highlighterwords,
                             borderRadius: wp('1%'),
                             alignItems: 'center',
                             justifyContent: 'center',
+                             marginBottom: hp('7%'),
                         }}>
 
                             <AppText style={[styles.getStartedText, { color: '#ffff' }]}>
@@ -187,6 +188,7 @@ const TutorialScreen = ({ navigation }) => {
                                 borderRadius: wp('5%'),
                                 alignItems: 'center',
                                 justifyContent: 'center',
+                                marginBottom: hp('7%'),
                             }}
                         >
                             <Icon name="arrow-forward-ios" size={wp('6')} color={'#fff'} />

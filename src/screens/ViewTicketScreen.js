@@ -83,10 +83,17 @@ const ViewTicketScreen = ({ route }) => {
       scrollViewRef.current?.scrollToEnd({ animated: true });
     }, 100);
   }, []);
+
   const stripHtmlTags = (str) => {
-    if (!str) return "";
-    return str.replace(/<[^>]*>?/gm, "").trim();
-  };
+  if (!str) return "";
+
+  return str
+    .replace(/<[^>]*>?/gm, "")     // remove all HTML tags
+    .replace(/&nbsp;/gi, " ")      // replace &nbsp; with space
+    .replace(/\s+/g, " ")          // collapse multiple spaces/newlines/tabs
+    .trim();                       // trim leading/trailing spaces
+};
+
   // API functions
   const fetchTicket = useCallback(async (isRefresh = false) => {
     try {
@@ -269,7 +276,7 @@ const ViewTicketScreen = ({ route }) => {
               source={{ uri: att }}
               style={styles.imagePlaceholder}
               resizeMode="cover"
-              onError={(e) => console.error('Image load error:', e)}
+              // onError={(e) => console.error('Image load error:', e)}
             />
           </TouchableOpacity>
         ))}

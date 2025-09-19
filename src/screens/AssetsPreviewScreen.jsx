@@ -234,7 +234,7 @@ const AssetsPreviewScreen = ({ navigation }) => {
           />
 
         )}
-        {!dataedit?.isActive && (
+        {dataedit?.isdisable && (
           <InfoBanner
             iconName="info"
             iconType="feather"
@@ -245,10 +245,11 @@ const AssetsPreviewScreen = ({ navigation }) => {
             rightsideiconcolor={theme.colors.themeIcon}
             onPress={() => navigation.navigate('TicketListScreen')}
             customStyle={{
-              height: hp('14.5%'),
+              height: hp('18.5%'),
               marginTop: hp('1%'),
               borderRadius: wp('3%'),
               paddingRight: wp('3%'),
+              padding: wp('1%'),
             }}
           />
         )}

@@ -137,7 +137,12 @@ const IssueDetailsModal = ({ visible, onClose, ticket ,imagePreview}) => {
   console.log('ticket111:', ticket);
 const stripHtmlTags = (str) => {
   if (!str) return "";
-  return str.replace(/<[^>]*>?/gm, "").trim();
+
+  return str
+    .replace(/<[^>]*>?/gm, "")     // remove all HTML tags
+    .replace(/&nbsp;/gi, " ")      // replace &nbsp; with space
+    .replace(/\s+/g, " ")          // collapse multiple spaces/newlines/tabs
+    .trim();                       // trim leading/trailing spaces
 };
 
 

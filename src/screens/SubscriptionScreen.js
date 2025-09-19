@@ -634,7 +634,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   buyNowBtn: {
-    marginBottom: hp('3%'),
+    marginBottom: hp('5%'),
     paddingVertical: wp('3%'),
     marginHorizontal: wp('2.5%'),
     marginTop: 20,
