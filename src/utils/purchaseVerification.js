@@ -17,7 +17,7 @@ export const verifyPurchaseOnBackend = async ({ productId, purchaseToken, userID
     packageName: 'com.gadilobharat.dealers',
     productId,
     purchaseToken,
-    purchase_platform: Platform.OS === 'android' ? 'google' : 'ios',
+    purchase_platform:'google',
   };
 
   console.log('🔄 Sending verification request:', payload);
@@ -29,7 +29,7 @@ export const verifyPurchaseOnBackend = async ({ productId, purchaseToken, userID
       '/api/dealer/dealerSubscriptionRoute/add',
       payload
     );
-    safeLogToPipedream({ stage: 'bbbbbb', response });
+    // safeLogToPipedream({ stage: 'bbbbbb', response });
     console.log('✅ Backend Response:', response.data);
 
     // Save response locally (for debugging)
@@ -39,7 +39,7 @@ export const verifyPurchaseOnBackend = async ({ productId, purchaseToken, userID
       console.log(`📄 Response saved to: ${filePath}`);
     } catch (fsError) {
       console.log('⚠️ Failed to write response locally:', fsError);
-      safeLogToPipedream({ stage: 'fs-error', error: fsError });
+      // safeLogToPipedream({ stage: 'fs-error', error: fsError });
     }
 
     // Handle backend response
@@ -51,14 +51,14 @@ export const verifyPurchaseOnBackend = async ({ productId, purchaseToken, userID
       removePurchaseTokenAndProductID();
     } else {
       console.log('⚠️ Unexpected response:', response.data);
-      safeLogToPipedream({ stage: 'unexpected-response', response: response.data });
+      // safeLogToPipedream({ stage: 'unexpected-response', response: response.data });
     }
 
     return filePath;
   } catch (error) {
     console.log('❌ Backend API Error:', error);
 
-    Alert.alert('Error', error.message || 'Failed to verify purchase');
+    // Alert.alert('Error', error.message || 'Failed to verify purchase');
     safeLogToPipedream({ stage: 'api-error', error });
 
     // Always clear token so user doesn’t get stuck

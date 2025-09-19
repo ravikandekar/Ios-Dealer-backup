@@ -53,8 +53,9 @@ const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPres
         </View>
       )}
       {isActive && (
-        <View style={[styles.overlayContainer, { backgroundColor: '#00000080' }]}>
-          <AppText style={styles.inactiveText}>Inactive</AppText>
+        <View style={[styles.overlayContainer, { backgroundColor: '#000000b8', alignItems: "flex-start", justifyContent: "flex-start", padding: wp('3%') }]}>
+          <AppText style={styles.inactiveText}>this product is Inactive </AppText>
+          <AppText style={[styles.inactiveTextdes,]}>This product has been deactivated by admin. Please contact support for assistance.</AppText>
         </View>
       )}
       <View style={{ paddingTop: wp('3%') }}>
@@ -219,8 +220,16 @@ const styles = StyleSheet.create({
   inactiveText: {
     fontSize: wp('6%'),
     fontWeight: 'bold',
+    color: '#f60b0bff',
+    textTransform: 'capitalize',
+    marginTop: hp('2%'),
+  },
+  inactiveTextdes: {
+    fontSize: wp('4%'),
+    fontWeight: '600',
     color: '#FFFFFF',
-    textTransform: 'uppercase',
+    textTransform: 'capitalize',
+    marginTop: hp('1%'),
   },
 
 });

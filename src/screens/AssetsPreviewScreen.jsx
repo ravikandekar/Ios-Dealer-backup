@@ -223,18 +223,7 @@ const AssetsPreviewScreen = ({ navigation }) => {
         contentContainerStyle={{ marginTop: hp('2%') }}
         showsVerticalScrollIndicator={false}>
 
-        {!loading && assetDetails && dataedit && (
-          <VehiclePreviewCard
-            {...assetDetails}
-            onPressEdit={() => {
-              setpriceModalVisible(true);
-              seteditModalData(dataedit._id); // or item._id if you are inside a list
-              setInputPrize(dataedit.price);  // or item.price
-            }}
-          />
-
-        )}
-        {dataedit?.isdisable && (
+    {dataedit?.isdisable && (
           <InfoBanner
             iconName="info"
             iconType="feather"
@@ -250,9 +239,22 @@ const AssetsPreviewScreen = ({ navigation }) => {
               borderRadius: wp('3%'),
               paddingRight: wp('3%'),
               padding: wp('1%'),
+              marginVertical: hp('2%'),
             }}
           />
         )}
+        {!loading && assetDetails && dataedit && (
+          <VehiclePreviewCard
+            {...assetDetails}
+            onPressEdit={() => {
+              setpriceModalVisible(true);
+              seteditModalData(dataedit._id); // or item._id if you are inside a list
+              setInputPrize(dataedit.price);  // or item.price
+            }}
+          />
+
+        )}
+    
         <PriceChnageModal
           visible={priceModalVisible}
           onClose={() => setpriceModalVisible(false)}
