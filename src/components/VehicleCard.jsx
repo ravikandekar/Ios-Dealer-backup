@@ -33,7 +33,7 @@ const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPres
     }
   }
   return (
-    <TouchableOpacity style={[styles.cardContainer, { backgroundColor: theme.colors.card }]} onPress={onPress}>
+    <TouchableOpacity style={[styles.cardContainer, { backgroundColor: theme.colors.card ,borderWidth: 0.2, borderColor: theme.colors.cardborder}]} onPress={onPress}>
       {isSold && (
         <View style={styles.overlayContainer}>
           <Image
@@ -53,7 +53,7 @@ const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPres
         </View>
       )}
       {isActive && (
-        <View style={[styles.overlayContainer, { backgroundColor: '#000000b8', alignItems: "flex-start", justifyContent: "flex-start", padding: wp('3%') }]}>
+        <View style={[styles.overlayContainer, { backgroundColor: '#554040b8', alignItems: "flex-start", justifyContent: "flex-start", padding: wp('3%') }]}>
           <AppText style={styles.inactiveText}>this product is Inactive </AppText>
           <AppText style={[styles.inactiveTextdes,]}>This product has been deactivated by admin. Please contact support for assistance.</AppText>
         </View>

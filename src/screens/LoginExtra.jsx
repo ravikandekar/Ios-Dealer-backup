@@ -20,7 +20,7 @@ const LoginExtra = ({ navigation }) => {
           thumbColor={isDark ? '#f5dd4b' : '#f4f3f4'}
           ios_backgroundColor="#3e3e3e"
           onValueChange={toggleTheme}
-          value={isDark}
+          value={isDark} 
         />
       </View>
       <Icon name="home" size={30} color="red" />

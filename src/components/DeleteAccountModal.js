@@ -41,7 +41,7 @@ const DeleteAccountModal = ({
       <TouchableWithoutFeedback onPress={resetModal}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
-            <View style={[styles.container, { backgroundColor: colors.background }]}>
+            <View style={[styles.container, { backgroundColor: colors.card }]}>
               <View style={styles.headerRow}>
                 <AppText style={[styles.title, { color: colors.text }]}>
                   Are you sure you want to Remove?
@@ -94,7 +94,7 @@ const DeleteAccountModal = ({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.8)',
     justifyContent: 'flex-end',
   },
   container: {

@@ -146,7 +146,7 @@ const CategoryDropdownMenu = ({
             animating={mainLoading}
           />
         )}
-        {categories.map(({ _id, category_name, isActive, isSubscribed ,isRegistered}) => {
+        {categories.map(({ _id, category_name, isActive, isSubscribed, isRegistered }) => {
           if (!category_name) return null;
           const isSelected = selectedCategory === category_name;
           const IconComponent = categoryIcons[category_name];
@@ -250,60 +250,60 @@ const CategoryDropdownMenu = ({
           </AppText>
         </View>
       </ScrollView>
-     <Modal
-  visible={registrationModalVisible}
-  transparent
-  animationType="fade"
-  onRequestClose={() => setRegistrationModalVisible(false)}
->
-  <View style={styles.modalOverlay}>
-    <View style={[styles.modalContainer, { backgroundColor: theme.colors.background }]}>
-      {/* Close Icon */}
-      <TouchableOpacity
-        style={styles.closeIcon}
-        onPress={() => setRegistrationModalVisible(false)}
+      <Modal
+        visible={registrationModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setRegistrationModalVisible(false)}
       >
-        <Icon name="close" size={18} color={theme.colors.primary} />
-      </TouchableOpacity>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContainer, { backgroundColor: theme.colors.background }]}>
+            {/* Close Icon */}
+            <TouchableOpacity
+              style={styles.closeIcon}
+              onPress={() => setRegistrationModalVisible(false)}
+            >
+              <Icon name="close" size={18} color={theme.colors.primary} />
+            </TouchableOpacity>
 
-      {/* Message */}
-      <AppText style={[styles.modalMessage, { color: theme.colors.text }]}>
-        Do you want to register as a <AppText style={{ fontWeight: 'bold' }}>{pendingCategory?.category_name}</AppText> dealer?
-      </AppText>
+            {/* Message */}
+            <AppText style={[styles.modalMessage, { color: theme.colors.text }]}>
+              Do you want to register as a <AppText style={{ fontWeight: 'bold' }}>{pendingCategory?.category_name}</AppText> dealer?
+            </AppText>
 
-      {/* Actions */}
-      <View style={styles.actions}>
-        <TouchableOpacity
-          style={[styles.button, styles.cancelButton]}
-          onPress={() => setRegistrationModalVisible(false)}
-        >
-          <AppText style={[styles.cancelText, { color: theme.colors.text }]}>
-            Cancel
-          </AppText>
-        </TouchableOpacity>
+            {/* Actions */}
+            <View style={styles.actions}>
+              <TouchableOpacity
+                style={[styles.button, styles.cancelButton,{ backgroundColor: theme.colors.placeholder }]}
+                onPress={() => setRegistrationModalVisible(false)}
+              >
+                <AppText style={[styles.cancelText, { color: theme.colors.text }]}>
+                  Cancel
+                </AppText>
+              </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[
-            styles.button,
-            styles.proceedButton,
-            { backgroundColor: theme.colors.primary },
-          ]}
-          onPress={() => {
-            setRegistrationModalVisible(false);
-            if (pendingCategory) {
-              switchCategory(
-                pendingCategory.categoryId,
-                pendingCategory.category_name
-              );
-            }
-          }}
-        >
-          <AppText style={styles.proceedText}>Proceed</AppText>
-        </TouchableOpacity>
-      </View>
-    </View>
-  </View>
-</Modal>
+              <TouchableOpacity
+                style={[
+                  styles.button,
+                  styles.proceedButton,
+                  { backgroundColor: theme.colors.primary },
+                ]}
+                onPress={() => {
+                  setRegistrationModalVisible(false);
+                  if (pendingCategory) {
+                    switchCategory(
+                      pendingCategory.categoryId,
+                      pendingCategory.category_name
+                    );
+                  }
+                }}
+              >
+                <AppText style={styles.proceedText}>Proceed</AppText>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
 
     </View>
@@ -434,65 +434,65 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: hp('6%'),
   },
-modalOverlay: {
-  flex: 1,
-  backgroundColor: 'rgba(0,0,0,0.6)',
-  justifyContent: 'center',
-  alignItems: 'center',
-},
-modalContainer: {
-  width: '85%',
-  borderRadius: 20,
-  padding: 24,
-  elevation: 10,
-  shadowColor: '#000',
-  shadowOpacity: 0.25,
-  shadowOffset: { width: 0, height: 4 },
-  shadowRadius: 6,
-  alignItems: 'center',
-},
-closeIcon: {
-  position: 'absolute',
-  right: 14,
-  top: 14,
-  padding: 6,
-  borderRadius: 20,
-  backgroundColor: 'rgba(0,0,0,0.05)',
-},
-modalMessage: {
-  fontSize: wp('4.8%'),
-  fontWeight: '500',
-  textAlign: 'center',
-  marginVertical: hp('1%'),
-  marginTop: hp('3%'),
-},
-actions: {
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  width: '100%',
-  marginTop: hp('1%'),
-},
-button: {
-  flex: 1,
-  marginHorizontal: 6,
-  paddingVertical: hp('1.8%'),
-  borderRadius: 12,
-  alignItems: 'center',
-},
-cancelButton: {
-  backgroundColor: '#f1f1f1',
-},
-proceedButton: {
-  backgroundColor: '#f7941d', // fallback, overridden by theme.colors.primary
-},
-cancelText: {
-  fontSize: wp('3.8%'),
-  fontWeight: '500',
-},
-proceedText: {
-  color: '#fff',
-  fontSize: wp('4%'),
-  fontWeight: '700',
-},
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    width: '85%',
+    borderRadius: 20,
+    padding: 24,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 6,
+    alignItems: 'center',
+  },
+  closeIcon: {
+    position: 'absolute',
+    right: 14,
+    top: 14,
+    padding: 6,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.05)',
+  },
+  modalMessage: {
+    fontSize: wp('4.8%'),
+    fontWeight: '500',
+    textAlign: 'center',
+    marginVertical: hp('1%'),
+    marginTop: hp('3%'),
+  },
+  actions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: hp('1%'),
+  },
+  button: {
+    flex: 1,
+    marginHorizontal: 6,
+    paddingVertical: hp('1.8%'),
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#f1f1f1',
+  },
+  proceedButton: {
+    backgroundColor: '#f7941d', // fallback, overridden by theme.colors.primary
+  },
+  cancelText: {
+    fontSize: wp('3.8%'),
+    fontWeight: '500',
+  },
+  proceedText: {
+    color: '#fff',
+    fontSize: wp('4%'),
+    fontWeight: '700',
+  },
 
 });

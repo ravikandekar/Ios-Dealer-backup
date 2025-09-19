@@ -19,7 +19,8 @@ export const LightTheme = {
     buttonText: '#ffffff',  //  #ffffff
     danger: '#E74C3C',      //  #E74C3C
     success: '#28A745',     //  #28A745
-    Highlighterwords:'#F79338',    //  #F79338
+    Highlighterwords: '#F79338',    //  #F79338
+    cardborder: '#E0E0E0',  //  #E0E0E0
   },
 };
 
@@ -42,6 +43,7 @@ export const DarkTheme = {
     buttonText: '#ffffff',  //  #ffffff
     danger: '#E74C3C',      //  #E74C3C
     success: '#28A745',     //  #28A745
-     Highlighterwords:'#F79338',    //  #F79338
+    Highlighterwords: '#F79338',    //  #F79338
+    cardborder: '#E0E0E0',  //  #E0E0E0
   },
 };

@@ -50,7 +50,7 @@ const LogoutModal = ({ visible, onClose, onConfirm }) => {
               styles.modalContainer,
               {
                 transform: [{ translateY }],
-                backgroundColor: theme.colors.background,
+                backgroundColor: theme.colors.card,
               }
             ]}>
               <View style={styles.modalHeader}>
@@ -71,11 +71,11 @@ const LogoutModal = ({ visible, onClose, onConfirm }) => {
               <View style={styles.modalFooter}>
 
                 <View>
-                  <ActionButton label="Cancel" onPress={handleCancel} style={{ backgroundColor: theme.colors.card }} textcolor={theme.colors.text} />
+                  <ActionButton label="Cancel" onPress={handleCancel} style={{ backgroundColor: theme.colors.placeholder }} textcolor={theme.colors.buttonText} />
 
                 </View>
                 <View>
-                  <ActionButton label="Logout" onPress={onConfirm} style={{ backgroundColor: theme.colors.danger }} />
+                  <ActionButton label="Logout" onPress={onConfirm} style={{ backgroundColor: theme.colors.danger }} textcolor={theme.colors.buttonText} />
 
                 </View>
 
@@ -91,7 +91,7 @@ const LogoutModal = ({ visible, onClose, onConfirm }) => {
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0,0,0,0.8)',
     justifyContent: 'flex-end',
   },
   modalContainer: {

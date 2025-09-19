@@ -99,9 +99,9 @@ const SpareTypeSelection = ({ navigation, route }) => {
         style={[
           styles.card,
           {
-            borderColor: isSelected ? theme.colors.primary : '#ccc',
-            borderWidth: isSelected ?1.5:0,
-            backgroundColor: isSelected ? theme.colors.background:theme.colors.card,
+            borderColor: isSelected ? theme.colors.primary : theme.colors.cardborder,
+            borderWidth: isSelected ? 1.5 : 0.5,
+            backgroundColor: isSelected ? theme.colors.background : theme.colors.card,
           },
         ]}
         onPress={() => onPressHandler(item)}

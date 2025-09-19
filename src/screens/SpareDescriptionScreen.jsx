@@ -118,6 +118,8 @@ const SpareDescriptionScreen = ({ navigation }) => {
             : {
                 backgroundColor: theme.colors.card,
                 shadowColor: theme.colors.shadow,
+                borderColor: theme.colors.cardborder,
+                borderWidth: 0.5,
               },
         ]}
       >

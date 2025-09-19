@@ -78,8 +78,9 @@ console.log('jjjjj',formData.bikeTypeId);
         style={[
           styles.card,
           {
-            borderColor: isSelected ? theme.colors.primary : '#ccc',
+            borderColor: isSelected ? theme.colors.primary : theme.colors.cardborder,
             backgroundColor: theme.colors.card,
+            borderWidth: isSelected ? 1.5 : 0.5,
           },
         ]}
         onPress={() => handleTypePress(item)}

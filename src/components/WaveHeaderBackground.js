@@ -35,7 +35,7 @@ const WaveHeaderBackground = () => {
         />
       </Svg>
 
-      <Svg width={width} height={200} viewBox={`0 0 ${width} 200`} fill="none">
+      <Svg width={width} height={200} viewBox={`0 0 ${width} 200`} fill="none" style={{ position: 'relative', bottom: 4 }}>
         <Rect width={width} height={50} fill="#E6F2FE" />
       </Svg>
     </View>

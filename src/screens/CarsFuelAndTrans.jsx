@@ -128,12 +128,14 @@ const CarsFuelAndTrans = ({ navigation }) => {
           isSelected
             ? {
               backgroundColor: theme.colors.background,
-              borderColor: theme.colors.primary,
+              borderColor: theme.colors.primary ,
               borderWidth: 1.5,
             }
             : {
               backgroundColor: theme.colors.card,
               shadowColor: theme.colors.shadow,
+              borderColor: theme.colors.cardborder,
+              borderWidth:  0.5,
             },
         ]}
       >

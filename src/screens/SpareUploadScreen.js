@@ -586,7 +586,7 @@ const styles = StyleSheet.create({
     bottomModalOverlay: {
         flex: 1,
         justifyContent: 'flex-end',
-        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
     },
     bottomModal: {
         borderTopLeftRadius: wp('4%'),

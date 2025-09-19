@@ -255,7 +255,7 @@ const CarHistoryAndColor = ({ navigation }) => {
                 styles.ownerBox,
                 selectedOwnerId === item._id
                   ? { backgroundColor: theme.colors.background, borderColor: theme.colors.primary, borderWidth: 1.5 }
-                  : { backgroundColor: theme.colors.card, shadowColor: theme.colors.shadow },
+                  : { backgroundColor: theme.colors.card, shadowColor: theme.colors.shadow, borderWidth: 1, borderColor: theme.colors.cardborder },
               ]}
               onPress={() => handleOwnerSelect(item)}
             >
@@ -281,7 +281,7 @@ const CarHistoryAndColor = ({ navigation }) => {
                   styles.yearBox,
                   selectedYearId === item._id
                     ? { backgroundColor: theme.colors.background, borderColor: theme.colors.primary, borderWidth: 1.5 }
-                    : { backgroundColor: theme.colors.card, shadowColor: theme.colors.shadow },
+                    : { backgroundColor: theme.colors.card, shadowColor: theme.colors.shadow , borderWidth: 1, borderColor: theme.colors.cardborder },
                 ]}
                 onPress={() => handleYearSelect(item)}
               >

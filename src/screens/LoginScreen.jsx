@@ -291,7 +291,7 @@ const styles = StyleSheet.create({
   },
   footerTextContainer: {
     alignItems: 'center',
-    paddingBottom: hp('4%'),
+    paddingBottom: hp('6%'),
     zIndex: 1,
   },
   footerText: {

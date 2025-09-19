@@ -114,7 +114,7 @@ const FeedbackModal = ({ visible, onClose, userId, postUrl, onResult, orderId })
                   styles.feedbackContainer,
                   {
                     transform: [{ translateY }],
-                    backgroundColor: theme.colors.background,
+                    backgroundColor: theme.colors.card,
                   },
                 ]}
               >
@@ -198,7 +198,7 @@ export default FeedbackModal;
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: '#00000099',
+     backgroundColor: 'rgba(0,0,0,0.8)',
     justifyContent: 'center',
   },
   feedbackContainer: {
