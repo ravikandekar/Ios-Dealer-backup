@@ -102,8 +102,12 @@ const LeadsScreen = () => {
             }
         }
     };
-
-
+    function formatAPIDate(date) {
+        const d = date.getDate().toString().padStart(2, '0');
+        const m = (date.getMonth() + 1).toString().padStart(2, '0');
+        const y = date.getFullYear();
+        return `${y}-${m}-${d}`;
+    }
 
     const handleApplyDateFilter = async () => {
         const from = parseDisplayDate(fromDateString);
@@ -161,8 +165,8 @@ const LeadsScreen = () => {
                 if (withDateFilter) {
                     const fromDate = getFromDate();
                     const toDate = getToDate();
-                    params.append('fromDate', fromDate.toISOString().split('T')[0]);
-                    params.append('toDate', toDate.toISOString().split('T')[0]);
+                    params.append('fromDate', formatAPIDate(fromDate));
+                    params.append('toDate', formatAPIDate(toDate));
                 }
 
                 const finalUrl = `${apiUrl}?${params.toString()}`;
@@ -606,9 +610,11 @@ const LeadsScreen = () => {
                                 value={tempSelectedDate}
                                 mode="date"
                                 display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                                maximumDate={today}
+                                // maximumDate={today}
                                 onChange={onDateChange}
                                 themeVariant="dark"
+                                maximumDate={datePickerType === 'from' ? today : today} // still allow only up to today
+                                minimumDate={datePickerType === 'to' ? getFromDate() : undefined} // ✅ To date cannot be before From date
                                 textColor={theme.colors.text}
                                 style={{ width: '100%' }} // the picker takes parent width
                             />

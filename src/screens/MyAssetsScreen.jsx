@@ -87,6 +87,7 @@ const MyAssetsScreen = ({ navigation }) => {
         isActive: item.isActive,
         isDeleted: item.isDeleted,
         deletionReason: item.deletionReason,
+        isdisable: item.isdisable,
     });
     const SpareformatAsset = item => ({
         id: item._id,
@@ -104,6 +105,7 @@ const MyAssetsScreen = ({ navigation }) => {
         isActive: item.isActive,
         isDeleted: item.isDeleted,
         deletionReason: item.deletionReason,
+         isdisable: item.isdisable,
     });
     const handlePriceNext = async () => {
         console.log('Selected edit option:', editModalData);
@@ -372,6 +374,14 @@ const MyAssetsScreen = ({ navigation }) => {
                 actionIcon="add-circle-outline"
                 actionText="Add New"
                 onActionPress={() => {
+                    clearFields([
+                        'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
+                        'model_name', 'price', 'kmsDriven', 'transmissionId', 'bikeTypeId',
+                        'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id',
+                        'SpareBrandId', 'Sparedescription', 'Spareyear_of_manufacture',
+                        'spareProductTypeId', 'Spareprice', 'spareConditionId', 'images',
+                        'SparePartNameId', 'Sparename', 'subproducttypeId', 'SpareyearId'
+                    ]);
                     if (isSubscriberRequired === true) {
                         setShowSubscriptionModal(true);
                     } else {

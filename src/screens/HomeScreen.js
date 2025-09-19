@@ -300,6 +300,7 @@ const HomeScreen = ({ navigation }) => {
                       showToast={showToast}
                       solddeletedmodal={(data) => bottomsheet(data)}
                       Viewsmodal={(data) => Viewbottomsheet(data)}
+                      refreshing={refreshing}
 
                     />
                   </View>

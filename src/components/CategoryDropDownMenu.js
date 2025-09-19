@@ -263,12 +263,12 @@ const CategoryDropdownMenu = ({
         style={styles.closeIcon}
         onPress={() => setRegistrationModalVisible(false)}
       >
-        <Icon name="close" size={28} color={theme.colors.primary} />
+        <Icon name="close" size={18} color={theme.colors.primary} />
       </TouchableOpacity>
 
       {/* Message */}
       <AppText style={[styles.modalMessage, { color: theme.colors.text }]}>
-        Do you want to register as a {pendingCategory?.category_name} dealer?
+        Do you want to register as a <AppText style={{ fontWeight: 'bold' }}>{pendingCategory?.category_name}</AppText> dealer?
       </AppText>
 
       {/* Actions */}
@@ -461,9 +461,10 @@ closeIcon: {
 },
 modalMessage: {
   fontSize: wp('4.8%'),
-  fontWeight: '700',
+  fontWeight: '500',
   textAlign: 'center',
-  marginVertical: hp('4%'),
+  marginVertical: hp('1%'),
+  marginTop: hp('3%'),
 },
 actions: {
   flexDirection: 'row',

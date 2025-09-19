@@ -93,7 +93,7 @@ const DATE_RANGE_OPTIONS = [
   }
 ];
 
-const ListingOverviewCard = ({ selectedCategory, apiClient, showToast, solddeletedmodal, Viewsmodal }) => {
+const ListingOverviewCard = ({ selectedCategory, apiClient, showToast, solddeletedmodal, Viewsmodal,refreshing }) => {
 
   console.log('uuuuuuuareeeeeeeeedjfhkzcvbjklzchvb');
   
@@ -195,7 +195,7 @@ const getDateRangeDisplayText = () => {
   // Load initial data
   useEffect(() => {
     getDealerOverviewStats();
-  }, [selectedCategory]);
+  }, [selectedCategory, refreshing]);
 
   // Handle date range option selection
   const handleDateRangeSelect = (option) => {
