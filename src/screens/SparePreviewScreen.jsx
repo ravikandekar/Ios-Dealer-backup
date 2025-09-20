@@ -158,6 +158,7 @@ const SparePreviewScreen = ({ navigation, route }) => {
       );
     } finally {
       setIsPublishing(false);
+      
     }
   };
 

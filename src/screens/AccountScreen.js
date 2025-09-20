@@ -219,6 +219,12 @@ const AccountScreen = () => {
   // }
   const alllogout = async (userId) => {
     const refreshToken = await getRefreshToken();
+      // ✅ Always clean up locally
+      InteractionManager.runAfterInteractions(() => {
+        setLogoutModalVisible(false);
+      });
+      triggerLogout();
+      console.log('✅ User logged out (local cleanup)');
     try {
       console.log('🚪 Logout pressed');
 
@@ -249,12 +255,12 @@ const AccountScreen = () => {
       console.error('❌ Logout API error:', error);
       showToast('error', '', 'Something went wrong while logging out.');
     } finally {
-      // ✅ Always clean up locally
-      InteractionManager.runAfterInteractions(() => {
-        setLogoutModalVisible(false);
-      });
-      triggerLogout();
-      console.log('✅ User logged out (local cleanup)');
+      // // ✅ Always clean up locally
+      // InteractionManager.runAfterInteractions(() => {
+      //   setLogoutModalVisible(false);
+      // });
+      // triggerLogout();
+      // console.log('✅ User logged out (local cleanup)');
     }
   };
 

@@ -343,7 +343,7 @@ const HomeScreen = ({ navigation }) => {
                           'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id',
                           'SpareBrandId', 'Sparedescription', 'Spareyear_of_manufacture',
                           'spareProductTypeId', 'Spareprice', 'spareConditionId', 'images',
-                          'SparePartNameId', 'Sparename', 'subproducttypeId', 'SpareyearId'
+                          'SparePartNameId', 'Sparename', 'subproducttypeId', 'SpareyearId', 'isEditSpare'
                         ]);
 
                         if (isSubscriberRequired === true) {

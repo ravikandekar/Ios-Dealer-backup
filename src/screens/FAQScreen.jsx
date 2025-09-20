@@ -114,9 +114,9 @@ const FAQScreen = ({ navigation }) => {
     <BackgroundWrapper>
       <DetailsHeader title="FAQ" />
 
-      <AppText style={[styles.subHeader, { color: theme.colors.text }]}>
+      {/* <AppText style={[styles.subHeader, { color: theme.colors.text }]}>
         Frequently Asked Questions
-      </AppText>
+      </AppText> */}
 
       <FlatList
         data={faqList}

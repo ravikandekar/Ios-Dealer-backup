@@ -158,13 +158,13 @@ const MyAssetsScreen = ({ navigation }) => {
     };
     const handleSubscribe = () => {
         clearFields([
-            'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
-            'model_name', 'price', 'kmsDriven', 'transmissionId', 'bikeTypeId',
-            'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id',
-            'SpareBrandId', 'Sparedescription', 'Spareyear_of_manufacture',
-            'spareProductTypeId', 'Spareprice', 'spareConditionId', 'images',
-            'SparePartNameId', 'Sparename', 'subproducttypeId', 'SpareyearId'
-        ]);
+                          'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
+                          'model_name', 'price', 'kmsDriven', 'transmissionId', 'bikeTypeId',
+                          'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id',
+                          'SpareBrandId', 'Sparedescription', 'Spareyear_of_manufacture',
+                          'spareProductTypeId', 'Spareprice', 'spareConditionId', 'images',
+                          'SparePartNameId', 'Sparename', 'subproducttypeId', 'SpareyearId', 'isEditSpare'
+                        ]);
 
         InteractionManager.runAfterInteractions(() => {
             setShowSubscriptionModal(false);

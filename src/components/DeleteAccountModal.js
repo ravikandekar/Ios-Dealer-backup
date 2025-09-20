@@ -15,6 +15,7 @@ import { AuthContext } from '../context/AuthContext';
 import ActionButton from './ActionButton';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AppText from './AppText';
+import { KeyboardAvoidingView } from 'react-native';
 const DeleteAccountModal = ({
   visible,
   onClose,
@@ -40,6 +41,10 @@ const DeleteAccountModal = ({
     <Modal visible={visible} transparent animationType="fade">
       <TouchableWithoutFeedback onPress={resetModal}>
         <View style={styles.overlay}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            style={{ flex: 1, justifyContent: 'flex-end' }}
+          >
           <TouchableWithoutFeedback>
             <View style={[styles.container, { backgroundColor: colors.card }]}>
               <View style={styles.headerRow}>
@@ -85,6 +90,7 @@ const DeleteAccountModal = ({
               </View>
             </View>
           </TouchableWithoutFeedback>
+          </KeyboardAvoidingView>
         </View>
       </TouchableWithoutFeedback>
     </Modal>

@@ -168,7 +168,7 @@ const SparePartName = ({ navigation, route }) => {
   return (
     <BackgroundWrapper>
       <DetailsHeader
-        title={isCar ? 'Car Spare Details' : 'Bike Spare Details'}
+        title={isCar ? 'Car Spare Details' : 'Bike/Scooty Spare Details'}
         stepText="3/5"
         rightType="steps"
         onBackPress={() => navigation.goBack()}
@@ -177,7 +177,7 @@ const SparePartName = ({ navigation, route }) => {
       <View style={[styles.inputContainer, { backgroundColor: theme.colors.inputBg }]}>
         <TextInput
           style={[styles.searchBox, { color: theme.colors.text }]}
-          placeholder={`Search ${isCar ? 'Car' : 'Bike'} Name`}
+          placeholder={`Search ${isCar ? 'Car ' : 'Bike/Scooty'} Spare Name`}
           value={searchText}
           onChangeText={handleSearchChange}
           placeholderTextColor={theme.colors.themeIcon}

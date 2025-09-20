@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   arrow: {
     fontSize: wp('5%'),
     color: '#000',
-    transform: [{ scaleX: -1 }],
+    // transform: [{ scaleX: -1 }],
   },
   phoneImage: {
     position: 'absolute',
