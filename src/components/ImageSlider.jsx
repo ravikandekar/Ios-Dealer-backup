@@ -19,6 +19,7 @@ const ImageSlider = ({
   width = wp('100%'),
   paginationshow = true,
   watermark = true,
+  isPadding = false,
 }) => {
   const swiperRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -35,16 +36,22 @@ const ImageSlider = ({
         onIndexChanged={(index) => setActiveIndex(index)}
       >
         {images.map((item, index) => (
-          <View style={styles.imageWrapper} key={index}>
+          <View
+            style={[
+              styles.imageWrapper,
+           
+            ]}
+            key={index}
+          >
             <ImageBackground
               source={typeof item === 'string' ? { uri: item } : item}
-              style={[styles.image, { height, width: width - wp('5%') }]}
+              style={[styles.image, { height, width: width - wp('5%') }, isPadding && { width: wp('90%'), backgroundColor: "green" }]}
               resizeMode="cover"
             >
               {watermark && (
                 <Image
                   source={require('../../public_assets/media/images/watermark.png')}
-                  style={styles.watermark}
+                  style={[styles.watermark,]}
                   resizeMode="contain"
                 />
               )}

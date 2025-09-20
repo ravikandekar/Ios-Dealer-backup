@@ -86,23 +86,23 @@ const HomeScreen = ({ navigation }) => {
 
 
 
-useEffect(() => {
-  const setupFCM = async () => {
-    try {
-      const token = await messaging().getToken();
-      // ✅ Save token
-      if (token) {
-        await registerDeviceToken(token, Platform.OS);
-        await messaging().subscribeToTopic('GlobalTopic');
-        console.log('✅ [FCM] Subscribed to GlobalTopic');
+  useEffect(() => {
+    const setupFCM = async () => {
+      try {
+        const token = await messaging().getToken();
+        // ✅ Save token
+        if (token) {
+          await registerDeviceToken(token, Platform.OS);
+          await messaging().subscribeToTopic('GlobalTopic');
+          console.log('✅ [FCM] Subscribed to GlobalTopic');
+        }
+      } catch (error) {
+        console.error('❌ [FCM] Error setting up FCM:', error);
       }
-    } catch (error) {
-      console.error('❌ [FCM] Error setting up FCM:', error);
-    }
-  };
+    };
 
-  setupFCM();
-}, []);
+    setupFCM();
+  }, []);
 
 
   useEffect(() => {
@@ -278,6 +278,7 @@ useEffect(() => {
 
                   />
                 }
+                showsVerticalScrollIndicator={false}
               >
                 <View style={styles.middleContainer}>
                   <ImageSlider

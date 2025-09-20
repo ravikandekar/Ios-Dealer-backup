@@ -105,7 +105,7 @@ const MyAssetsScreen = ({ navigation }) => {
         isActive: item.isActive,
         isDeleted: item.isDeleted,
         deletionReason: item.deletionReason,
-         isdisable: item.isdisable,
+        isdisable: item.isdisable,
     });
     const handlePriceNext = async () => {
         console.log('Selected edit option:', editModalData);
@@ -340,7 +340,7 @@ const MyAssetsScreen = ({ navigation }) => {
             }}
 
             isDraft={activeTab === 'draft'}
-
+           isPadding={true}
         />
     );
 

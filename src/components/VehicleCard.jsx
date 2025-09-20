@@ -14,7 +14,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import ImageSlider from './ImageSlider';
 import AppText from './AppText';
 
-const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPressEdit, isDraft, }) => {
+const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPressEdit, isDraft,isPadding=false }) => {
   const isSold = data?.isSold;
   const isDeleted = data?.isDeleted;
   const isActive = data?.isdisable || false;
@@ -58,12 +58,13 @@ const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPres
           <AppText style={[styles.inactiveTextdes,]}>This product has been deactivated by admin. Please contact support for assistance.</AppText>
         </View>
       )}
-      <View style={{ paddingTop: wp('3%') }}>
+      <View style={{ paddingTop: wp('3%'),}}>
         <ImageSlider
           images={data.images || []}
           theme={theme}
           height={hp('20%')}
-          width={wp('94%')}
+          // width={wp('94%')}
+          isPadding={isPadding}
         />
       </View>
 

@@ -32,7 +32,7 @@ const InventoryScreen = ({ navigation }) => {
   const [priceModalVisible, setPriceModalVisible] = useState(false);
   const [inputPrize, setInputPrize] = useState(null);
   const [editModalData, setEditModalData] = useState(null);
-console.log('data');
+  console.log('data');
 
   const PAGE_SIZE = 10;
   const [pageMap, setPageMap] = useState({ cars: 1, bikes: 1, spares: 1 });
@@ -44,11 +44,11 @@ console.log('data');
     { key: 'bikes', label: 'Bikes' },
     { key: 'spares', label: 'Spareparts & Accessories' },
   ];
-    // ✅ Handle typing
-    const formatNumberWithCommas = (text) => {
-        const numericValue = text.replace(/[^0-9]/g, ""); // keep digits only
-        return numericValue; // store raw number (without commas)
-    };
+  // ✅ Handle typing
+  const formatNumberWithCommas = (text) => {
+    const numericValue = text.replace(/[^0-9]/g, ""); // keep digits only
+    return numericValue; // store raw number (without commas)
+  };
   const handleDelete = async reason => {
     if (!selectedItem) return;
     try {
@@ -246,6 +246,7 @@ console.log('data');
         setInputPrize(data?.price);
       }}
       isDraft={false}
+      isPadding={true}
     />
   );
 
@@ -307,7 +308,7 @@ console.log('data');
         }}
         onDelete={handleDelete}
         onSold={handleMarkSold}
-        // isDraft={activeTab === 'draft'}
+      // isDraft={activeTab === 'draft'}
       />
 
       <PriceChnageModal

@@ -196,7 +196,7 @@ const SubscriptionScreen = ({ navigation }) => {
           setLoading(false);
           isProcessingPurchaseRef.current = false;
           if (error.code !== 'E_USER_CANCELLED') {
-            showToast('error', '', error.message || 'Purchase failed.');
+            // showToast('error', '', error.message || 'Purchase failed.');
           }
         });
       }
