@@ -45,7 +45,7 @@ const ImageSlider = ({
           >
             <ImageBackground
               source={typeof item === 'string' ? { uri: item } : item}
-              style={[styles.image, { height, width: width - wp('5%') }, isPadding && { width: wp('90%'), backgroundColor: "green" }]}
+              style={[styles.image, { height, width: width - wp('5%') }, isPadding && { width: wp('90%')}]}
               resizeMode="cover"
             >
               {watermark && (

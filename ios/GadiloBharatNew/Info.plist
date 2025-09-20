@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.gadilobharat.dealer.refresh</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -16,20 +20,18 @@
 	<string>$(PRODUCT_NAME)</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-
-	<!-- Version and Build -->
 	<key>CFBundleShortVersionString</key>
 	<string>1.1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>2</string>
-
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<true/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
-
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>GMSApiKey</key>
@@ -39,7 +41,6 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
-
 	<key>NSCameraUsageDescription</key>
 	<string>
 This app uses the camera so you can capture photos of cars, bikes, and spare parts to upload and share within the app. 
@@ -53,7 +54,6 @@ It also allows you to take a selfie for user validation and profile creation.
 	<string>This app needs access to save photos you capture or download (such as car, bike, and spare part images) into your library.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app needs access to your photo library so you can select and upload existing images of cars, bikes, and spare parts.</string>
-
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
@@ -74,20 +74,12 @@ It also allows you to take a selfie for user validation and profile creation.
 		<string>ManufacturingConsent-Regular.ttf</string>
 		<string>Outfit-Medium.ttf</string>
 	</array>
-
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
 		<string>remote-notification</string>
 		<string>processing</string>
 	</array>
-
-	<!-- Required if using "processing" background mode -->
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>com.gadilobharat.dealer.refresh</string>
-	</array>
-
 	<key>UIFileSharingEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
@@ -99,12 +91,14 @@ It also allows you to take a selfie for user validation and profile creation.
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortrait</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>FirebaseAppDelegateProxyEnabled</key>
-	<true/>
 </dict>
 </plist>
