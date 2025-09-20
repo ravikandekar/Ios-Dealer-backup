@@ -7,7 +7,7 @@ export const welcomeCardData = {
   headText: 'Welcome to GADILO Bharat',
   subTitleText: 'Tap to know more about GADILO Bharat.',
   buttonText: 'Lets Start',
-  iconName: 'arrow-back',
+  iconName: 'arrow-forward',
   imageName: 'gadiloPhone'
 };
 
