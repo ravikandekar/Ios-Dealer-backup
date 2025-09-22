@@ -66,8 +66,8 @@ const NewTicketScreen = ({ navigation }) => {
   const pickFile = async () => {
     try {
       const imageResult = await launchImageLibrary({
-        mediaType: 'mixed', // images and videos
-        selectionLimit: 0,
+        mediaType: 'photo', // images and videos
+        selectionLimit: 10,
       });
 
       if (imageResult.didCancel) return;

@@ -47,6 +47,7 @@ const SpareBrandScreen = ({ navigation, route }) => {
       if (!isRefresh) setLoading(true);
 
       const listing_id = formData?.listing_id;
+console.log('listing_id', listing_id);
 
       // Construct correct API endpoint
       const endpoint = listing_id

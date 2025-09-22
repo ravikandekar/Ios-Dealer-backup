@@ -1,5 +1,5 @@
 import { StyleSheet, View, ScrollView, Text, Linking, InteractionManager } from 'react-native';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -145,13 +145,17 @@ const bannerItems = [
   },
 ];
 const AccountScreen = () => {
-  const { theme, isDark, toggleTheme, userID, userName } = useContext(AuthContext);
+  const { theme, isDark, toggleTheme, userID, userName, isAuthenticated } = useContext(AuthContext);
   const navigation = useNavigation();
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [showThemeModal, setsShowThemeModal] = useState(false);
-
+  useEffect(() => {
+    if (isAuthenticated) { // assuming you have a login state
+      setLogoutModalVisible(false);
+    }
+  }, [isAuthenticated]);
   const fetchCMSContentAndNavigate = async type => {
     try {
       const endpoint =
@@ -218,12 +222,13 @@ const AccountScreen = () => {
   //   console.log('User logged out');
   // }
   const alllogout = async (userId) => {
+
+    setLogoutModalVisible(false);
+
     const refreshToken = await getRefreshToken();
     // ✅ Always clean up locally
-    InteractionManager.runAfterInteractions(() => {
-      setLogoutModalVisible(false);
-    });
-    triggerLogout();
+
+
     console.log('✅ User logged out (local cleanup)');
     try {
       console.log('🚪 Logout pressed');
@@ -259,13 +264,11 @@ const AccountScreen = () => {
       // InteractionManager.runAfterInteractions(() => {
       //   setLogoutModalVisible(false);
       // });
-      // triggerLogout();
+      triggerLogout();
+
       // console.log('✅ User logged out (local cleanup)');
     }
   };
-
-
-
 
   return (
     <BackgroundWrapper style={{ padding: wp('1%') }}>
@@ -278,19 +281,16 @@ const AccountScreen = () => {
         onDelete={handleDelete}
         productTitle="User Account"
       />
-      <LogoutModal
-        visible={logoutModalVisible}
-        onClose={() => InteractionManager.runAfterInteractions(() => {
-          setLogoutModalVisible(false);
-        })}
-
-        onConfirm={() => {
-          InteractionManager.runAfterInteractions(() => {
+      {logoutModalVisible && (
+        <LogoutModal
+          visible={logoutModalVisible}
+          onClose={() => setLogoutModalVisible(false)}
+          onConfirm={async () => {
             setLogoutModalVisible(false);
-          });
-          alllogout(userID,)
-        }}
-      />
+            await alllogout(userID);
+          }}
+        />
+      )}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.listWrapper}>
           {bannerItems.map((item, index) => {
@@ -304,9 +304,9 @@ const AccountScreen = () => {
               } else if (item.title === 'Delete Account') {
                 setDeleteModalVisible(true);
               } else if (item.title === 'Logout') {
-                InteractionManager.runAfterInteractions(() => {
-                  setLogoutModalVisible(true);
-                });
+
+                setLogoutModalVisible(true);
+
               } else if (item.title === 'Feedback & Ratings') {
                 setFeedbackVisible(true);
               } else if (item.title === 'Terms & Conditions') {

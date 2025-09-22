@@ -189,7 +189,7 @@ const ViewTicketScreen = ({ route }) => {
     try {
       const result = await launchImageLibrary({
         mediaType: 'mixed',
-        selectionLimit: 0,
+        selectionLimit: 10,
         quality: 0.8,
         maxWidth: 1024,
         maxHeight: 1024,

@@ -25,7 +25,7 @@ import Loader from '../components/Loader';
 const SpareTypeSelection = ({ navigation, route }) => {
   const headerName = route.params.selectedCategory || 'Spare';
   const { theme } = useContext(AuthContext);
-  const { updateForm ,formData} = useFormStore();
+  const { updateForm, formData } = useFormStore();
 
   const [selectedType, setSelectedType] = useState(formData.subproducttypeId || '');
   const [selectedCondition, setSelectedCondition] = useState(formData.spareConditionId || '');
@@ -71,23 +71,25 @@ const SpareTypeSelection = ({ navigation, route }) => {
     fetchConditions();
   }, []);
   const handleTypePress = (item) => {
+    if (!selectedCondition) {
+      showToast('error', '', 'Please select a condition first');
+      return;
+    }
     setSelectedType(item?._id);  // now storing _id
     updateForm('spareProductTypeId', item?.product_type_id);
     updateForm('listing_id', item?.listing_id);
     updateForm('subproducttypeId', item?._id);
-  };
-
-  const handleConditionPress = (item) => {
-    if (!selectedType) {
-      showToast('error', '', 'Please select a type first');
-      return;
-    }
-    setSelectedCondition(item._id); // now storing _id
-    updateForm('spareConditionId', item._id);
     navigation.navigate('SpareBrandScreen', {
       typeId: selectedType,
       conditionId: item._id,
     });
+  };
+
+  const handleConditionPress = (item) => {
+
+    setSelectedCondition(item._id); // now storing _id
+    updateForm('spareConditionId', item._id);
+
   };
 
 
@@ -132,6 +134,15 @@ const SpareTypeSelection = ({ navigation, route }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContainer}
       >
+        <AppText style={[styles.subHeader, { color: theme.colors.text, marginTop: hp('3%') }]}>
+          Select Type
+        </AppText>
+
+        <View style={styles.gridContainer}>
+          {conditions.map((item) =>
+            renderCard({ item }, selectedCondition, 'condition', handleConditionPress)
+          )}
+        </View>
         <AppText style={[styles.subHeader, { color: theme.colors.text }]}>
           Select Type of sparepart or accessries
         </AppText>
@@ -146,15 +157,7 @@ const SpareTypeSelection = ({ navigation, route }) => {
           </View>
         )}
 
-        <AppText style={[styles.subHeader, { color: theme.colors.text, marginTop: hp('3%') }]}>
-          Select Type
-        </AppText>
 
-        <View style={styles.gridContainer}>
-          {conditions.map((item) =>
-            renderCard({ item }, selectedCondition, 'condition', handleConditionPress)
-          )}
-        </View>
       </ScrollView>
     </BackgroundWrapper>
   );

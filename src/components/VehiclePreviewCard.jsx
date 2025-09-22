@@ -7,7 +7,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { AuthContext } from '../context/AuthContext';
 import InterestedPeopleCard from './InterestedPeopleCard';
 import AppText from './AppText';
-const VehiclePreviewCard = ({ images, title, subtitle, price, specs, interested, description = null, onPressEdit ,isSold=false}) => {
+const VehiclePreviewCard = ({ images, title, subtitle, price, specs, interested, description = null, onPressEdit, isSold = false, isPadding = false }) => {
     const { theme } = useContext(AuthContext);
     console.log('isSold', isSold);
 
@@ -17,7 +17,8 @@ const VehiclePreviewCard = ({ images, title, subtitle, price, specs, interested,
                 images={images}
                 theme={theme}
                 height={hp('20%')}
-                width={wp('94%')} // Custom image styling
+                // width={wp('94%')} // Custom image styling
+                isPadding={true}
             />
 
             <View style={{ padding: wp('2%') }}>
@@ -30,7 +31,7 @@ const VehiclePreviewCard = ({ images, title, subtitle, price, specs, interested,
                         <FontAwesome5 name="edit" size={24} color={theme.colors.placeholder} />
                     </TouchableOpacity>
                     )} */}
-                    
+
                 </View>
                 {interested && (
                     <InterestedPeopleCard

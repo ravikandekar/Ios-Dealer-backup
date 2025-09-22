@@ -107,9 +107,9 @@ const InventoryScreen = ({ navigation }) => {
 
       const payload = { user_id: userID };
       const urlMap = {
-        cars: `/api/product/carRoutes/cars_by_dealerid`,
-        bikes: `/api/product/bikeRoute/bikes_by_dealerid`,
-        spares: `/api/product/spareRoute/spare_by_dealerid`,
+        cars: `/api/product/carRoutes/cars_by_dealerids`,
+        bikes: `/api/product/bikeRoute/bikes_by_dealerids`,
+        spares: `/api/product/spareRoute/spare_by_dealerids`,
       };
 
       setLoadingMoreMap(prev => ({ ...prev, [type]: page > 1 }));

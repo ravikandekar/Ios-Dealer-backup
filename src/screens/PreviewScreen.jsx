@@ -31,7 +31,7 @@ const PreviewScreen = ({ navigation, route }) => {
   const [editvehicleDetails, setEditVehicleDetails] = useState(null);
   const [isPublishing, setIsPublishing] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
-  console.log('vehicleType', vehicleType);
+  console.log('selectedCategory', selectedCategory);
 
   useEffect(() => {
     if (!carandBikeId || !vehicleType) {

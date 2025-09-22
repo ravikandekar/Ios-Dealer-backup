@@ -223,7 +223,7 @@ const AssetsPreviewScreen = ({ navigation }) => {
         contentContainerStyle={{ marginTop: hp('2%') }}
         showsVerticalScrollIndicator={false}>
 
-    {dataedit?.isdisable && (
+        {dataedit?.isdisable && (
           <InfoBanner
             iconName="info"
             iconType="feather"
@@ -251,10 +251,11 @@ const AssetsPreviewScreen = ({ navigation }) => {
               seteditModalData(dataedit._id); // or item._id if you are inside a list
               setInputPrize(dataedit.price);  // or item.price
             }}
+            isPadding={true}
           />
 
         )}
-    
+
         <PriceChnageModal
           visible={priceModalVisible}
           onClose={() => setpriceModalVisible(false)}
