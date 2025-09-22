@@ -219,12 +219,12 @@ const AccountScreen = () => {
   // }
   const alllogout = async (userId) => {
     const refreshToken = await getRefreshToken();
-      // ✅ Always clean up locally
-      InteractionManager.runAfterInteractions(() => {
-        setLogoutModalVisible(false);
-      });
-      triggerLogout();
-      console.log('✅ User logged out (local cleanup)');
+    // ✅ Always clean up locally
+    InteractionManager.runAfterInteractions(() => {
+      setLogoutModalVisible(false);
+    });
+    triggerLogout();
+    console.log('✅ User logged out (local cleanup)');
     try {
       console.log('🚪 Logout pressed');
 
@@ -272,7 +272,9 @@ const AccountScreen = () => {
       <DetailsHeader title="Accounts" onBackPress={() => navigation.goBack()} />
       <DeleteAccountModal
         visible={deleteModalVisible}
-        onClose={() => setDeleteModalVisible(false)}
+        onClose={() => InteractionManager.runAfterInteractions(() => {
+          setDeleteModalVisible(false);
+        })}
         onDelete={handleDelete}
         productTitle="User Account"
       />
