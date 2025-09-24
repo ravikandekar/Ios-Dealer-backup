@@ -30,8 +30,8 @@ import {
 import AppText from '../components/AppText';
 // Platform-specific product IDs
 const PRODUCT_IDS = Platform.select({
-  ios: ['monthly_plan_ios','test2'], // Make sure this matches exactly in App Store Connect
-  android: ['car_test','bike_test','spare_test'],
+  ios: ['spares_dealer_plan', 'monthly_plan_ios', 'test2', 'spares_dealer_plan'], // Make sure this matches exactly in App Store Connect
+  android: ['car_test', 'bike_test', 'spare_test', 'spares_dealer_plan'],
 });
 
 const PRODUCT_ID = PRODUCT_IDS[0];

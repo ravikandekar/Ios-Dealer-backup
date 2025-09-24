@@ -13,8 +13,8 @@ import * as RNIap from 'react-native-iap';
 import Clipboard from '@react-native-clipboard/clipboard';
 import axios from 'axios';
 const PRODUCT_IDS = Platform.select({
-  ios: ['monthly_plan_ios','test2'], // Make sure this matches exactly in App Store Connect
-  android: ['car_test','bike_test','spare_test'],
+  ios: ['spares_dealer_plan'], // Make sure this matches exactly in App Store Connect
+  android: ['car_test', 'bike_test', 'spare_test'],
 });
 
 const InAppPurchase = () => {
@@ -25,30 +25,30 @@ const InAppPurchase = () => {
   const [purchesdone, setpurchesdone] = useState([]);
   const [error, setError] = useState(null);
   console.log('purchesdone', purchesdone);
-const storeInAppPurchase = async (purchase) => {
-  try {
-    const response = await axios.post('https://webhook.site/8dde4150-9489-43c6-bb90-01e2658e1e56', {
-      packageName: purchase.packageNameAndroid,
-      productId: purchase.productId,
-      purchaseToken: purchase.purchaseToken,
-      userId: "hhhhhhh"
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        // 'Authorization': `Bearer YOUR_ACCESS_TOKEN` // if required
-      }
-    });
+  const storeInAppPurchase = async (purchase) => {
+    try {
+      const response = await axios.post('https://webhook.site/8dde4150-9489-43c6-bb90-01e2658e1e56', {
+        packageName: purchase.packageNameAndroid,
+        productId: purchase.productId,
+        purchaseToken: purchase.purchaseToken,
+        userId: "hhhhhhh"
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          // 'Authorization': `Bearer YOUR_ACCESS_TOKEN` // if required
+        }
+      });
 
-    console.log("Success:", response.data);
-    Alert.alert('token passed ')
-  } catch (error) {
-    if (error.response) {
-      console.error("API Error:", error.response.data);
-    } else {
-      console.error("Network Error:", error.message);
+      console.log("Success:", response.data);
+      Alert.alert('token passed ')
+    } catch (error) {
+      if (error.response) {
+        console.error("API Error:", error.response.data);
+      } else {
+        console.error("Network Error:", error.message);
+      }
     }
-  }
-};
+  };
   const copyToClipboard = (value) => {
     Clipboard.setString(value);
   };
@@ -456,19 +456,19 @@ const storeInAppPurchase = async (purchase) => {
         </>
       )}
       <View style={styles.keyContainer}>
-        <Text style={styles.keyText}>productId  =  <Text style={[styles.keyText,{color:'red'}]}>{purchesdone.productId}</Text></Text>
+        <Text style={styles.keyText}>productId  =  <Text style={[styles.keyText, { color: 'red' }]}>{purchesdone.productId}</Text></Text>
         <TouchableOpacity style={styles.copyButton} onPress={() => copyToClipboard(purchesdone.productId)}>
           <Text style={styles.copyText}>Copy</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.keyContainer}>
-        <Text style={styles.keyText}>packageNameAndroid  = <Text style={[styles.keyText,{color:'red'}]}>{purchesdone.packageNameAndroid}</Text></Text>
+        <Text style={styles.keyText}>packageNameAndroid  = <Text style={[styles.keyText, { color: 'red' }]}>{purchesdone.packageNameAndroid}</Text></Text>
         <TouchableOpacity style={styles.copyButton} onPress={() => copyToClipboard(purchesdone.packageNameAndroid)}>
           <Text style={styles.copyText}>Copy</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.keyContainer}>
-        <Text style={styles.keyText}>purchaseToken   = <Text style={[styles.keyText,{color:'red'}]}>{purchesdone.purchaseToken}</Text></Text>
+        <Text style={styles.keyText}>purchaseToken   = <Text style={[styles.keyText, { color: 'red' }]}>{purchesdone.purchaseToken}</Text></Text>
         <TouchableOpacity style={styles.copyButton} onPress={() => copyToClipboard(purchesdone.purchaseToken)}>
           <Text style={styles.copyText}>Copy</Text>
         </TouchableOpacity>

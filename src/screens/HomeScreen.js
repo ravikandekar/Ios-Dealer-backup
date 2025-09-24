@@ -315,7 +315,7 @@ const HomeScreen = ({ navigation }) => {
 
                   <View style={styles.welcomeCard}>
                     <GadiloWelcomeCard headText={cardData.headText} />
-                  </View>
+                  </View> 
 
                   <View style={styles.carListCard}>
                     <ListingOverviewCard

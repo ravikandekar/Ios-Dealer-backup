@@ -293,9 +293,8 @@ const SpareUploadScreen = ({ navigation }) => {
                 clearFields([
                     'SpareBrandId', 'Sparedescription', 'Spareyear_of_manufacture',
                     'spareProductTypeId', 'Spareprice', 'spareConditionId',
-                    'SparePartNameId', 'Sparename', 'subproducttypeId', 'SpareyearId'
+                    'SparePartNameId', 'Sparename', 'subproducttypeId', 'SpareyearId','images'
                 ]);
-                updateForm('images', []);
                 updateForm('isEditSpare', false);
                 InteractionManager.runAfterInteractions(() => {
                     setModalVisible(false);

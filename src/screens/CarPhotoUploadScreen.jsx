@@ -295,45 +295,8 @@ const CarPhotoUploadScreen = ({ navigation }) => {
 
 
             // 5. Handle Success
-            // if (response.data?.success) {
-            //     const createdVehicle = isBike ? response.data?.data?.createdBike : response.data?.data?.createdCar;
-            //     showToast('success', 'Success', `${vehicleType} ${actionType === 'save' ? 'saved' : 'published'} successfully!`);
-
-            //     // Reset form and images
-            //     clearFields([
-            //         'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
-            //         'model_name', 'price', 'kmsDriven', 'transmissionId',
-            //         'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id'
-            //     ]);
-            //     updateForm('images', []); // explicitly clear images
-            //     setModalVisible(false)
-            //     setShowConfirmModal(false);
-
-            //     // 6. Clean navigation
-            //     navigation.reset({
-            //         index: 0,
-            //         routes: [
-            //             {
-            //                 name: actionType === 'publish' ? 'PreviewScreen' : 'BottomTabNavigator',
-            //                 params: actionType === 'publish' ? {
-            //                     carandBikeId: createdVehicle?._id,
-            //                     vehicleType: isBike ? 'bike' : 'car'
-            //                 } : undefined,
-            //             },
-            //         ],
-            //     });
-            // } else {
-            //     // Handle API error response
-            //     const error = response.data;
-            //     if (error.code === 'VALIDATION_ERROR' && error.meta?.errors?.length) {
-            //         const fieldErr = error.meta.errors[0];
-            //         showToast('error', fieldErr.field, fieldErr.message);
-            //     }
-
-            //     else {
-            //         showToast('error', 'Failed', error.message || 'Submission failed');
-            //     }
-            // }
+           
+       
             const responseData = response.data;
 
             // ✅ Check success based on appCode
@@ -352,9 +315,8 @@ const CarPhotoUploadScreen = ({ navigation }) => {
                 clearFields([
                     'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
                     'model_name', 'price', 'kmsDriven', 'transmissionId',
-                    'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id', 'model_name'
+                    'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id', 'model_name','images'
                 ]);
-                updateForm('images', []);
                 updateForm('isEdit', false);
                 InteractionManager.runAfterInteractions(() => {
                     setModalVisible(false);
