@@ -14,7 +14,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import ImageSlider from './ImageSlider';
 import AppText from './AppText';
 
-const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPressEdit, isDraft,isPadding=false }) => {
+const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPressEdit, isDraft, isPadding = false }) => {
   const isSold = data?.isSold;
   const isDeleted = data?.isDeleted;
   const isActive = data?.isdisable || false;
@@ -33,7 +33,7 @@ const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPres
     }
   }
   return (
-    <TouchableOpacity style={[styles.cardContainer, { backgroundColor: theme.colors.card ,borderWidth: 0.2, borderColor: theme.colors.cardborder}]} onPress={onPress}>
+    <TouchableOpacity style={[styles.cardContainer, { backgroundColor: theme.colors.card, borderWidth: 0.2, borderColor: theme.colors.cardborder }]} onPress={onPress}>
       {isSold && (
         <View style={styles.overlayContainer}>
           <Image
@@ -58,7 +58,7 @@ const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPres
           <AppText style={[styles.inactiveTextdes,]}>This product has been deactivated by admin. Please contact support for assistance.</AppText>
         </View>
       )}
-      <View style={{ paddingTop: wp('3%'),}}>
+      <View style={{ paddingTop: wp('3%'), }}>
         <ImageSlider
           images={data.images || []}
           theme={theme}

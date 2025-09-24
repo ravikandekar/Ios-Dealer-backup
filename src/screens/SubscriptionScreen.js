@@ -104,6 +104,7 @@ const SubscriptionScreen = ({ navigation }) => {
   }, []);
 
   // ✅ Make sure listeners are set up only once
+  // added trasication complete android and ios dated 2024-06-17 if project not run then revert code before  5 pm 2024-06-17
   const initializeIAP = async () => {
     try {
       console.log('Initializing IAP connection...');
@@ -162,10 +163,20 @@ const SubscriptionScreen = ({ navigation }) => {
                 })
               );
 
-              if (purchase.transactionId || purchase.transactionReceipt) {
-                await RNIap.finishTransaction(purchase, true);
-              } else {
-                console.log("⚠️ Skipping finishTransaction, no transactionId/receipt:", purchase);
+              if (Platform.OS === 'android') {
+                // On Android, purchaseToken is required
+                if (purchase.purchaseToken) {
+                  await RNIap.finishTransaction(purchase, true);
+                } else {
+                  console.log("⚠️ Skipping finishTransaction, no purchaseToken:", purchase);
+                }
+              } else if (Platform.OS === 'ios') {
+                // On iOS, transactionId or transactionReceipt is required
+                if (purchase.transactionId || purchase.transactionReceipt) {
+                  await RNIap.finishTransaction(purchase, true);
+                } else {
+                  console.log("⚠️ Skipping finishTransaction, no transactionId/receipt:", purchase);
+                }
               }
 
               await refreshActiveSubscriptions();
@@ -173,10 +184,22 @@ const SubscriptionScreen = ({ navigation }) => {
             }
             else if (result?.status === 'already_used') {
               console.log('ℹ️ Purchase already used.');
-              if (purchase.transactionId || purchase.transactionReceipt) {
-                await RNIap.finishTransaction(purchase, true);
+
+              if (Platform.OS === 'android') {
+                if (purchase.purchaseToken) {
+                  await RNIap.finishTransaction(purchase, true);
+                } else {
+                  console.log("⚠️ Skipping finishTransaction, no purchaseToken:", purchase);
+                }
+              } else if (Platform.OS === 'ios') {
+                if (purchase.transactionId || purchase.transactionReceipt) {
+                  await RNIap.finishTransaction(purchase, true);
+                } else {
+                  console.log("⚠️ Skipping finishTransaction, no transactionId/receipt:", purchase);
+                }
               }
-            } else {
+            }
+            else {
               console.log('⚠️ Verification failed.');
             }
           } catch (err) {
