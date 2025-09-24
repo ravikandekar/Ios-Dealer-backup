@@ -296,8 +296,12 @@ const MyAssetsScreen = ({ navigation }) => {
             theme={theme}
             onPressShare={() => console.log('Share', item.id)}
             onPressDelete={() => {
-                setSelectedAssetId(item.id);
-                setShowDeleteModal(true);
+                isSubscriberRequired === true
+                    ? setShowSubscriptionModal(true)
+                    : (
+                        setSelectedAssetId(item.id),
+                        setShowDeleteModal(true)
+                    );
             }}
             onPressEdit={() => {
                 setpriceModalVisible(true)
@@ -341,6 +345,7 @@ const MyAssetsScreen = ({ navigation }) => {
 
             isDraft={activeTab === 'draft'}
             isPadding={true}
+
         />
     );
 

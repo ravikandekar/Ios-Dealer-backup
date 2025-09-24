@@ -19,6 +19,7 @@ export const initApp = async ({
         const res = await apiClient.get('/api/dealer/auth/dealer-app-config');
         const data = res.data?.data.config;
         console.log('✅ App config data:', data);
+        console.log('✅ App config data:', res.data);
 
         setUserID(data?.dealerId || '');
         setUserName(data?.name || '');
