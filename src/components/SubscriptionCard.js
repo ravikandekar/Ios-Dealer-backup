@@ -13,7 +13,7 @@ const SubscriptionCard = ({ title, price, lastDate, expiryDate, listings, onDown
         <AppText style={[styles.title, { color: theme.colors.text}]}>{title}</AppText>
         <View style={styles.priceContainer}>
           <AppText style={[styles.price, { color: theme.colors.text}]}>₹{price}</AppText>
-          <AppText style={[styles.perMonth, { color: theme.colors.text}]}>/week</AppText>
+          <AppText style={[styles.perMonth, { color: theme.colors.text}]}>/month</AppText>
         </View>
       </View>
 

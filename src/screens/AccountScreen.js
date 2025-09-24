@@ -224,6 +224,7 @@ const AccountScreen = () => {
   const alllogout = async (userId) => {
 
     setLogoutModalVisible(false);
+    triggerLogout();
 
     const refreshToken = await getRefreshToken();
     // ✅ Always clean up locally
@@ -264,7 +265,6 @@ const AccountScreen = () => {
       // InteractionManager.runAfterInteractions(() => {
       //   setLogoutModalVisible(false);
       // });
-      triggerLogout();
 
       // console.log('✅ User logged out (local cleanup)');
     }

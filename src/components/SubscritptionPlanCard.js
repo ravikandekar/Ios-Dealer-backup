@@ -91,7 +91,7 @@ const SubscriptionPlanCard = ({
           <View style={styles.priceBox}>
             <AppText style={styles.oldPrice}>{oldPrice}</AppText>
             <AppText style={styles.newPrice}>₹{newPrice}/</AppText>
-            <AppText style={{ fontSize: hp('2%'), fontWeight: '500', color: '#FFFFFF', }}>week</AppText>
+            <AppText style={{ fontSize: hp('2%'), fontWeight: '500', color: '#FFFFFF', }}>month</AppText>
             <AppText style={styles.gstText}>Including GST</AppText>
           </View>
         </View>

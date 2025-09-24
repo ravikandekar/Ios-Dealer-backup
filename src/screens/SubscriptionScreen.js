@@ -554,7 +554,7 @@ const SubscriptionScreen = ({ navigation }) => {
                   <SubscriptionPlanCard
                     key={`${plan._id}-${plan.isSubscribed}`}
                     title={plan?.subscriptiontitle}
-                    duration={`${Math.round(plan.validity_in_days / 30)} week`}
+                    duration={`${Math.round(plan.validity_in_days / 30)} month`}
                     listing={`${plan.listings_allowed} ${plan.category_id?.category_name || ''}`}
                     oldPrice={plan.oldprice ? `${plan.oldprice}` : undefined}
                     newPrice={`${plan.price}`}

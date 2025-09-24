@@ -21,6 +21,8 @@ import VehiclePreviewCard from '../components/VehiclePreviewCard';
 import { useFormStore } from '../store/formStore';
 import { showToast } from '../utils/toastService';
 import apiClient from '../utils/apiClient';
+import CustomAlertModal from '../components/CustomAlertModal';
+import SubscriptionModal from '../components/SubscriptionModal';
 
 const PreviewScreen = ({ navigation, route }) => {
   const { carandBikeId, vehicleType } = route.params || {};
@@ -30,6 +32,7 @@ const PreviewScreen = ({ navigation, route }) => {
   const [vehicleDetails, setVehicleDetails] = useState(null);
   const [editvehicleDetails, setEditVehicleDetails] = useState(null);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [showQuotaModal, setShowQuotaModal] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   console.log('selectedCategory', selectedCategory);
 
@@ -165,6 +168,10 @@ const PreviewScreen = ({ navigation, route }) => {
         showToast('error', 'Already Published', 'Vehicle is already published and cannot be edited.');
       } else if (appCode === 1134 || appCode === 1126) {
         setShowSubscriptionModal(true);
+      } else if (appCode === 1098) {
+        // showToast('error', 'Raviii', 'Your profile is under verification. You cannot publish at the moment.');
+
+        setShowQuotaModal(true);
       } else {
         showToast('error', 'Error', message || 'Failed to publish');
       }
@@ -235,7 +242,7 @@ const PreviewScreen = ({ navigation, route }) => {
       </ScrollView>
 
       {/* Subscription Modal */}
-      <Modal
+      {/* <Modal
         visible={showSubscriptionModal}
         animationType="fade"
         transparent
@@ -267,7 +274,21 @@ const PreviewScreen = ({ navigation, route }) => {
             </View>
           </View>
         </View>
-      </Modal>
+      </Modal> */}
+           <SubscriptionModal
+        visible={showSubscriptionModal}
+        onClose={() => setShowSubscriptionModal(false)}
+        onSubscribe={() => { handleSubscribe() }}
+      />
+      <CustomAlertModal
+        visible={showQuotaModal}
+        onClose={() => InteractionManager.runAfterInteractions(() => setShowQuotaModal(false))}
+        title="Quota Exceeded"
+        message="You have reached your allowed limit. Delete Old products or Mark as Sold to free up space."
+        primaryButtonText="Ok"
+        onPrimaryPress={() => InteractionManager.runAfterInteractions(() => setShowQuotaModal(false))}
+        theme={theme}
+      />
     </BackgroundWrapper>
   );
 };

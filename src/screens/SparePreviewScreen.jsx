@@ -22,6 +22,7 @@ import { useFormStore } from '../store/formStore';
 import { showToast } from '../utils/toastService';
 import apiClient from '../utils/apiClient';
 import SubscriptionModal from '../components/SubscriptionModal';
+import CustomAlertModal from '../components/CustomAlertModal';
 
 const SparePreviewScreen = ({ navigation, route }) => {
   const { spareId } = route.params || {};
@@ -158,7 +159,7 @@ const SparePreviewScreen = ({ navigation, route }) => {
       );
     } finally {
       setIsPublishing(false);
-      
+
     }
   };
 
@@ -220,6 +221,15 @@ const SparePreviewScreen = ({ navigation, route }) => {
         visible={showSubscriptionModal}
         onClose={() => setShowSubscriptionModal(false)}
         onSubscribe={() => { handleSubscribe() }}
+      />
+      <CustomAlertModal
+        visible={showQuotaModal}
+        onClose={() => InteractionManager.runAfterInteractions(() => setShowQuotaModal(false))}
+        title="Quota Exceeded"
+        message="You have reached your allowed limit. Delete Old products or Mark as Sold to free up space."
+        primaryButtonText="Ok"
+        onPrimaryPress={() => InteractionManager.runAfterInteractions(() => setShowQuotaModal(false))}
+        theme={theme}
       />
     </BackgroundWrapper>
   );
