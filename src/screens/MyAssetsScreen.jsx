@@ -25,7 +25,8 @@ import PriceChnageModal from '../components/PriceChnageModal';
 import { useFormStore } from '../store/formStore';
 import SubscriptionModal from '../components/SubscriptionModal';
 import { InteractionManager } from 'react-native';
-
+import LottieCompo from '../components/LottieCompo';
+import { Mark_as_sold } from '../../public_assets/media/lottie/Mark_as_sold.json'
 const PAGE_SIZE = 20;
 
 const MyAssetsScreen = ({ navigation }) => {
@@ -45,7 +46,8 @@ const MyAssetsScreen = ({ navigation }) => {
     const [inputPrize, setInputPrize] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
-
+    const [showMarkAsSoldLottie, setShowMarkAsSoldLottie] = useState(false);
+    const [showDeleteAsSoldLottie, setShowDeleteAsSoldLottie] = useState(false);
     const [selectedAssetId, setSelectedAssetId] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     console.log('publishedAssets in MyAssetsScreen:', publishedAssets);
@@ -236,8 +238,10 @@ const MyAssetsScreen = ({ navigation }) => {
             const response = await apiClient.put(url, payload);
 
             if (response?.data?.success) {
-                showToast('success', '', 'Product deleted successfully');
-
+                // showToast('success', '', 'Product deleted successfully');
+                setShowDeleteAsSoldLottie(true);
+                // Refresh the inventory to reflect deletion
+                fetchInventory(1, true);
                 // Remove the deleted item from all lists immediately
                 setPublishedAssets(prev => prev.filter(item => item.id !== selectedAssetId));
                 setDraftAssets(prev => prev.filter(item => item.id !== selectedAssetId));
@@ -263,7 +267,10 @@ const MyAssetsScreen = ({ navigation }) => {
             const response = await apiClient.patch(url);
 
             if (response?.data?.success) {
-                showToast('success', '', 'Product marked as sold');
+                // showToast('success', '', 'Product marked as sold');
+                setShowMarkAsSoldLottie(true);
+                fetchInventory(1, true);
+
 
                 // Find the item from published or draft lists
                 const soldItem = publishedAssets.find(item => item.id === selectedAssetId) ||
@@ -512,6 +519,22 @@ const MyAssetsScreen = ({ navigation }) => {
                 visible={showSubscriptionModal}
                 onClose={() => setShowSubscriptionModal(false)}
                 onSubscribe={() => { handleSubscribe() }}
+            />
+            <LottieCompo
+                visible={showMarkAsSoldLottie}
+                lottieSource={require('../../public_assets/media/lottie/Mark_as_sold.json')}
+                title="Mark as Sold"
+                description="Your asset has been marked as sold successfully."
+                buttonText="OK"
+                onClose={() => InteractionManager.runAfterInteractions(() => setShowMarkAsSoldLottie(false))}
+            />
+            <LottieCompo
+                visible={showDeleteAsSoldLottie}
+                lottieSource={require('../../public_assets/media/lottie/Deleted.json')}
+                title="Asset Deleted"
+                description="Your asset has been deleted successfully."
+                buttonText="OK"
+                onClose={() => InteractionManager.runAfterInteractions(() => setShowDeleteAsSoldLottie(false))}
             />
         </BackgroundWrapper>
     );

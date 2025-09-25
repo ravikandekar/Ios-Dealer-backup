@@ -23,6 +23,7 @@ import { showToast } from '../utils/toastService';
 import apiClient from '../utils/apiClient';
 import CustomAlertModal from '../components/CustomAlertModal';
 import SubscriptionModal from '../components/SubscriptionModal';
+import LottieCompo from '../components/LottieCompo';
 
 const PreviewScreen = ({ navigation, route }) => {
   const { carandBikeId, vehicleType } = route.params || {};
@@ -34,6 +35,7 @@ const PreviewScreen = ({ navigation, route }) => {
   const [isPublishing, setIsPublishing] = useState(false);
   const [showQuotaModal, setShowQuotaModal] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [showPublishAsSoldLottie, setShowPublishAsSoldLottie] = useState(false);
   console.log('selectedCategory', selectedCategory);
 
   useEffect(() => {
@@ -162,8 +164,8 @@ const PreviewScreen = ({ navigation, route }) => {
       const { appCode, message } = response?.data;
 
       if (appCode === 1000) {
-        showToast('success', 'Success', 'Published Successfully');
-        navigateToHomeAndReset();
+        // showToast('success', 'Success', 'Published Successfully');
+        setShowPublishAsSoldLottie(true);
       } else if (appCode === 1085) {
         showToast('error', 'Already Published', 'Vehicle is already published and cannot be edited.');
       } else if (appCode === 1134 || appCode === 1126) {
@@ -275,7 +277,7 @@ const PreviewScreen = ({ navigation, route }) => {
           </View>
         </View>
       </Modal> */}
-           <SubscriptionModal
+      <SubscriptionModal
         visible={showSubscriptionModal}
         onClose={() => setShowSubscriptionModal(false)}
         onSubscribe={() => { handleSubscribe() }}
@@ -288,6 +290,17 @@ const PreviewScreen = ({ navigation, route }) => {
         primaryButtonText="Ok"
         onPrimaryPress={() => InteractionManager.runAfterInteractions(() => setShowQuotaModal(false))}
         theme={theme}
+      />
+      <LottieCompo
+        visible={showPublishAsSoldLottie}
+        lottieSource={require('../../public_assets/media/lottie/Published.json')}
+        title="Asset Published"
+        description="Your asset has been published successfully."
+        buttonText="OK"
+        onClose={() => {
+          InteractionManager.runAfterInteractions(() => setShowPublishAsSoldLottie(false));
+          navigateToHomeAndReset();
+        }}
       />
     </BackgroundWrapper>
   );

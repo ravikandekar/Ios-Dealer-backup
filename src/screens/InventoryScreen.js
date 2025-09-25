@@ -20,6 +20,8 @@ import { showToast } from '../utils/toastService';
 import Loader from '../components/Loader';
 import ProductDeleteModal from '../components/ProductDeleteModal';
 import PriceChnageModal from '../components/PriceChnageModal';
+import LottieCompo from '../components/LottieCompo';
+import { InteractionManager } from 'react-native';
 
 const InventoryScreen = ({ navigation }) => {
   const { theme, userID } = useContext(AuthContext);
@@ -32,6 +34,8 @@ const InventoryScreen = ({ navigation }) => {
   const [priceModalVisible, setPriceModalVisible] = useState(false);
   const [inputPrize, setInputPrize] = useState(null);
   const [editModalData, setEditModalData] = useState(null);
+  const [showMarkAsSoldLottie, setShowMarkAsSoldLottie] = useState(false);
+  const [showDeleteAsSoldLottie, setShowDeleteAsSoldLottie] = useState(false);
   console.log('data');
 
   const PAGE_SIZE = 10;
@@ -61,7 +65,8 @@ const InventoryScreen = ({ navigation }) => {
 
       const response = await apiClient.put(urlMap[activeTab], { reason });
       if (response?.data?.success) {
-        showToast('success', '', 'Product deleted successfully');
+        // showToast('success', '', 'Product deleted successfully');
+        setShowDeleteAsSoldLottie(true);
         fetchPaginatedInventory(activeTab, 1, true);
       } else {
         throw new Error(response?.data?.message || 'Failed to delete');
@@ -87,7 +92,8 @@ const InventoryScreen = ({ navigation }) => {
 
       const response = await apiClient.patch(urlMap[activeTab]);
       if (response?.data?.success) {
-        showToast('success', '', 'Product marked as sold');
+        // showToast('success', '', 'Product marked as sold');
+        setShowMarkAsSoldLottie(true);
         fetchPaginatedInventory(activeTab, 1, true);
       } else {
         throw new Error(response?.data?.message || 'Failed to mark as sold');
@@ -320,6 +326,22 @@ const InventoryScreen = ({ navigation }) => {
         modalTitle="Enter Price"
         placeholder="₹50,000"
         theme={theme}
+      />
+      <LottieCompo
+        visible={showMarkAsSoldLottie}
+        lottieSource={require('../../public_assets/media/lottie/Mark_as_sold.json')}
+        title="Mark as Sold"
+        description="Your asset has been marked as sold successfully."
+        buttonText="OK"
+        onClose={() => InteractionManager.runAfterInteractions(() => setShowMarkAsSoldLottie(false))}
+      />
+      <LottieCompo
+        visible={showDeleteAsSoldLottie}
+        lottieSource={require('../../public_assets/media/lottie/Deleted.json')}
+        title="Asset Deleted"
+        description="Your asset has been deleted successfully."
+        buttonText="OK"
+        onClose={() => InteractionManager.runAfterInteractions(() => setShowDeleteAsSoldLottie(false))}
       />
     </BackgroundWrapper>
   );

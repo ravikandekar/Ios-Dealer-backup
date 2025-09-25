@@ -23,6 +23,7 @@ import { showToast } from '../utils/toastService';
 import apiClient from '../utils/apiClient';
 import SubscriptionModal from '../components/SubscriptionModal';
 import CustomAlertModal from '../components/CustomAlertModal';
+import LottieCompo from '../components/LottieCompo';
 
 const SparePreviewScreen = ({ navigation, route }) => {
   const { spareId } = route.params || {};
@@ -30,9 +31,11 @@ const SparePreviewScreen = ({ navigation, route }) => {
 
   const [loading, setLoading] = useState(true);
   const [vehicleDetails, setVehicleDetails] = useState(null);
+  const [showQuotaModal, setShowQuotaModal] = useState(false);
   const [editSpareDetails, seteditSpareDetails] = useState(null);
   const [isPublishing, setIsPublishing] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [showPublishAsSoldLottie, setShowPublishAsSoldLottie] = useState(false);
   const { formData, updateForm, clearFields } = useFormStore();
   useEffect(() => {
     if (!spareId) {
@@ -142,7 +145,7 @@ const SparePreviewScreen = ({ navigation, route }) => {
 
       if (appCode === 1000) {
         showToast('success', 'Success', 'Published Successfully');
-        navigateToHomeAndReset();
+        setShowPublishAsSoldLottie(true);
       } else if (appCode === 1085) {
         showToast('error', 'Already Published', 'Spare is already published and cannot be edited.');
       } else if (appCode === 1134 || appCode === 1126) {
@@ -230,6 +233,17 @@ const SparePreviewScreen = ({ navigation, route }) => {
         primaryButtonText="Ok"
         onPrimaryPress={() => InteractionManager.runAfterInteractions(() => setShowQuotaModal(false))}
         theme={theme}
+      />
+      <LottieCompo
+        visible={showPublishAsSoldLottie}
+        lottieSource={require('../../public_assets/media/lottie/Published.json')}
+        title="Asset Published"
+        description="Your asset has been published successfully."
+        buttonText="OK"
+        onClose={() => {
+          InteractionManager.runAfterInteractions(() => setShowPublishAsSoldLottie(false));
+          navigateToHomeAndReset();
+        }}
       />
     </BackgroundWrapper>
   );
