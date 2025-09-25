@@ -45,12 +45,13 @@ const MyAssetsScreen = ({ navigation }) => {
     const [priceModalVisible, setpriceModalVisible] = useState(false);
     const [inputPrize, setInputPrize] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const [listingCount, setListingCount] = useState('');
     const [hasMore, setHasMore] = useState(true);
     const [showMarkAsSoldLottie, setShowMarkAsSoldLottie] = useState(false);
     const [showDeleteAsSoldLottie, setShowDeleteAsSoldLottie] = useState(false);
     const [selectedAssetId, setSelectedAssetId] = useState(null);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    console.log('publishedAssets in MyAssetsScreen:', publishedAssets);
+    console.log('publishedAssets in listingCount:', listingCount);
 
     // ✅ Handle typing
     const formatNumberWithCommas = (text) => {
@@ -201,7 +202,8 @@ const MyAssetsScreen = ({ navigation }) => {
 
 
             const pagination = response?.data?.data?.assets?.pagination || {};
-            // const allowedNum = response?.data?.data?.assets?.allowedNum || {};
+            const allowedNum = response?.data?.data?.assets?.subscription || {};
+            setListingCount(allowedNum);
             setCurrentPage(pagination.currentPage || page);
             setHasMore(pagination.currentPage < pagination.totalPages);
 
@@ -459,10 +461,10 @@ const MyAssetsScreen = ({ navigation }) => {
                 </AppText>
                 <AppText style={[styles.noteText, { marginLeft: wp('2%'), color: theme.colors.text }]}>
                     {activeTab === 'publish'
-                        ? `(Published: ${currentData.length})`
+                        ? `(Published: ${currentData.length}/${listingCount?.listingsAllowed})`
                         : activeTab === 'draft'
-                            ? `(Drafts: ${currentData.length})`
-                            : `(Sold: ${currentData.length})`}
+                            ? `(Drafts: ${currentData.length}/${listingCount?.listingsAllowed})`
+                            : `(Sold: ${currentData.length}/${listingCount?.listingsAllowed})`}
                 </AppText>
             </View>
 
