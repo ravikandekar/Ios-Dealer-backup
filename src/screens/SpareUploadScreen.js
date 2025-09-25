@@ -31,6 +31,7 @@ import SubscriptionModal from '../components/SubscriptionModal';
 import Loader from '../components/Loader';
 import { check, request, PERMISSIONS, RESULTS, openSettings } from 'react-native-permissions';
 import PermissionSettingsModal from '../components/PermissionSettingsModal';
+import CustomAlertModal from '../components/CustomAlertModal';
 const SpareUploadScreen = ({ navigation }) => {
     const { theme, userID, selectedCategory } = useContext(AuthContext);
     const [modalVisible, setModalVisible] = useState(false);
@@ -40,6 +41,7 @@ const SpareUploadScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(false);
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
     const [settingsModalVisible, setSettingsModalVisible] = useState(false);
+    const [showQuotaModal, setShowQuotaModal] = useState(false);
     console.log('ffffff', formData.subscription_plan);
     const isEditing = formData?.isEditSpare;
 
@@ -293,7 +295,7 @@ const SpareUploadScreen = ({ navigation }) => {
                 clearFields([
                     'SpareBrandId', 'Sparedescription', 'Spareyear_of_manufacture',
                     'spareProductTypeId', 'Spareprice', 'spareConditionId',
-                    'SparePartNameId', 'Sparename', 'subproducttypeId', 'SpareyearId','images'
+                    'SparePartNameId', 'Sparename', 'subproducttypeId', 'SpareyearId', 'images'
                 ]);
                 updateForm('isEditSpare', false);
                 InteractionManager.runAfterInteractions(() => {
@@ -316,6 +318,10 @@ const SpareUploadScreen = ({ navigation }) => {
                 // ✅ Handle plan not purchased (appCode === 1126)
                 if (response.data?.appCode === 1126 || response.data?.appCode === 1003 || response.data?.appCode === 1134) {
                     setShowSubscriptionModal(true);
+                    return;
+                }
+                if (code === 1098) {
+                    setShowQuotaModal(true);
                     return;
                 }
 
@@ -505,6 +511,15 @@ const SpareUploadScreen = ({ navigation }) => {
                 message="Camera and storage permissions are required. Please enable them in settings."
             />
             <Loader visible={loading} />
+            <CustomAlertModal
+                visible={showQuotaModal}
+                onClose={() => InteractionManager.runAfterInteractions(() => setShowQuotaModal(false))}
+                title="Quota Exceeded"
+                message="You have reached your allowed limit. Delete Old products or Mark as Sold to free up space."
+                primaryButtonText="Ok"
+                onPrimaryPress={() => InteractionManager.runAfterInteractions(() => setShowQuotaModal(false))}
+                theme={theme}
+            />
         </BackgroundWrapper>
     );
 };

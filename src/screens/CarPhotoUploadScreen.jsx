@@ -32,6 +32,7 @@ import SubscriptionModal from '../components/SubscriptionModal';
 import { check, request, PERMISSIONS, RESULTS, openSettings } from 'react-native-permissions';
 import PermissionSettingsModal from '../components/PermissionSettingsModal';
 import Loader from '../components/Loader';
+import CustomAlertModal from '../components/CustomAlertModal';
 const CarPhotoUploadScreen = ({ navigation }) => {
     const { theme, userID, selectedCategory } = useContext(AuthContext);
     const [modalVisible, setModalVisible] = useState(false);
@@ -43,7 +44,7 @@ const CarPhotoUploadScreen = ({ navigation }) => {
     const [settingsModalVisible, setSettingsModalVisible] = useState(false);
     const isEditing = formData?.isEdit;
     console.log('ffffff', isEditing);
-
+    const [showQuotaModal, setShowQuotaModal] = useState(false);
     // Determine if it's a car or bike based on category_id or other identifier
     const isBike = selectedCategory?.toLowerCase() === 'bike';
     console.log('isBike', isBike);
@@ -295,8 +296,8 @@ const CarPhotoUploadScreen = ({ navigation }) => {
 
 
             // 5. Handle Success
-           
-       
+
+
             const responseData = response.data;
 
             // ✅ Check success based on appCode
@@ -315,7 +316,7 @@ const CarPhotoUploadScreen = ({ navigation }) => {
                 clearFields([
                     'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
                     'model_name', 'price', 'kmsDriven', 'transmissionId',
-                    'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id', 'model_name','images'
+                    'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id', 'model_name', 'images'
                 ]);
                 updateForm('isEdit', false);
                 InteractionManager.runAfterInteractions(() => {
@@ -343,21 +344,29 @@ const CarPhotoUploadScreen = ({ navigation }) => {
                 });
 
             } else {
-                // ✅ Handle plan not purchased (appCode === 1126)
-                if (responseData?.appCode === 1126 || responseData?.appCode === 1003 || responseData?.appCode === 1134 || responseData?.appCode === 1068) {
+                const code = responseData?.appCode;
+
+                // ✅ Handle subscription-related codes
+                if ([1126, 1003, 1134, 1068].includes(code)) {
                     setShowSubscriptionModal(true);
                     return;
                 }
 
-                // ✅ Handle validation error
-                if (responseData.code === 'VALIDATION_ERROR' && responseData.meta?.errors?.length) {
-                    const fieldErr = responseData.meta.errors[0];
-                    showToast('error', fieldErr.field, fieldErr.message);
-
-                } else {
-                    // ✅ Generic failure message
-                    showToast('error', 'Failed', responseData.message || 'Submission failed');
+                // ✅ Handle quota
+                if (code === 1098) {
+                    setShowQuotaModal(true);
+                    return;
                 }
+
+                // ✅ Handle validation error
+                if (responseData?.code === 'VALIDATION_ERROR' && responseData?.meta?.errors?.length) {
+                    const { field, message } = responseData.meta.errors[0];
+                    showToast('error', field, message);
+                    return;
+                }
+
+                // ✅ Fallback: generic failure
+                showToast('error', 'Failed', responseData?.message || 'Submission failed');
             }
 
         } catch (err) {
@@ -541,7 +550,15 @@ const CarPhotoUploadScreen = ({ navigation }) => {
                 message="Camera and storage permissions are required. Please enable them in settings."
             />
             <Loader visible={loading} />
-
+            <CustomAlertModal
+                visible={showQuotaModal}
+                onClose={() => InteractionManager.runAfterInteractions(() => setShowQuotaModal(false))}
+                title="Quota Exceeded"
+                message="You have reached your allowed limit. Delete Old products or Mark as Sold to free up space."
+                primaryButtonText="Ok"
+                onPrimaryPress={() => InteractionManager.runAfterInteractions(() => setShowQuotaModal(false))}
+                theme={theme}
+            />
         </BackgroundWrapper>
     );
 };

@@ -90,6 +90,7 @@ const MyAssetsScreen = ({ navigation }) => {
         isDeleted: item.isDeleted,
         deletionReason: item.deletionReason,
         isdisable: item.isdisable,
+        isDraft: item.isDraft,
     });
     const SpareformatAsset = item => ({
         id: item._id,
@@ -108,6 +109,7 @@ const MyAssetsScreen = ({ navigation }) => {
         isDeleted: item.isDeleted,
         deletionReason: item.deletionReason,
         isdisable: item.isdisable,
+        isDraft: item.isDraft,
     });
     const handlePriceNext = async () => {
         console.log('Selected edit option:', editModalData);
@@ -188,6 +190,7 @@ const MyAssetsScreen = ({ navigation }) => {
 
             const response = await apiClient.get(`/api/dealer/myassetRoute/${userID}?page=${page}&limit=${PAGE_SIZE}`);
             const allListings = response?.data?.data?.assets?.listings || [];
+            console.log('allListings:', allListings);
 
             // Filter out deleted items from the API response
             const activeListings = allListings.filter(item => !item.isDeleted);
@@ -198,13 +201,14 @@ const MyAssetsScreen = ({ navigation }) => {
 
 
             const pagination = response?.data?.data?.assets?.pagination || {};
+            // const allowedNum = response?.data?.data?.assets?.allowedNum || {};
             setCurrentPage(pagination.currentPage || page);
             setHasMore(pagination.currentPage < pagination.totalPages);
 
             if (refreshing) {
                 // Separate items based on their status
-                const published = formattedAssets.filter(item => item.isPublished === true && !item.isSold);
-                const drafts = formattedAssets.filter(item => item.isPublished === false && !item.isSold);
+                const published = formattedAssets.filter(item => item.isPublished === true && item.isSold === false);
+                const drafts = formattedAssets.filter(item => item.isDraft === true && item.isSold === false);
                 const sold = formattedAssets.filter(item => item.isSold === true);
 
                 setPublishedAssets(published);
@@ -212,8 +216,8 @@ const MyAssetsScreen = ({ navigation }) => {
                 setSoldAssets(sold);
             } else {
                 // For pagination, add new items to existing lists
-                const newPublished = formattedAssets.filter(item => item.isPublished === true && !item.isSold);
-                const newDrafts = formattedAssets.filter(item => item.isPublished === false && !item.isSold);
+                const newPublished = formattedAssets.filter(item => item.isPublished === true && item.isSold === false);
+                const newDrafts = formattedAssets.filter(item => item.isDraft === true && item.isSold === false);
                 const newSold = formattedAssets.filter(item => item.isSold === true);
 
                 setPublishedAssets(prev => [...prev, ...newPublished]);
