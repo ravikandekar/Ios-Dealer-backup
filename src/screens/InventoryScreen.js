@@ -232,6 +232,7 @@ const InventoryScreen = ({ navigation }) => {
         isSold: item?.isSold,
         isDeleted: item?.isDeleted,
         isdisable: item?.isdisable,
+        isExpired: item?.isExpired,
       }}
       theme={theme}
       onPressDelete={() => {

@@ -92,6 +92,7 @@ const MyAssetsScreen = ({ navigation }) => {
         deletionReason: item.deletionReason,
         isdisable: item.isdisable,
         isDraft: item.isDraft,
+        isExpired: item.isExpired,
     });
     const SpareformatAsset = item => ({
         id: item._id,
@@ -111,6 +112,7 @@ const MyAssetsScreen = ({ navigation }) => {
         deletionReason: item.deletionReason,
         isdisable: item.isdisable,
         isDraft: item.isDraft,
+        isExpired: item.isExpired,
     });
     const handlePriceNext = async () => {
         console.log('Selected edit option:', editModalData);

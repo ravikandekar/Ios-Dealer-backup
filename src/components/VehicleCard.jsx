@@ -18,6 +18,8 @@ const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPres
   const isSold = data?.isSold;
   const isDeleted = data?.isDeleted;
   const isActive = data?.isdisable || false;
+  const isExpired= data.isExpired
+
   const shareVehicleDetails = async () => {
     try {
       const shareData = {
@@ -56,6 +58,12 @@ const VehicleCard = ({ data, theme, onPressDelete, onPressShare, onPress, onPres
         <View style={[styles.overlayContainer, { backgroundColor: '#554040b8', alignItems: "flex-start", justifyContent: "flex-start", padding: wp('3%') }]}>
           <AppText style={styles.inactiveText}>this product is Inactive </AppText>
           <AppText style={[styles.inactiveTextdes,]}>This product has been deactivated by admin. Please contact support for assistance.</AppText>
+        </View>
+      )}
+      {isExpired && (
+        <View style={[styles.overlayContainer, { backgroundColor: '#554040b8', alignItems: "flex-start", justifyContent: "flex-start", padding: wp('3%') }]}>
+          <AppText style={styles.inactiveText}>Product Expired </AppText>
+          <AppText style={[styles.inactiveTextdes,]}>Your subscription has expired. Please renew to continue using the product.</AppText>
         </View>
       )}
       <View style={{ paddingTop: wp('3%'), }}>
