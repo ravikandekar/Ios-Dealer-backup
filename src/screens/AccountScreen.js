@@ -32,6 +32,7 @@ import { getRefreshToken, removeToken } from '../utils/storage';
 import { triggerLogout } from '../utils/LogoutFunction';
 import apiClient from '../utils/apiClient';
 import { showToast } from '../utils/toastService';
+import Loader from '../components/Loader';
 
 const iconStyle = {
   width: wp('7%'),
@@ -150,7 +151,8 @@ const AccountScreen = () => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
   const [feedbackVisible, setFeedbackVisible] = useState(false);
-  const [showThemeModal, setsShowThemeModal] = useState(false);
+  const [showThemeModal, setShowThemeModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     if (isAuthenticated) { // assuming you have a login state
       setLogoutModalVisible(false);
@@ -224,7 +226,6 @@ const AccountScreen = () => {
   const alllogout = async (userId) => {
 
     setLogoutModalVisible(false);
-    triggerLogout();
 
     const refreshToken = await getRefreshToken();
     // ✅ Always clean up locally
@@ -232,6 +233,7 @@ const AccountScreen = () => {
 
     console.log('✅ User logged out (local cleanup)');
     try {
+      setIsLoading(true);
       console.log('🚪 Logout pressed');
 
       if (!userId || !refreshToken) {
@@ -253,6 +255,7 @@ const AccountScreen = () => {
 
         if (appCode === 1000) {
           showToast('success', '', message || 'Logged out successfully.');
+          
         } else {
           showToast('error', '', message || 'Logout failed on server. Logging out locally.');
         }
@@ -261,10 +264,13 @@ const AccountScreen = () => {
       console.error('❌ Logout API error:', error);
       showToast('error', '', 'Something went wrong while logging out.');
     } finally {
+      setIsLoading(false);
       // // ✅ Always clean up locally
-      // InteractionManager.runAfterInteractions(() => {
-      //   setLogoutModalVisible(false);
-      // });
+      InteractionManager.runAfterInteractions(() => {
+        setLogoutModalVisible(false);
+        triggerLogout();
+
+      });
 
       // console.log('✅ User logged out (local cleanup)');
     }
@@ -325,7 +331,7 @@ const AccountScreen = () => {
                 navigation.navigate('TutorialScreen');
               }
               else if (item.title === 'Mark Attendance') {
-                setsShowThemeModal(true);
+                setShowThemeModal(true);
               }
               else {
                 console.log(`${item.title} pressed`);
@@ -367,12 +373,13 @@ const AccountScreen = () => {
       />
       <ThemeToggleModal
         visible={showThemeModal}
-        onClose={() => setsShowThemeModal(false)}
+        onClose={() => setShowThemeModal(false)}
         isDark={isDark}
         toggleTheme={toggleTheme}
         name={userName}
         userid={userID}
       />
+      <Loader visible={isLoading} />
     </BackgroundWrapper>
   );
 };
