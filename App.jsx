@@ -35,7 +35,12 @@ const AppContent = () => {
   // ✅ move initialize out so it can be reused (retry button)
   const initialize = useCallback(async () => {
     const isTokenValid = await checkToken();
-    if (!isTokenValid) return;
+    if (!isTokenValid) {
+      console.log("❌ No valid token, skipping initApp");
+      setIsAppReady(true);      // ✅ allow app to render login
+      setIsAppInitialized(true);
+      return;
+    }
 
     const response = await initApp({
       setUserID,
@@ -68,8 +73,6 @@ const AppContent = () => {
 
   return (
     <>
-      <RootNavigation />
-
       {/* ✅ Put LottieCompo inside returned JSX */}
       <LottieCompo
         visible={showMarkAsSoldLottie}
@@ -82,6 +85,7 @@ const AppContent = () => {
           InteractionManager.runAfterInteractions(() => initialize()); // 🔁 retry init
         }}
       />
+      <RootNavigation />
     </>
   );
 };
@@ -127,6 +131,7 @@ const App = () => {
           onRefresh={() => requestPermission(setSettingsModalVisible, setFcmToken)}
           refreshShow={true}
         />
+
       </NavigationContainer>
     </AuthProvider>
   );
