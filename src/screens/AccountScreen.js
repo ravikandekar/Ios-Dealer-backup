@@ -39,17 +39,6 @@ const iconStyle = {
   height: wp('7%'),
 };
 
-// const bannerItems = [
-//   {title: 'Profile Details', imageName: profileIcon, iconName:'user', imageIconStyle: iconStyle},
-//   {title: 'Subscriptions', imageName: subscriptions, imageIconStyle: iconStyle},
-//   {title: 'My Inventory', imageName: inventory, imageIconStyle: iconStyle},
-//   {title: 'Appearance', imageName: appearance, imageIconStyle: iconStyle},
-//   {title: 'Feedback & Ratings', imageName: feedbackRatings, imageIconStyle: iconStyle},
-//   {title: 'FAQs', imageName: faqs, imageIconStyle: iconStyle},
-//   {title: 'Terms & Conditions', imageName: termsCondition, imageIconStyle: iconStyle},
-//   {title: 'Privacy Policy', imageName: privacyPolicy, imageIconStyle: iconStyle},
-//   {title: 'Support Tickets', imageName: supportTickets, imageIconStyle: iconStyle},
-// ];
 
 const bannerItems = [
   {
