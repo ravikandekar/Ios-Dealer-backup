@@ -1,5 +1,5 @@
 // App.js
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import RootNavigation from './src/navigations/RootNavigation';
 import SplashScreen from './src/screens/SplashScreen';
@@ -15,10 +15,14 @@ import messaging from '@react-native-firebase/messaging';
 import InternetStatus from './src/components/InternetStatus';
 import { requestPermission, setupNotificationListeners } from './src/utils/NotificationService';
 import { handleNotificationData } from './src/utils/notifications';
-import { AppState } from 'react-native';
+import { Alert, AppState } from 'react-native';
+import LottieCompo from './src/components/LottieCompo';
+import { InteractionManager } from 'react-native';
 
 const AppContent = () => {
   const [isAppReady, setIsAppReady] = useState(false);
+  const [showMarkAsSoldLottie, setShowMarkAsSoldLottie] = useState(false);
+
   const { updateForm } = useFormStore();
   const {
     checkToken,
@@ -28,29 +32,58 @@ const AppContent = () => {
     userID, selectedCategory
   } = useContext(AuthContext);
 
+  // ✅ move initialize out so it can be reused (retry button)
+  const initialize = useCallback(async () => {
+    const isTokenValid = await checkToken();
+    if (!isTokenValid) return;
+
+    const response = await initApp({
+      setUserID,
+      setUserName,
+      setcityselected,
+      setProfileCompleted,
+      setisAadharVerified,
+      setBussinessdetails,
+      setregister,
+      setSelectedCategory,
+      updateForm,
+    });
+
+    if (response.success) {
+      console.log("✅ Init success, response:", response.data);
+    } else {
+      console.error("❌ Init failed:", response.error);
+      setShowMarkAsSoldLottie(true); // show retry animation
+    }
+
+    setIsAppInitialized(true);
+    setIsAppReady(true);
+  }, [checkToken, setUserID, setUserName, setcityselected, setProfileCompleted, setisAadharVerified, setBussinessdetails, setregister, setSelectedCategory, updateForm]);
+
   useEffect(() => {
-    const initialize = async () => {
-      try {
-        const isTokenValid = await checkToken();
-        if (isTokenValid) {
-          await initApp({
-            setUserID, setUserName, setcityselected, setProfileCompleted,
-            setisAadharVerified, setBussinessdetails, setregister,
-            setSelectedCategory, setIsAppInitialized, updateForm
-          });
-        }
-      } catch (error) {
-        console.error('❌ App initialization failed:', error.message);
-      } finally {
-        setIsAppInitialized(true);
-        setIsAppReady(true);
-      }
-    };
     initialize();
-  }, [selectedCategory]);
+  }, [initialize, selectedCategory]);
 
   if (!isAppReady || !isAppInitialized) return <SplashScreen />;
-  return <RootNavigation />;
+
+  return (
+    <>
+      <RootNavigation />
+
+      {/* ✅ Put LottieCompo inside returned JSX */}
+      <LottieCompo
+        visible={showMarkAsSoldLottie}
+        lottieSource={require('./public_assets/media/lottie/retry.json')}
+        title="Initialization Failed"
+        description="Something went wrong while setting up the app."
+        buttonText="Retry"
+        onClose={() => {
+          setShowMarkAsSoldLottie(false);
+          InteractionManager.runAfterInteractions(() => initialize()); // 🔁 retry init
+        }}
+      />
+    </>
+  );
 };
 
 const App = () => {
