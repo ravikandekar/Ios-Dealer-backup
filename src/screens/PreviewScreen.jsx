@@ -191,7 +191,7 @@ const PreviewScreen = ({ navigation, route }) => {
 
   const handleSubscribe = () => {
 
-    navigation.navigate('SubscriptionScreen');
+    navigation.replace('SubscriptionScreen');
     InteractionManager.runAfterInteractions(() => {
       setShowSubscriptionModal(false);
     });

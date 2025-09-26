@@ -38,7 +38,7 @@ const SubscriptionScreen = ({ navigation }) => {
   const purchaseErrorSubscriptionRef = useRef(null);
   const isProcessingPurchaseRef = useRef(false);
 
-  // console.log('iapProductshhhhhhhhh:', activePlanCardList);
+  console.log('iapProductshhhhhhhhh:', activePlanCardList);
 
   // Safe state setter that checks if component is mounted
   const safeSetState = (setter) => {
@@ -484,7 +484,13 @@ const SubscriptionScreen = ({ navigation }) => {
     <BackgroundWrapper style={{ padding: wp('1%') }}>
       <DetailsHeader
         title="Subscriptions"
-        onBackPress={() => navigation.goBack()}
+        onBackPress={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack(); // ✅ normal back
+          } else {
+            navigation.navigate("BottomTabNavigator"); // ✅ fallback
+          }
+        }}
       />
 
       <View style={{ marginTop: -hp('0.3%') }}>
@@ -531,7 +537,7 @@ const SubscriptionScreen = ({ navigation }) => {
                   price={sub?.subscription_plan_id?.price}
                   lastDate={new Date(sub?.start_date).toLocaleDateString()}
                   expiryDate={new Date(sub?.end_date).toLocaleDateString()}
-                  listings={`${sub?.listings_used || 0} Used`}
+                  listings={`${sub?.subscription_plan_id?.listings_allowed || 0} Used`}
                   onDownload={() => handleDownloadInvoice(sub._id)}
                 />
               ))

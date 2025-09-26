@@ -388,7 +388,7 @@ const SpareUploadScreen = ({ navigation }) => {
             setShowSubscriptionModal(false);
         });
 
-        navigation.navigate('SubscriptionScreen');
+        navigation.replace('SubscriptionScreen');
     };
     return (
         <BackgroundWrapper>
