@@ -233,7 +233,7 @@ const CarPhotoUploadScreen = ({ navigation }) => {
             formPayload.append('subscription_plan', formData?.subscription_plan);
             formPayload.append('ownership_other_text', formData?.carAndbike_ownership_other_text);
             formPayload.append('isPublished', actionType === 'save' ? 'false' : 'false');
-            formPayload.append('isDraft', actionType === 'save' ? 'true' : 'false');
+            formPayload.append('isDraft', actionType === 'save' ? 'true' : 'true');
 
             // 3. Safely compress images
             const validImages = images.filter(img => img?.uri);
@@ -328,20 +328,20 @@ const CarPhotoUploadScreen = ({ navigation }) => {
                 navigation.reset({
                     index: 0,
                     routes: [
-                        {
-                            name: actionType === 'publish' ? 'PreviewScreen' : 'PreviewScreen',
-                            params: actionType === 'publish'
-                                ? {
+                        actionType === 'publish'
+                            ? {
+                                name: 'PreviewScreen',
+                                params: {
                                     carandBikeId: createdVehicle?._id,
-                                    vehicleType: isBike ? 'bike' : 'car'
-                                }
-                                : {
-                                    carandBikeId: createdVehicle?._id,
-                                    vehicleType: isBike ? 'bike' : 'car'
-                                }
-                        },
+                                    vehicleType: isBike ? 'bike' : 'car',
+                                },
+                            }
+                            : {
+                                name: 'MyAssetsScreen',
+                            },
                     ],
                 });
+
 
             } else {
                 const code = responseData?.appCode;
@@ -421,7 +421,7 @@ const CarPhotoUploadScreen = ({ navigation }) => {
         //     'carAndBikeBrandId', 'carandBikeId', 'yearId', 'fuelTypeId', 'carColorId',
         //     'model_name', 'price', 'kmsDriven', 'transmissionId',
         //     'ownerHistoryId', 'isPublished', 'otherbrand', 'bike_type_id', 'model_name'
-        // ]);
+        // ]); 
 
         InteractionManager.runAfterInteractions(() => {
             setShowSubscriptionModal(false);

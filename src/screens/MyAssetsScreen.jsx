@@ -391,6 +391,13 @@ const MyAssetsScreen = ({ navigation }) => {
             <DetailsHeader
                 title="My Assets"
                 rightType="action"
+                onBackPress={() => {
+                    if (navigation.canGoBack()) {
+                        navigation.goBack(); // ✅ normal back
+                    } else {
+                        navigation.navigate("BottomTabNavigator"); // ✅ fallback
+                    }
+                }}
                 actionIcon="add-circle-outline"
                 actionText="Add New"
                 onActionPress={() => {

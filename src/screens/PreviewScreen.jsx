@@ -205,7 +205,13 @@ const PreviewScreen = ({ navigation, route }) => {
         actionIcon="pencil-sharp"
         actionText="Edit"
         onActionPress={onEditPress}
-        onBackPress={navigateToHomeAndReset}
+        onBackPress={() => {
+          if (navigation.canGoBack()) {
+            navigation.goBack(); // ✅ normal back
+          } else {
+            navigation.navigate("MyAssetsScreen"); // ✅ fallback
+          }
+        }}
       />
 
       <ScrollView

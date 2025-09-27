@@ -303,17 +303,25 @@ const SpareUploadScreen = ({ navigation }) => {
                 });
 
                 // Optional: Navigation logic if needed in the future
-                navigation.reset({
-                    index: 0,
-                    routes: [
-                        {
-                            name: 'SparePreviewScreen',
-                            params: {
-                                spareId: createdSpare?._id,
+                if (actionType === 'save') {
+                    navigation.reset({
+                        index: 0,
+                        routes: [{ name: 'MyAssetsScreen' }],
+                    });
+                } else {
+                    navigation.reset({
+                        index: 0,
+                        routes: [
+                            {
+                                name: 'SparePreviewScreen',
+                                params: { spareId: createdSpare?._id },
                             },
-                        },
-                    ],
-                });
+                        ],
+                    });
+                }
+
+
+
             } else {
                 // ✅ Handle plan not purchased (appCode === 1126)
                 if (response.data?.appCode === 1126 || response.data?.appCode === 1003 || response.data?.appCode === 1134) {

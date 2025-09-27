@@ -217,7 +217,13 @@ const AssetsPreviewScreen = ({ navigation }) => {
 
   return (
     <BackgroundWrapper style={{ padding: wp('2%') }}>
-      <DetailsHeader title="Assets Preview" />
+      <DetailsHeader title="Assets Preview" onBackPress={() => {
+        if (navigation.canGoBack()) {
+          navigation.goBack(); // ✅ normal back
+        } else {
+          navigation.navigate("MyAssetsScreen"); // ✅ fallback
+        }
+      }} />
 
       <ScrollView
         contentContainerStyle={{ marginTop: hp('2%') }}
